@@ -1,0 +1,55 @@
+MONEV PROJECT
+
+dashboard
+kode paket -> nama paket {udah}
+interaktif kursor jadi "menggu ke {5}" dan di jadikan {5}%
+
+pajabat (navbar menu pokja)
+
+konfigurasi set API secara terpisah
+3 input
+-api key
+-parameter
+-bearer token
+
+data entry
+detail kontrak, dia bs update data nya .
+email dan nomor telepon detail kontrak, lokasi dan alamat. dia bs update data 
+nomor 3 4 5
+semua mandatory(termasuk lampiran) selain kontrak
+di tambahkan label file apa saja yang bisa di gunakan
+
+jika kelompok kerja dia TIM (per kelompok), jika salah 1 sudah input, dia gk bakal bs input lagi, termasuk di pelaporan
+jumlah pendaftar dan measukan pnw di input di laporan kelompok kerja
+efesiensi nilai pagi dikurang nilai negosiasi, nilai kontrak input manual
+nilai negosisas/spk -> nilai negosiasi, nilai kontrak = detail kontrak, if kosong = tidak perhitungan, klo ada = perhitungan
+kode paket / no tender -> kode paket aja
+
+clear if change 
+
+123 dia enable jika kosong, dan disable jika sudah ada di API
+nah kalo 345 dia enable semua
+total harga -> negosisasi
+
+123 tidak bisa input
+345 dia bisa input
+
+RAB
+tanggal awal dan akhir di hapus, dipindahkan di jadwal
+label edit button -> revisi
+
+jadwal pelaksanaan
+validasi tanggal
+
+realisasi
+input sesuai minggu saat ini
+validasi tidak boleh hingga 100%
+revisi di bikin modelan RAB & jadwal	
+progress perencanaan dan actual mengikuti dari yang sudah di isi, bukan keseluruhan
+
+jadwal jika di ubah, realisasi akan terhapus
+
+
+
+admin
+semua data di isi {udah}

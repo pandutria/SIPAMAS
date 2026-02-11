@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "poppins-regular";
+    src: url('../public/fonts/Poppins-Regular.ttf');
+}
+
+@font-face {
+    font-family: "poppins-medium";
+    src: url('../public/fonts/Poppins-Medium.ttf');
+}
+
+@font-face {
+    font-family: "poppins-semibold";
+    src: url('../public/fonts/Poppins-SemiBold.ttf');
+}
+
+@font-face {
+    font-family: "poppins-bold";
+    src: url('../public/fonts/Poppins-Bold.ttf');
+}
+
+@theme {
+    --font-poppins-regular: "poppins-regular";
+    --font-poppins-medium: "poppins-medium";
+    --font-poppins-semibold: "poppins-semibold";
+    --font-poppins-bold: "poppins-bold";
+    --color-primary: #f60;
+    --color-secondary: #EA580C;
+    --color-third: #F97316;
+    --color-hover: #FFEDD5;
+    /* --color-primary: #1E40AF;
+    --color-secondary: #1E3A8A;
+    --color-third: #3B82F6;
+    --color-hover: #DBEAFE; */
+    /* --color-primary: #991B1B;
+    --color-secondary: #7F1D1D;
+    --color-third: #DC2626;
+    --color-hover: #FEE2E2; */
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #fff7ed;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff6600 0%, #ff8533 100%);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ff8533 0%, #ff6600 100%);
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes logoPop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes borderExpand {
+    from {
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    to {
+        width: 7rem;
+        height: 7rem;
+        opacity: 1;
+    }
+}

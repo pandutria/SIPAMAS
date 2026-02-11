@@ -1,0 +1,360 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useState } from "react";
+import API from "../server/API";
+import { SwalMessage } from "../utils/SwalMessage";
+import { useNavigate } from "react-router-dom";
+import SwalLoading from "../utils/SwalLoading";
+import { SortDescById } from "../utils/SortDescById";
+
+export default function useRealisasiHooks() {
+    const [realisasiData, setRealisasiData] = useState<RealizationProps[]>([]);
+    const [realisasiDataById, setRealisasiDataById] = useState<RealizationProps | null>(null);
+    const [week, setWeek] = useState<string | number>();
+    const [target, setTarget] = useState<string>("");
+    const [reason, setReason] = useState(null);
+    const [file, setFile] = useState<File | null>(null);
+    const [tahunData, setTahunData] = useState<any>([]);
+    const [satkerData, setSatkerData] = useState<any>([]);
+    const [selectedId, setSelectedId] = useState<any>(null);
+    const token = localStorage.getItem("token");
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchRealization = async () => {
+            try {
+                const response = await API.get("/realisasi", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const data = response.data.data;
+                const normalizeDetailByWeek = (details: RealizationDetailProps[]) => {
+                    const map = new Map<number, RealizationDetailProps>();
+
+                    details.forEach((d) => {
+                        const existing = map.get(d.week_number);
+
+                        if (!existing) {
+                            map.set(d.week_number, d);
+                        } else {
+                            if (d.alasan_count > existing.alasan_count) {
+                                map.set(d.week_number, d);
+                            }
+                        }
+                    });
+
+                    return Array.from(map.values());
+                };
+
+                const mappingData = data?.map((item: RealizationProps) => ({
+                    ...item,
+                    detail: item.detail
+                        ? normalizeDetailByWeek(item.detail)
+                        : [],
+                    tahun_anggaran: item?.schedule.rab?.data_entry.tahun_anggaran,
+                    satuan_kerja: item.schedule.rab?.data_entry.satuan_kerja,
+                    kode_rup: item.schedule.rab?.data_entry.kode_rup,
+                    kode_paket: item.schedule.rab?.data_entry.kode_paket,
+                    nama_paket: item.schedule.rab?.data_entry.nama_paket,
+                }))
+
+                const tahunUnique = Array.from(
+                    new Set(
+                        mappingData
+                            ?.map((item: { tahun_anggaran: any; }) => item.tahun_anggaran)
+                            .filter(Boolean)
+                    )
+                ).sort((a, b) => Number(b) - Number(a));
+
+                const tahunOptions = tahunUnique?.map((tahun, index) => ({
+                    id: index + 1,
+                    text: tahun?.toString()
+                }));
+
+                const satkerUnique = Array.from(
+                    new Set(
+                        mappingData
+                            ?.map((item: { satuan_kerja: any; }) => item.satuan_kerja)
+                            .filter(Boolean)
+                    )
+                );
+
+                const satkerOptions = [
+                    ...satkerUnique.map((satker, index) => ({
+                        id: index + 2,
+                        text: satker
+                    }))
+                ];
+
+                setRealisasiData(SortDescById(mappingData || []));
+                setSatkerData(satkerOptions);
+                setTahunData(tahunOptions);
+            } catch (error) {
+                if (error) {
+                    console.error("Terjadi Kesalahan");
+                }
+            }
+        }
+
+        const fetchRealizationById = async () => {
+            try {
+                if (!selectedId) return;
+                const response = await API.get(`/realisasi/${selectedId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const data = response.data.data;
+                const dataRevision = {
+                    ...data,
+                    detail: SortDescById(data.detail)
+                }
+
+                setRealisasiDataById(dataRevision);
+            } catch (error) {
+                if (error) {
+                    console.error("Terjadi Kesalahan");
+                }
+            }
+        }
+
+        fetchRealization();
+        fetchRealizationById();
+    }, [token, selectedId]);
+
+    const handleRealizationPost = async (selectedSchedule: ScheduleProps, weekComulatif: number, realizationWeekComulatif: number) => {
+        try {
+            if (!week || !target || !file) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Harap isi seluruh field!"
+                });
+
+                return;
+            }
+
+            if (realizationWeekComulatif + Number(target) > weekComulatif) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Realisasi data lebih besar dari jadwal!"
+                });
+
+                return;
+            }
+
+            SwalLoading();
+            const responseHeader = await API.post("/realisasi/create", {
+                schedule_header_id: selectedSchedule?.id
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const formData = new FormData();
+            formData.append("realisasi_header_id", responseHeader?.data?.data?.id);
+            formData.append("week_number", week.toString());
+            formData.append("value", target.toString());
+            formData.append("bukti_file", file);
+            if (reason) {
+                formData.append("alasan_text", reason);
+            }
+            const responseChild = await API.post("/realisasi/detail/create", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            SwalMessage({
+                type: "success",
+                title: "Berhasil!",
+                text: responseChild.data.message
+            });
+
+            setTimeout(() => {
+                navigate("/ppk/realisasi-pekerjaan/");
+            }, 2000);
+        } catch (error: any) {
+            if (error) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: error.response.data.message
+                })
+            }
+        }
+    }
+
+    const handleRealizationPut = async (
+        selectedRealization: RealizationProps,
+        weekComulatif: number,
+    ) => {
+        try {
+            if (!week || !target || !file) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Harap isi seluruh field!"
+                });
+                return;
+            }
+
+            const currentWeek = Number(week);
+            const inputValue = Number(target);
+
+            const weekScheduleLimit = selectedRealization!.schedule.items!.reduce(
+                (sum, item) => {
+                    const weekData = item.schedule_weeks.find(
+                        w => w.week_number === currentWeek
+                    );
+                    return sum + Number(weekData?.value || 0);
+                },
+                0
+            );
+
+            const normalizeTotal = (
+                details: RealizationDetailProps[] = []
+            ): Map<number, number> => {
+                const map = new Map<number, RealizationDetailProps[]>();
+
+                for (const item of details) {
+                    if (!map.has(item.week_number)) {
+                        map.set(item.week_number, []);
+                    }
+                    map.get(item.week_number)!.push(item);
+                }
+
+                const result = new Map<number, number>();
+
+                for (const [week, items] of map.entries()) {
+                    const maxAlasan = Math.max(...items.map(i => i.alasan_count));
+
+                    if (maxAlasan === 0) {
+                        result.set(
+                            week,
+                            items.reduce((s, i) => s + Number(i.value || 0), 0)
+                        );
+                    } else {
+                        const chosen = items.reduce((a, b) =>
+                            b.alasan_count > a.alasan_count ? b : a
+                        );
+                        result.set(week, Number(chosen.value || 0));
+                    }
+                }
+
+                return result;
+            };
+
+            const normalized = normalizeTotal(selectedRealization.detail || []);
+
+            const totalUsed = Array.from(normalized.entries()).reduce(
+                (sum, [weekNum, value]) =>
+                    weekNum !== currentWeek ? sum + value : sum,
+                0
+            );
+
+            const remainingTotal = weekComulatif - totalUsed;
+
+            if (inputValue > weekScheduleLimit) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: `Nilai maksimal minggu ${currentWeek} adalah ${weekScheduleLimit}`
+                });
+                return;
+            }
+
+            if (inputValue > remainingTotal) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: `Sisa total realisasi hanya ${remainingTotal}`
+                });
+                return;
+            }
+
+            const previousValue = selectedRealization.detail?.some(
+                d => d.week_number === currentWeek
+            );
+
+            if (previousValue && !reason) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Alasan wajib diisi!"
+                });
+                return;
+            }
+
+            SwalLoading();
+
+            const formData = new FormData();
+            formData.append(
+                "realisasi_header_id",
+                selectedRealization.id.toString()
+            );
+            formData.append("week_number", currentWeek.toString());
+            formData.append("value", inputValue.toString());
+            formData.append("bukti_file", file);
+
+            if (reason) {
+                formData.append("alasan_text", reason);
+            }
+
+            const responseChild = await API.post(
+                "/realisasi/detail/create",
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            SwalMessage({
+                type: "success",
+                title: "Berhasil!",
+                text: responseChild.data.message
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+
+        } catch (error: any) {
+            SwalMessage({
+                type: "error",
+                title: "Gagal!",
+                text: error?.response?.data?.message || "Terjadi kesalahan"
+            });
+        }
+    };
+
+
+    const handleChangeRealization = (e: React.ChangeEvent<any>) => {
+        const { name, value, files } = e.target;
+        if (name == "week") return setWeek(value);
+        if (name == "target") return setTarget(value);
+        if (name == "reason") return setReason(value);
+        if (name == "file") return setFile(files?.[0] || null)
+    }
+
+    return {
+        realisasiData,
+        handleRealizationPost,
+        handleChangeRealization,
+        week,
+        target,
+        file,
+        tahunData,
+        satkerData,
+        setSelectedId,
+        realisasiDataById,
+        handleRealizationPut,
+        reason
+    }
+}
