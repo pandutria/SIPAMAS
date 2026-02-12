@@ -18,5 +18,10 @@ func SetupRoutes(r *gin.Engine) {
 	private.Use(middlewares.BearerAuth())
 	{
 		private.GET("/auth/me", controllers.Me)
+
+		private.GET("/identitas-proyek", controllers.GetAllIdentitas)
+		private.GET("/identitas-proyek/:id", controllers.GetIdentitasById)
+		private.POST("/identitas-proyek/create", controllers.CreateIdentitas)
+		private.PUT("/identitas-proyek/update", controllers.UpdateIdentitas)
 	}
 }

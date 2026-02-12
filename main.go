@@ -19,6 +19,7 @@ func main() {
 
 	config.DB.AutoMigrate(
 		&models.User{},
+		&models.IdentitasProyek{},
 	)
 
 	r.Use(cors.New(cors.Config{
