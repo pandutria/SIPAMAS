@@ -38,7 +38,7 @@ func CreateUser(c *gin.Context) {
 	profilePath, err := utils.SaveUploadedFile(
 		c,
 		profileFile,
-		"assets/profile_photos",
+		"assets/photo",
 	)
 
 	if err != nil {
@@ -53,7 +53,7 @@ func CreateUser(c *gin.Context) {
 	skPath, err := utils.SaveUploadedFile(
 		c,
 		skFile,
-		"assets/sk_files",
+		"assets/file",
 	)
 
 	if err != nil {

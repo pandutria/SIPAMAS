@@ -13,7 +13,11 @@ import (
 func GetAllIdentitas(c *gin.Context) {
 	query := config.DB
 	var data []models.IdentitasProyek
-	if err := query.Find(&data).Error; err != nil {
+	if err := query.
+		Preload("CreatedBy").
+		Preload("Photos").
+		Preload("Documents").
+		Find(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
 			"error":   err.Error(),
@@ -30,7 +34,11 @@ func GetIdentitasById(c *gin.Context) {
 	query := config.DB
 	id := c.Param("id")
 	var data models.IdentitasProyek
-	if err := query.First(&data, id).Error; err != nil {
+	if err := query.
+		Preload("CreatedBy").
+		Preload("Photos").
+		Preload("Documents").
+		First(&data, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
 			"error":   err.Error(),
@@ -71,6 +79,42 @@ func CreateIdentitas(c *gin.Context) {
 		return
 	}
 
+	kontrakFile, _ := c.FormFile("kontrak_file")
+	kontrakPath, err := utils.SaveUploadedFile(
+		c,
+		kontrakFile,
+		"assets/file",
+	)
+
+	suratPerintahFile, _ := c.FormFile("surat_perintah_file")
+	suratPerintahPath, err := utils.SaveUploadedFile(
+		c,
+		suratPerintahFile,
+		"assets/file",
+	)
+
+	suratPenunjukanFile, _ := c.FormFile("surat_penunjukan_file")
+	suratPenunjukanPath, err := utils.SaveUploadedFile(
+		c,
+		suratPenunjukanFile,
+		"assets/file",
+	)
+
+	beritaAcaraFile, _ := c.FormFile("berita_acara_file")
+	beritaAcaraPath, err := utils.SaveUploadedFile(
+		c,
+		beritaAcaraFile,
+		"assets/file",
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Upload Kontrak file gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
 	if utils.NilIfEmpty(req.Nama) == nil ||
 		utils.NilIfEmpty(req.TahunAnggaran) == nil ||
 		utils.NilIfEmpty(req.Kategori) == nil ||
@@ -88,16 +132,20 @@ func CreateIdentitas(c *gin.Context) {
 	}
 
 	data := models.IdentitasProyek{
-		Nama:          utils.NilIfEmpty(req.Nama),
-		TahunAnggaran: utils.NilIfEmpty(req.TahunAnggaran),
-		Kategori:      utils.NilIfEmpty(req.Kategori),
-		Provinsi:      utils.NilIfEmpty(req.Provinsi),
-		Kabupaten:     utils.NilIfEmpty(req.Kabupaten),
-		Kecamatan:     utils.NilIfEmpty(req.Kecamatan),
-		Kelurahan:     utils.NilIfEmpty(req.Kelurahan),
-		Latitude:      utils.NilIfEmpty(req.Latitude),
-		Longitude:     utils.NilIfEmpty(req.Longitude),
-		CreatedById:   &user.ID,
+		Nama:                utils.NilIfEmpty(req.Nama),
+		TahunAnggaran:       utils.NilIfEmpty(req.TahunAnggaran),
+		Kategori:            utils.NilIfEmpty(req.Kategori),
+		Provinsi:            utils.NilIfEmpty(req.Provinsi),
+		Kabupaten:           utils.NilIfEmpty(req.Kabupaten),
+		Kecamatan:           utils.NilIfEmpty(req.Kecamatan),
+		Kelurahan:           utils.NilIfEmpty(req.Kelurahan),
+		Latitude:            utils.NilIfEmpty(req.Latitude),
+		Longitude:           utils.NilIfEmpty(req.Longitude),
+		KontrakFile:         utils.NilIfEmpty(*kontrakPath),
+		SuratPerintahFile:   utils.NilIfEmpty(*suratPerintahPath),
+		SuratPenunjukanFile: utils.NilIfEmpty(*suratPenunjukanPath),
+		BeritaAcaraFile:     utils.NilIfEmpty(*beritaAcaraPath),
+		CreatedById:         &user.ID,
 	}
 
 	if err := config.DB.Create(&data).Error; err != nil {
@@ -110,7 +158,7 @@ func CreateIdentitas(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }
 
@@ -147,7 +195,7 @@ func UpdateIdentitas(c *gin.Context) {
 	if err := query.First(&data, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengubah data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -165,14 +213,14 @@ func UpdateIdentitas(c *gin.Context) {
 	if err := query.Save(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengubah data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengubah data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }
 
@@ -184,22 +232,60 @@ func DeleteIdentitas(c *gin.Context) {
 	if err := query.First(&data, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
-		
+
+		return
+	}
+
+	var photo []models.IdentitasProyekPhoto
+	if err := query.
+		Where("identitas_proyek_id = ?", data.ID).
+		Find(&photo).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&photo).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var document []models.IdentitasProyekDocument
+	if err := query.
+		Where("identitas_proyek_id = ?", data.ID).
+		Find(&document).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&document).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
 		return
 	}
 
 	if err := query.Delete(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusInternalServerError, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "Menghapus data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }
