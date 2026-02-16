@@ -13,6 +13,10 @@ type IdentitasProyek struct {
 	Kelurahan           *string   `json:"kelurahan"`
 	Latitude            *string   `json:"latitude"`
 	Longitude           *string   `json:"longitude"`
+	NilaiKontrak        *string   `json:"nilai_kontrak"`
+	KontraktorPelaksana *string   `json:"kontraktor_pelaksana"`
+	KonsultasPengawas   *string   `json:"konsultas_pengawas"`
+	SumberDana          *string   `json:"sumber_dana"`
 	KontrakFile         *string   `json:"kontrak_file"`
 	SuratPerintahFile   *string   `json:"surat_perintah_file"`
 	SuratPenunjukanFile *string   `json:"surat_penunjukan_file"`

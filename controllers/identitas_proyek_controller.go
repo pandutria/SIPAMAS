@@ -123,7 +123,11 @@ func CreateIdentitas(c *gin.Context) {
 		utils.NilIfEmpty(req.Kecamatan) == nil ||
 		utils.NilIfEmpty(req.Kelurahan) == nil ||
 		utils.NilIfEmpty(req.Latitude) == nil ||
-		utils.NilIfEmpty(req.Longitude) == nil {
+		utils.NilIfEmpty(req.Longitude) == nil ||
+		utils.NilIfEmpty(req.NilaiKontrak) == nil ||
+		utils.NilIfEmpty(req.KontraktorPelaksana) == nil ||
+		utils.NilIfEmpty(req.KonsultasPengawas) == nil ||
+		utils.NilIfEmpty(req.SumberDana) == nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Semua input wajib di isi!",
@@ -141,6 +145,10 @@ func CreateIdentitas(c *gin.Context) {
 		Kelurahan:           utils.NilIfEmpty(req.Kelurahan),
 		Latitude:            utils.NilIfEmpty(req.Latitude),
 		Longitude:           utils.NilIfEmpty(req.Longitude),
+		NilaiKontrak:        utils.NilIfEmpty(req.NilaiKontrak),
+		KontraktorPelaksana: utils.NilIfEmpty(req.KontraktorPelaksana),
+		KonsultasPengawas:   utils.NilIfEmpty(req.KonsultasPengawas),
+		SumberDana:          utils.NilIfEmpty(req.SumberDana),
 		KontrakFile:         utils.NilIfEmpty(*kontrakPath),
 		SuratPerintahFile:   utils.NilIfEmpty(*suratPerintahPath),
 		SuratPenunjukanFile: utils.NilIfEmpty(*suratPenunjukanPath),
@@ -175,18 +183,38 @@ func UpdateIdentitas(c *gin.Context) {
 		return
 	}
 
-	if utils.NilIfEmpty(req.Nama) == nil ||
-		utils.NilIfEmpty(req.TahunAnggaran) == nil ||
-		utils.NilIfEmpty(req.Kategori) == nil ||
-		utils.NilIfEmpty(req.Provinsi) == nil ||
-		utils.NilIfEmpty(req.Kabupaten) == nil ||
-		utils.NilIfEmpty(req.Kecamatan) == nil ||
-		utils.NilIfEmpty(req.Kelurahan) == nil ||
-		utils.NilIfEmpty(req.Latitude) == nil ||
-		utils.NilIfEmpty(req.Longitude) == nil {
+	kontrakFile, _ := c.FormFile("kontrak_file")
+	kontrakPath, err := utils.SaveUploadedFile(
+		c,
+		kontrakFile,
+		"assets/file",
+	)
 
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Semua input wajib di isi!",
+	suratPerintahFile, _ := c.FormFile("surat_perintah_file")
+	suratPerintahPath, err := utils.SaveUploadedFile(
+		c,
+		suratPerintahFile,
+		"assets/file",
+	)
+
+	suratPenunjukanFile, _ := c.FormFile("surat_penunjukan_file")
+	suratPenunjukanPath, err := utils.SaveUploadedFile(
+		c,
+		suratPenunjukanFile,
+		"assets/file",
+	)
+
+	beritaAcaraFile, _ := c.FormFile("berita_acara_file")
+	beritaAcaraPath, err := utils.SaveUploadedFile(
+		c,
+		beritaAcaraFile,
+		"assets/file",
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Upload file gagal",
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -200,15 +228,39 @@ func UpdateIdentitas(c *gin.Context) {
 		return
 	}
 
-	data.Nama = utils.NilIfEmpty(req.Nama)
-	data.TahunAnggaran = utils.NilIfEmpty(req.TahunAnggaran)
-	data.Kategori = utils.NilIfEmpty(req.Kategori)
-	data.Provinsi = utils.NilIfEmpty(req.Provinsi)
-	data.Kabupaten = utils.NilIfEmpty(req.Kabupaten)
-	data.Kecamatan = utils.NilIfEmpty(req.Kecamatan)
-	data.Kelurahan = utils.NilIfEmpty(req.Kelurahan)
-	data.Latitude = utils.NilIfEmpty(req.Latitude)
-	data.Longitude = utils.NilIfEmpty(req.Longitude)
+	utils.SetIfNotEmpty(&data.Nama, req.Nama)
+	utils.SetIfNotEmpty(&data.TahunAnggaran, req.TahunAnggaran)
+	utils.SetIfNotEmpty(&data.Kategori, req.Kategori)
+	utils.SetIfNotEmpty(&data.Provinsi, req.Provinsi)
+	utils.SetIfNotEmpty(&data.Kabupaten, req.Kabupaten)
+	utils.SetIfNotEmpty(&data.Kecamatan, req.Kecamatan)
+	utils.SetIfNotEmpty(&data.Kelurahan, req.Kelurahan)
+	utils.SetIfNotEmpty(&data.Latitude, req.Latitude)
+	utils.SetIfNotEmpty(&data.Longitude, req.Longitude)
+	utils.SetIfNotEmpty(&data.NilaiKontrak, req.NilaiKontrak)
+	utils.SetIfNotEmpty(&data.KontraktorPelaksana, req.KontraktorPelaksana)
+	utils.SetIfNotEmpty(&data.KonsultasPengawas, req.KonsultasPengawas)
+	utils.SetIfNotEmpty(&data.SumberDana, req.SumberDana)
+
+	if kontrakPath != nil {
+		data.KontrakFile = kontrakPath
+	}
+
+	if suratPerintahPath != nil {
+		data.SuratPerintahFile = suratPenunjukanPath
+	}
+
+	if suratPenunjukanPath != nil {
+		data.SuratPenunjukanFile = suratPenunjukanPath
+	}
+
+	if suratPenunjukanPath != nil {
+		data.SuratPenunjukanFile = suratPenunjukanPath
+	}
+
+	if beritaAcaraPath != nil {
+		data.BeritaAcaraFile = beritaAcaraPath
+	}
 
 	if err := query.Save(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -235,6 +287,24 @@ func DeleteIdentitas(c *gin.Context) {
 			"error":   err.Error(),
 		})
 
+		return
+	}
+
+	var rab []models.RabHeader
+	if err := query.
+		Where("identitas_proyek_id = ?", data.ID).
+		Find(&rab).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if len(rab) > 0 {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Paket Pekerjaan Konstruksi sudah di-assign ke user PPK",
+		})
 		return
 	}
 

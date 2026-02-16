@@ -18,6 +18,7 @@ func SetupRoutes(r *gin.Engine) {
 	private.Use(middlewares.BearerAuth())
 	{
 		private.GET("/auth/me", controllers.Me)
+		private.PUT("/auth/update", controllers.UpdateProfile)
 
 		private.GET("/identitas-proyek", controllers.GetAllIdentitas)
 		private.GET("/identitas-proyek/:id", controllers.GetIdentitasById)
@@ -32,5 +33,17 @@ func SetupRoutes(r *gin.Engine) {
 		private.GET("/identitas-proyek/document", controllers.GetAllIdentitasProyekDocument)
 		private.GET("/identitas-proyek/document/:id", controllers.GetIdentitasProyekDocumentById)
 		private.POST("/identitas-proyek/document/create", controllers.CreateIdentitasProyekDocument)
+
+		private.GET("/rab", controllers.GetAllRabHader)
+		private.GET("/rab/:id", controllers.GetRabHaderById)
+		private.POST("/rab/create", controllers.CreateRabHeader)
+		private.DELETE("/rab/delete/:id", controllers.DeleteRab)
+
+		private.GET("/rab/detail", controllers.GetAllRabDetail)
+		private.POST("/rab/detail/create", controllers.CreateRabDetail)
+
+		private.GET("/schedule", controllers.GetAllScheduleHeader)
+		private.GET("/schedule/:id", controllers.GetScheduleHeaderById)
+		private.POST("/schedule/create", controllers.CreateScheduleHeader)
 	}
 }

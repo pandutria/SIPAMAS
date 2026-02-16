@@ -13,6 +13,6 @@ type User struct {
 	SkNumber     *string `json:"sk_number"`
 	SkFile       *string `json:"sk_file"`
 	Role         *string `json:"role"`
-	IsActive     *bool   `json:"is_active"`
+	IsActive     *string   `json:"is_active"`
 	Jabatan      *string `json:"jabatan"`
 }

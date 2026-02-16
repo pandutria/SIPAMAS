@@ -13,7 +13,7 @@ import (
 
 func CreateUser(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreateUserRequest
+	var req dtos.CreateAndUpdateUserRequest
 
 	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -64,12 +64,6 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	var isActive *bool
-	if utils.NilIfEmpty(req.IsActive) != nil {
-		val := req.IsActive == "true"
-		isActive = &val
-	}
-
 	user := models.User{
 		FullName:     utils.NilIfEmpty(req.FullName),
 		Email:        utils.NilIfEmpty(req.Email),
@@ -82,7 +76,7 @@ func CreateUser(c *gin.Context) {
 		ProfilePhoto: profilePath,
 		SkNumber:     utils.NilIfEmpty(req.SkNumber),
 		SkFile:       skPath,
-		IsActive:     isActive,
+		IsActive:     utils.NilIfEmpty(req.IsActive),
 		Jabatan:      utils.NilIfEmpty(req.Jabatan),
 	}
 
@@ -97,6 +91,98 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
 		"data":    user,
+	})
+}
+
+func UpdateProfile(c *gin.Context) {
+	query := config.DB
+	var req dtos.CreateAndUpdateUserRequest
+	userID, exists := c.Get("user_id")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Membuat data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	profileFile, _ := c.FormFile("profile_file")
+	profilePath, err := utils.SaveUploadedFile(
+		c,
+		profileFile,
+		"assets/photo",
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Upload profile photo gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	skFile, _ := c.FormFile("sk_file")
+	skPath, err := utils.SaveUploadedFile(
+		c,
+		skFile,
+		"assets/file",
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Upload SK file gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var data models.User
+	if err := query.First(&data, userID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Mengubah data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	utils.SetIfNotEmpty(&data.FullName, req.FullName)
+	utils.SetIfNotEmpty(&data.Email, req.Email)
+	utils.SetIfNotEmpty(&data.Role, req.Role)
+	utils.SetIfNotEmpty(&data.Nik, req.Nik)
+	utils.SetIfNotEmpty(&data.PhoneNumber, req.PhoneNumber)
+	utils.SetIfNotEmpty(&data.Address, req.Address)
+	utils.SetIfNotEmpty(&data.Nip, req.Nip)
+	utils.SetIfNotEmpty(&data.SkNumber, req.SkNumber)
+	utils.SetIfNotEmpty(&data.SkNumber, req.SkNumber)
+	utils.SetIfNotEmpty(&data.Jabatan, req.Jabatan)
+
+	if profilePath != nil {
+		data.ProfilePhoto = profilePath
+	}
+
+	if skPath != nil {
+		data.SkFile = skPath
+	}
+
+	if err := query.Save(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Mengubah data gagal",
+			"error":  err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Mengubah data berhasil",
+		"data":    data,
 	})
 }
 

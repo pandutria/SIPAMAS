@@ -47,7 +47,7 @@ func GetIdentitasProyekDocumentById(c *gin.Context) {
 
 func CreateIdentitasProyekDocument(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreateIdentitasProyekDocument
+	var req dtos.CreateIdentitasProyekDocumentRequest
 
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

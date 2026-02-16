@@ -1,6 +1,6 @@
 package dtos
 
-type CreateUserRequest struct {
+type CreateAndUpdateUserRequest struct {
 	FullName    string `form:"fullname"`
 	Email       string `form:"email"`
 	Nik         string `form:"nik"`
