@@ -45,5 +45,15 @@ func SetupRoutes(r *gin.Engine) {
 		private.GET("/schedule", controllers.GetAllScheduleHeader)
 		private.GET("/schedule/:id", controllers.GetScheduleHeaderById)
 		private.POST("/schedule/create", controllers.CreateScheduleHeader)
+		private.DELETE("/schedule/delete/:id", controllers.DeleteSchedule)
+
+		private.GET("/schedule/item", controllers.GetAllScheduleItem)
+		private.POST("/schedule/item/create", controllers.CreateScheduleItem)
+
+		private.GET("/schedule/week", controllers.GetAllScheduleWeek)
+		private.POST("/schedule/week/create", controllers.CreateScheduleWeek)
+
+		private.GET("/realisasi", controllers.GetAllRealisasiHeader)
+		private.POST("/realisasi/create", controllers.CreateRealisasiHeader)
 	}
 }

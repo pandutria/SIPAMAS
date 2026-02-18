@@ -14,7 +14,8 @@ func BearerAuth() gin.HandlerFunc {
 		auth := c.GetHeader("Authorization")
 		if auth == "" || !strings.HasPrefix(auth, "Bearer ") {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"message": "Unauthorized",
+				"message": "Pengguna harus masuk terlebih dahulu",
+				"error":   "Unauthorized",
 			})
 			return
 		}
@@ -27,7 +28,8 @@ func BearerAuth() gin.HandlerFunc {
 
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"message": "Invalid token",
+				"message": "Pengguna harus masuk terlebih dahulu",
+				"error":   "Invalid token",
 			})
 			return
 		}

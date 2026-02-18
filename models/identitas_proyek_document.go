@@ -4,7 +4,7 @@ import "time"
 
 type IdentitasProyekDocument struct {
 	ID                uint      `gorm:"primaryKey" json:"id"`
-	IdentitasProyekId uint     `json:"identitas_proyek_id"`
+	IdentitasProyekId uint      `json:"identitas_proyek_id"`
 	Name              *string   `json:"name"`
 	Kategori          *string   `json:"kategori"`
 	PhotoFile         *string   `json:"photo_file"`

@@ -14,6 +14,7 @@ type ScheduleHeader struct {
 	CreatedAt       time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt       time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 
-	CreatedBy *User      `gorm:"foreignKey:CreatedById" json:"created_by"`
-	Rab       *RabHeader `gorm:"foreignKey:RabId" json:"rab"`
+	CreatedBy *User           `gorm:"foreignKey:CreatedById" json:"created_by"`
+	Rab       *RabHeader      `gorm:"foreignKey:RabId" json:"rab"`
+	Items     *[]ScheduleItem `gorm:"foreignKey:ScheduleHeaderId" json:"items"`
 }

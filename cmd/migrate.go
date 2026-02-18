@@ -16,5 +16,8 @@ func main() {
 		&models.RabHeader{},
 		&models.RabDetail{},
 		&models.ScheduleHeader{},
+		&models.ScheduleItem{},
+		&models.ScheduleWeek{},
+		&models.RealisasiHeader{},
 	)
 }

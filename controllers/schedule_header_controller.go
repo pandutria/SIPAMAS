@@ -16,6 +16,8 @@ func GetAllScheduleHeader(c *gin.Context) {
 
 	if err := query.
 		Preload("CreatedBy").
+		Preload("Items").
+		Preload("Items.Weeks").
 		Preload("Rab.IdentitasProyek").
 		Preload("Rab.IdentitasProyek.CreatedBy").
 		Preload("Rab.IdentitasProyek.Photos").
@@ -31,7 +33,7 @@ func GetAllScheduleHeader(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengambil data berhasil",
-		"error":   data,
+		"data":    data,
 	})
 }
 
@@ -42,6 +44,8 @@ func GetScheduleHeaderById(c *gin.Context) {
 
 	if err := query.
 		Preload("CreatedBy").
+		Preload("Items").
+		Preload("Items.Weeks").
 		Preload("Rab.IdentitasProyek").
 		Preload("Rab.IdentitasProyek.CreatedBy").
 		Preload("Rab.IdentitasProyek.Photos").
@@ -57,7 +61,7 @@ func GetScheduleHeaderById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengambil data berhasil",
-		"error":   data,
+		"data":    data,
 	})
 }
 
@@ -166,6 +170,88 @@ func CreateScheduleHeader(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
+		"data":    data,
+	})
+}
+
+func DeleteSchedule(c *gin.Context) {
+	query := config.DB
+	id := c.Param("id")
+	var data models.ScheduleHeader
+
+	if err := query.First(&data, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var realisasi []models.RealisasiHeader
+	if err := query.Where("schedule_header_id = ?", data.ID).Find(&realisasi).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if len(realisasi) > 0 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Paket Pekerjaan Konstruksi sudah di-assign ke user PPK",
+		})
+		return
+	}
+
+	var item []models.ScheduleItem
+	if err := query.Where("schedule_header_id = ?", data.ID).Find(&item).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var itemIDs []uint
+	for _, i := range item {
+		itemIDs = append(itemIDs, i.ID)
+	}
+
+	var week []models.ScheduleWeek
+	if err := query.Where("schedule_item_id = ?", itemIDs).Find(&week).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&week).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&item).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Menghapus data berhasil",
 		"data":    data,
 	})
 }
