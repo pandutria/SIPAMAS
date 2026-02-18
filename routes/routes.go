@@ -20,6 +20,8 @@ func SetupRoutes(r *gin.Engine) {
 		private.GET("/auth/me", controllers.Me)
 		private.PUT("/auth/update", controllers.UpdateProfile)
 
+		private.GET("/user", controllers.GetAllUser)
+
 		private.GET("/identitas-proyek", controllers.GetAllIdentitas)
 		private.GET("/identitas-proyek/:id", controllers.GetIdentitasById)
 		private.POST("/identitas-proyek/create", controllers.CreateIdentitas)
@@ -55,5 +57,8 @@ func SetupRoutes(r *gin.Engine) {
 
 		private.GET("/realisasi", controllers.GetAllRealisasiHeader)
 		private.POST("/realisasi/create", controllers.CreateRealisasiHeader)
+
+		private.GET("/realisasi/detail", controllers.GetAllRealisasiDetail)
+		private.POST("/realisasi/detail/create", controllers.CreateRealisasiDetail)
 	}
 }

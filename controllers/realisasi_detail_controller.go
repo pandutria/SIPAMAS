@@ -41,6 +41,16 @@ func CreateRealisasiDetail(c *gin.Context) {
 	}
 
 	buktiFile, _ := c.FormFile("bukti_file")
+
+	if utils.NilIfEmpty(req.Nilai) == nil ||
+		utils.NilIfEmpty(utils.ToString(req.RealisasiHeaderId)) == nil ||
+		buktiFile == nil || utils.NilIfEmpty(utils.ToString(req.MingguNomor)) == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Semua input wajib di isi",
+		})
+		return
+	}
+
 	buktiPath, err := utils.SaveUploadedFile(
 		c,
 		buktiFile,
@@ -61,7 +71,7 @@ func CreateRealisasiDetail(c *gin.Context) {
 		Where(
 			"realisasi_header_id = ? AND week_number = ?",
 			req.RealisasiHeaderId,
-			req.WeekNumber,
+			req.MingguNomor,
 		).
 		Select("COALESCE(MAX(alasan_count), -1)").
 		Scan(&lastRevision).Error
@@ -78,8 +88,8 @@ func CreateRealisasiDetail(c *gin.Context) {
 
 	data := models.RealisasiDetail{
 		RealisasiHeaderId: req.RealisasiHeaderId,
-		WeekNumber:        &req.WeekNumber,
-		Value:             utils.NilIfEmpty(req.Value),
+		MingguNomor:       &req.MingguNomor,
+		Nilai:             utils.NilIfEmpty(req.Nilai),
 		BuktiFile:         buktiPath,
 		AlasanCount:       &revision,
 		AlasanText:        utils.NilIfEmpty(req.AlasanText),
@@ -88,13 +98,13 @@ func CreateRealisasiDetail(c *gin.Context) {
 	if err := query.Create(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Membuat data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }

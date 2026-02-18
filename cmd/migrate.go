@@ -19,5 +19,6 @@ func main() {
 		&models.ScheduleItem{},
 		&models.ScheduleWeek{},
 		&models.RealisasiHeader{},
+		&models.RealisasiDetail{},
 	)
 }

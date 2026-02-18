@@ -11,6 +11,24 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
+func GetAllUser(c *gin.Context) {
+	query := config.DB
+	var data []models.User
+
+	if err := query.Find(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Mengambil data gagal",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Mengambil data berhasil",
+		"data": data,
+	})
+}
+
 func CreateUser(c *gin.Context) {
 	query := config.DB
 	var req dtos.CreateAndUpdateUserRequest

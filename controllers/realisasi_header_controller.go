@@ -101,3 +101,7 @@ func CreateRealisasiHeader(c *gin.Context) {
 		"data":    data,
 	})
 }
+
+func DeleteRealisasi(c *gin.Context) {
+	
+}
