@@ -63,7 +63,7 @@ func CreateRealisasiHeader(c *gin.Context) {
 	if err := query.First(&user, userId).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Membuat data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -85,7 +85,7 @@ func CreateRealisasiHeader(c *gin.Context) {
 
 	data := models.RealisasiHeader{
 		ScheduleHeaderId: req.ScheduleHeaderId,
-		CreatedById: user.ID,
+		CreatedById:      user.ID,
 	}
 
 	if err := query.Create(&data).Error; err != nil {
@@ -103,5 +103,45 @@ func CreateRealisasiHeader(c *gin.Context) {
 }
 
 func DeleteRealisasi(c *gin.Context) {
-	
+	query := config.DB
+	id := c.Param("id")
+	var data models.RealisasiHeader
+
+	if err := query.First(&data, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var detail []models.RealisasiDetail
+	if err := query.Where("realisasi_header_id = ?", data.ID).Find(&detail).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&detail).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+	"message": "Menghapus data berhasil",
+		"data":    data,
+	})
 }

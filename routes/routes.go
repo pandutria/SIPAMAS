@@ -57,6 +57,7 @@ func SetupRoutes(r *gin.Engine) {
 
 		private.GET("/realisasi", controllers.GetAllRealisasiHeader)
 		private.POST("/realisasi/create", controllers.CreateRealisasiHeader)
+		private.DELETE("/realisasi/delete/:id", controllers.DeleteRealisasi)
 
 		private.GET("/realisasi/detail", controllers.GetAllRealisasiDetail)
 		private.POST("/realisasi/detail/create", controllers.CreateRealisasiDetail)

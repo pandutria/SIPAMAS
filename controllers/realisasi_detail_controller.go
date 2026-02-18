@@ -69,7 +69,7 @@ func CreateRealisasiDetail(c *gin.Context) {
 	err = query.
 		Model(&models.RealisasiDetail{}).
 		Where(
-			"realisasi_header_id = ? AND week_number = ?",
+			"realisasi_header_id = ? AND minggu_nomor = ?",
 			req.RealisasiHeaderId,
 			req.MingguNomor,
 		).
