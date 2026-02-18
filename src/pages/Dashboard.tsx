@@ -7,6 +7,13 @@ import SearchData from '../components/SearchData';
 import { useState } from 'react';
 import Footer from '../components/Footer';
 import SplashScreen from './SplashScreen';
+import Home from '../components/Home';
+import Peta from '../components/Peta';
+import Kapabilitas from '../components/Kapabilitas';
+import Work from '../components/Work';
+import AlurMobile from '../components/AlurMobile';
+import AlurWebsite from '../components/AlurWebsite';
+import Testimonial from '../components/Testimonial';
 
 export default function Dashboard() {
   const [selectedRealization, setSelectedRealization] = useState<any>(null);
@@ -14,6 +21,12 @@ export default function Dashboard() {
     <div className="bg-white">
       <SplashScreen/>
       <Navbar/>
+      <Home/>
+      <Peta/>
+      <Kapabilitas/>
+      <Work/>
+      <AlurMobile/>
+      <AlurWebsite/>
       <SearchData
         setSelectedRealization={setSelectedRealization}
       />
@@ -22,6 +35,7 @@ export default function Dashboard() {
       />
       <TopPackage/>
       <BottomPackage/>
+      <Testimonial/>
       <Footer/>
     </div>
   );

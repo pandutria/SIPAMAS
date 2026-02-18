@@ -25,10 +25,10 @@
     --font-poppins-medium: "poppins-medium";
     --font-poppins-semibold: "poppins-semibold";
     --font-poppins-bold: "poppins-bold";
-    --color-primary: #f60;
-    --color-secondary: #EA580C;
-    --color-third: #F97316;
-    --color-hover: #FFEDD5;
+    --color-primary: #00BF50;
+    --color-secondary: #005925;
+    --color-third: #00692C;
+    --color-hover: #00BF50;
     /* --color-primary: #1E40AF;
     --color-secondary: #1E3A8A;
     --color-third: #3B82F6;
@@ -71,6 +71,10 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #ff8533 0%, #ff6600 100%);
+}
+
+.bounce {
+  animation: smoothBounce 8s infinite ease-out;
 }
 
 @keyframes fade-in {
@@ -140,5 +144,27 @@
         width: 7rem;
         height: 7rem;
         opacity: 1;
+    }
+}
+
+@keyframes smoothBounce {
+    0% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-12px);
+    }
+
+    65% {
+        transform: translateY(0);
+    }
+
+    80% {
+        transform: translateY(-6px);
+    }
+
+    100% {
+        transform: translateY(0);
     }
 }

@@ -129,8 +129,7 @@ export default function Login() {
           <div className="flex items-center justify-between text-sm">
             <button
               type="button"
-              className="font-medium hover:underline"
-              style={{ color: '#f60' }}
+              className="font-medium hover:underline text-primary"
               onClick={() => navigate("/lupa-kata-sandi")}
             >
               Lupa kata sandi?
@@ -139,10 +138,7 @@ export default function Login() {
           <button
             type="button"
             onClick={() => handleLogin()}
-            className="w-full text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            style={{ backgroundColor: '#f60' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ff7a1a'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f60'}
+            className="w-full bg-primary text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 hover:bg-secondary"
           >
             Masuk
           </button>

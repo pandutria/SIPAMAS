@@ -1,5 +1,5 @@
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from 'lucide-react';
-import monev from "/image/logo/logo-monalisa.png";
+import monev from "/image/logo/logo-sipamas.png";
 
 export default function Footer() {
     return (
@@ -10,7 +10,7 @@ export default function Footer() {
                         <div className="flex items-center w-45 h-auto bg-white rounded-lg p-4">
                             <img src={monev} className='' alt="" />
                         </div>
-                        <p className="font-poppins-regular text-sm leading-relaxed">Platform monitoring dan evaluasi proyek konstruksi yang komprehensif.</p>
+                        <p className="font-poppins-regular text-sm leading-relaxed">Platform pengaduan masyarakat yang komprehensif.</p>
                         <div className="flex gap-3 pt-4">
                             <button className="w-9 h-9 bg-gray-800 hover:bg-primary rounded-full flex items-center justify-center transition-colors">
                                 <Facebook size={16} />
@@ -31,7 +31,7 @@ export default function Footer() {
                         <h4 className="font-poppins-bold text-white text-lg mb-6">Navigasi</h4>
                         <ul className="space-y-3">
                             <li className="font-poppins-medium text-sm hover:text-primary transition-colors">Beranda</li>
-                            <li className="font-poppins-medium text-sm hover:text-primary transition-colors">Realisasi Pekerjaan</li>
+                            <li className="font-poppins-medium text-sm hover:text-primary transition-colors">Realisasi</li>
                             <li className="font-poppins-medium text-sm hover:text-primary transition-colors">Data Paket</li>
                             <li className="font-poppins-medium text-sm hover:text-primary transition-colors">Laporan</li>
                             <li className="font-poppins-medium text-sm hover:text-primary transition-colors">Dokumentasi</li>
@@ -54,7 +54,7 @@ export default function Footer() {
                             </div>
                             <div className="flex items-center gap-3">
                                 <Mail size={18} className="text-primary shrink-0" />
-                                <a href="mailto:info@monevproject.id" className="font-poppins-medium text-sm hover:text-primary transition-colors">info@monevproject.id</a>
+                                <a href="mailto:info@monevproject.id" className="font-poppins-medium text-sm hover:text-primary transition-colors">info@sipamas.id</a>
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@ export default function Footer() {
                             </div>
                         </div>
                         <div className="md:text-right">
-                            <p className="font-poppins-medium text-sm text-gray-400">&copy; 2026 Monev Project. Semua hak dilindungi.</p>
+                            <p className="font-poppins-medium text-sm text-gray-400">&copy; 2026 Sipamas. Semua hak dilindungi.</p>
                         </div>
                     </div>
                 </div>

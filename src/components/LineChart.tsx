@@ -49,7 +49,7 @@ export default function LineChart({ selectedRealization }: LineChartProps) {
     const isAhead = deviation >= 0;
 
     return (
-        <div className="w-full lg:h-screen h-auto flex items-center p-4 lg:p-8 my-24 lg:my-36 bg-linear-to-br from-hover/30 via-white to-blue-50/20" data-aos="fade-up" data-aos-duration="1000">
+        <div className="w-full lg:h-screen h-auto flex items-center p-4 lg:p-8 my-24 lg:my-36 " data-aos="fade-up" data-aos-duration="1000">
             <div className="max-w-7xl mx-auto w-full">
                 <div className="text-center mb-4">
                     <div className="inline-flex items-center space-x-2 px-3 py-1.5 bg-linear-to-r from-hover to-blue-100 rounded-full mb-3">

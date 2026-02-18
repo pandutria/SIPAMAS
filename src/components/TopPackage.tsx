@@ -21,7 +21,7 @@ export default function TopPackage() {
         <div className="w-full min-h-screen p-4  sm:p-6 lg:p-8 mt-8" data-aos="fade-up" data-aos-duration="1000">
             <div className="max-w-350 mx-auto">
                 <div className="mb-8">
-                    <h1 className='font-poppins-bold text-2xl sm:text-4xl lg:text-3xl text-primary mb-2'>10 Paket Teratas Realisasi Pekerjaan Konstruksi</h1>
+                    <h1 className='font-poppins-bold text-2xl sm:text-4xl lg:text-3xl text-primary mb-2'>10 Paket Teratas Realisasi Pekerjaan</h1>
                     <div className="flex flex-row gap-4 items-center">
                         <p className="font-poppins-medium text-[16px]">Tahun Anggaran: </p>
                         <select value={select} onChange={(e) => setSelect(e.target.value)} className="border-2 border-gray-600 px-6 rounded-md font-poppins-regular text-[14px] py-2">
@@ -44,7 +44,7 @@ export default function TopPackage() {
                                     </th>
                                     <th className="px-6 py-6 text-left min-w-37.5">
                                         <div className="bg-linear-to-r from-primary to-secondary text-white rounded-2xl px-6 py-4 font-poppins-bold text-sm shadow-lg transform hover:scale-105 transition-transform">
-                                            Kode Tender
+                                            Kode Identitas Proyek
                                         </div>
                                     </th>
                                     <th className="px-6 py-6 text-left min-w-28">
@@ -157,7 +157,7 @@ export default function TopPackage() {
                                 </div>
                             </div>
                             <h3 className="font-poppins-bold text-2xl text-gray-800 mb-2">Belum Ada Data</h3>
-                            <p className="font-poppins-regular text-gray-500 text-base mb-6 max-w-xs mx-auto">Silakan pilih tahun anggaran untuk menampilkan data realisasi pekerjaan konstruksi</p>
+                            <p className="font-poppins-regular text-gray-500 text-base mb-6 max-w-xs mx-auto">Silakan pilih tahun anggaran untuk menampilkan data realisasi pekerjaan</p>
                             <div className="flex justify-center gap-2">
                                 <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: "0s"}}></div>
                                 <div className="w-2 h-2 bg-secondary rounded-full animate-bounce" style={{animationDelay: "0.15s"}}></div>

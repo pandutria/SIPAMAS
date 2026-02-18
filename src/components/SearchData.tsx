@@ -233,7 +233,9 @@ export default function SearchData({ setSelectedRealization }: searchDataProps) 
     return (
         <div
             ref={sectionRef}
-            className="lg:h-screen h-auto flex items-center lg:my-16 my-32 px-4 md:px-8 bg-linear-to-br from-hover/30 via-white to-hover/20"
+            className="lg:h-screen h-auto flex items-center px-4 md:px-8"
+            data-aos="fade-up"
+            data-aos-duration="1000"
         >
             <div className="max-w-7xl mx-auto w-full">
                 <div
@@ -247,10 +249,10 @@ export default function SearchData({ setSelectedRealization }: searchDataProps) 
                     <h1
                         className="text-3xl md:text-4xl lg:text-5xl font-poppins-bold mb-4 bg-linear-to-r from-secondary via-third to-secondary bg-clip-text text-transparent"
                     >
-                        Realisasi Pekerjaan Konstruksi
+                        Realisasi Aduan Masyarakat
                     </h1>
-                    <p className="text-gray-600 text-base md:text-lg max-w-3xl mx-auto font-poppins-regular leading-relaxed">
-                        Cari dan lihat detail realisasi pekerjaan konstruksi berdasarkan tahun anggaran, satuan kerja, dan paket pekerjaan dengan mudah dan cepat
+                    <p className="text-gray-600 text-[12px] md:text-lg max-w-3xl mx-auto font-poppins-regular leading-relaxed">
+                        Cari dan lihat detail realisasi pekerjaan konstruksi berdasarkan tahun anggaran, satuan kerja, dan paket aduan dengan mudah dan cepat
                     </p>
                 </div>
 
@@ -317,23 +319,6 @@ export default function SearchData({ setSelectedRealization }: searchDataProps) 
                                 </>
                             )}
                         </button>
-                    </div>
-
-                    <div className="mt-6 pt-6 border-t border-hover">
-                        <div className="flex items-center justify-center space-x-6 text-sm text-gray-500 font-poppins-regular">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                                <span>Data Tersedia</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 rounded-full bg-third"></div>
-                                <span>Sedang Diproses</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                                <span>Tidak Tersedia</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

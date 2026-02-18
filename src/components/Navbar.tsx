@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react';
-import logo from "/image/logo/logo-monalisa.png";
+import logo from "/image/logo/logo-sipamas.png";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useAuthHooks from '../hooks/AuthHooks';
