@@ -115,52 +115,9 @@ func CreateIdentitas(c *gin.Context) {
 		return
 	}
 
-	if req.IdentitasProyekGroupId != nil {
-		var exists bool
-		err := query.
-			Model(&models.IdentitasProyek{}).
-			Select("count(1) > 0").
-			Where("identitas_proyek_group_id = ?", *req.IdentitasProyekGroupId).
-			Scan(&exists).Error
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Membuat data gagal",
-				"error":   err.Error(),
-			})
-			return
-		}
-
-		if !exists {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "Membuat data gagal",
-			})
-			return
-		}
-	}
-
-	lastRevision := -1
-	if req.IdentitasProyekGroupId != nil {
-		err := query.
-			Model(&models.IdentitasProyek{}).
-			Where("identitas_proyek_group_id = ?", *req.IdentitasProyekGroupId).
-			Select("COALESCE(MAX(alasan_count), 0)").
-			Scan(&lastRevision).Error
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Membuat data gagal",
-				"error":   err.Error(),
-			})
-			return
-		}
-	}
-
 	if utils.NilIfEmpty(req.Nama) == nil ||
 		utils.NilIfEmpty(req.TahunAnggaran) == nil ||
 		utils.NilIfEmpty(req.Kategori) == nil ||
-		utils.NilIfEmpty(req.Provinsi) == nil ||
-		utils.NilIfEmpty(req.Kabupaten) == nil ||
 		utils.NilIfEmpty(req.Kecamatan) == nil ||
 		utils.NilIfEmpty(req.Kelurahan) == nil ||
 		utils.NilIfEmpty(req.Latitude) == nil ||
@@ -176,30 +133,26 @@ func CreateIdentitas(c *gin.Context) {
 		return
 	}
 
-	revision := lastRevision + 1
-
 	data := models.IdentitasProyek{
-		IdentitasProyekGroupId: req.IdentitasProyekGroupId,
-		Nama:                   utils.NilIfEmpty(req.Nama),
-		TahunAnggaran:          utils.NilIfEmpty(req.TahunAnggaran),
-		Kategori:               utils.NilIfEmpty(req.Kategori),
-		Provinsi:               utils.NilIfEmpty(req.Provinsi),
-		Kabupaten:              utils.NilIfEmpty(req.Kabupaten),
-		Kecamatan:              utils.NilIfEmpty(req.Kecamatan),
-		Kelurahan:              utils.NilIfEmpty(req.Kelurahan),
-		Latitude:               utils.NilIfEmpty(req.Latitude),
-		Longitude:              utils.NilIfEmpty(req.Longitude),
-		NilaiKontrak:           utils.NilIfEmpty(req.NilaiKontrak),
-		KontraktorPelaksana:    utils.NilIfEmpty(req.KontraktorPelaksana),
-		KonsultasPengawas:      utils.NilIfEmpty(req.KonsultasPengawas),
-		SumberDana:             utils.NilIfEmpty(req.SumberDana),
-		KontrakFile:            utils.NilIfEmpty(*kontrakPath),
-		SuratPerintahFile:      utils.NilIfEmpty(*suratPerintahPath),
-		SuratPenunjukanFile:    utils.NilIfEmpty(*suratPenunjukanPath),
-		BeritaAcaraFile:        utils.NilIfEmpty(*beritaAcaraPath),
-		AlasanText:             utils.NilIfEmpty(req.AlasanText),
-		AlasanCount:            &revision,
-		CreatedById:            &user.ID,
+		Nama:                utils.NilIfEmpty(req.Nama),
+		TahunAnggaran:       utils.NilIfEmpty(req.TahunAnggaran),
+		Kategori:            utils.NilIfEmpty(req.Kategori),
+		Provinsi:            utils.NilIfEmpty(req.Provinsi),
+		Kabupaten:           utils.NilIfEmpty(req.Kabupaten),
+		Kecamatan:           utils.NilIfEmpty(req.Kecamatan),
+		KecamatanKode:       utils.NilIfEmpty(req.KecamatanKode),
+		Kelurahan:           utils.NilIfEmpty(req.Kelurahan),
+		Latitude:            utils.NilIfEmpty(req.Latitude),
+		Longitude:           utils.NilIfEmpty(req.Longitude),
+		NilaiKontrak:        utils.NilIfEmpty(req.NilaiKontrak),
+		KontraktorPelaksana: utils.NilIfEmpty(req.KontraktorPelaksana),
+		KonsultasPengawas:   utils.NilIfEmpty(req.KonsultasPengawas),
+		SumberDana:          utils.NilIfEmpty(req.SumberDana),
+		KontrakFile:         utils.NilIfEmpty(*kontrakPath),
+		SuratPerintahFile:   utils.NilIfEmpty(*suratPerintahPath),
+		SuratPenunjukanFile: utils.NilIfEmpty(*suratPenunjukanPath),
+		BeritaAcaraFile:     utils.NilIfEmpty(*beritaAcaraPath),
+		CreatedById:         &user.ID,
 	}
 
 	if err := config.DB.Create(&data).Error; err != nil {
@@ -208,11 +161,6 @@ func CreateIdentitas(c *gin.Context) {
 			"error":   err.Error(),
 		})
 		return
-	}
-
-	if req.IdentitasProyekGroupId == nil {
-		query.Model(&data).
-			Update("identitas_proyek_group_id", data.ID)
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -282,9 +230,8 @@ func UpdateIdentitas(c *gin.Context) {
 	utils.SetIfNotEmpty(&data.Nama, req.Nama)
 	utils.SetIfNotEmpty(&data.TahunAnggaran, req.TahunAnggaran)
 	utils.SetIfNotEmpty(&data.Kategori, req.Kategori)
-	utils.SetIfNotEmpty(&data.Provinsi, req.Provinsi)
-	utils.SetIfNotEmpty(&data.Kabupaten, req.Kabupaten)
 	utils.SetIfNotEmpty(&data.Kecamatan, req.Kecamatan)
+	utils.SetIfNotEmpty(&data.KecamatanKode, req.KecamatanKode)
 	utils.SetIfNotEmpty(&data.Kelurahan, req.Kelurahan)
 	utils.SetIfNotEmpty(&data.Latitude, req.Latitude)
 	utils.SetIfNotEmpty(&data.Longitude, req.Longitude)

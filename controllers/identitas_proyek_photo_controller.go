@@ -65,11 +65,12 @@ func CreateIdentitasProyekPhoto(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Upload photo gagal",
+			"error":   err.Error(),
 		})
 		return
 	}
 
-	if utils.NilIfEmpty(*photoPath) == nil ||
+	if utils.NilIfEmpty(*photoPath) == nil || photoPath == nil ||
 		utils.NilIfEmpty(req.Title) == nil ||
 		utils.NilIfEmpty(req.Type) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -95,6 +96,33 @@ func CreateIdentitasProyekPhoto(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
+		"data":    data,
+	})
+}
+
+func DeleteIdentitasProyekPhoto(c *gin.Context) {
+	query := config.DB
+	id := c.Param("id")
+	var data models.IdentitasProyekPhoto
+
+	if err := query.First(&data, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Menghapus data berhasil",
 		"data":    data,
 	})
 }
