@@ -91,9 +91,7 @@ func CreateRabHeader(c *gin.Context) {
 	}
 
 	if utils.NilIfEmpty(utils.ToString(req.IdentitasProyekId)) == nil ||
-		utils.NilIfEmpty(req.Program) == nil ||
-		utils.NilIfEmpty(req.TanggalMulai) == nil ||
-		utils.NilIfEmpty(req.TanggalAkhir) == nil {
+		utils.NilIfEmpty(req.Program) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Semua input wajib di isi",
 		})
@@ -184,12 +182,11 @@ func DeleteRab(c *gin.Context) {
 		return
 	}
 
-
 	var schedule []models.ScheduleHeader
-	if err := query.Find(&schedule).Error; err != nil {
+	if err := query.Where("rab_id = ?", data.ID).Find(&schedule).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -215,8 +212,21 @@ func DeleteRab(c *gin.Context) {
 	if err := query.Delete(&detail).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
+
+	if err := query.Delete(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Menghapus data berhasil",
+		"data": data,
+	})
 }

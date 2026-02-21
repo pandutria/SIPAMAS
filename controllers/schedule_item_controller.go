@@ -40,15 +40,15 @@ func CreateScheduleItem(c *gin.Context) {
 		return
 	}
 
-	if utils.NilIfEmpty(utils.ToString(req.ScheduleHeaderId)) == nil ||
-		utils.NilIfEmpty(req.Keterangan) == nil ||
-		utils.NilIfEmpty(req.Jumlah) == nil ||
-		utils.NilIfEmpty(req.Bobot) == nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Semua input wajib di isi",
-		})
-		return
-	}
+	// if utils.NilIfEmpty(utils.ToString(req.ScheduleHeaderId)) == nil ||
+	// 	utils.NilIfEmpty(req.Keterangan) == nil ||
+	// 	utils.NilIfEmpty(req.Jumlah) == nil ||
+	// 	utils.NilIfEmpty(req.Bobot) == nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"message": "Semua input wajib di isi",
+	// 	})
+	// 	return
+	// }
 
 	data := models.ScheduleItem{
 		ScheduleHeaderId: req.ScheduleHeaderId,

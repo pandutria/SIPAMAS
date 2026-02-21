@@ -57,6 +57,7 @@ func CreateRabDetail(c *gin.Context) {
 		Satuan:      req.Satuan,
 		Volume:      req.Volume,
 		Harga:       req.Harga,
+		Total:       req.Total,
 	}
 
 	if err := query.Create(&data).Error; err != nil {

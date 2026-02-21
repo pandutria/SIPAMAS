@@ -6,4 +6,5 @@ type CreateRabDetailRequest struct {
 	Satuan      string `form:"satuan"`
 	Volume      string `form:"volume"`
 	Harga       string `form:"harga"`
+	Total       string `form:"total"`
 }

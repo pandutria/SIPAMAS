@@ -20,5 +20,6 @@ func main() {
 		&models.ScheduleWeek{},
 		&models.RealisasiHeader{},
 		&models.RealisasiDetail{},
+		&models.Evaluasi{},
 	)
 }

@@ -58,10 +58,21 @@ func SetupRoutes(r *gin.Engine) {
 		private.POST("/schedule/week/create", controllers.CreateScheduleWeek)
 
 		private.GET("/realisasi", controllers.GetAllRealisasiHeader)
+		private.GET("/realisasi/:id", controllers.GetRealisasiById)
 		private.POST("/realisasi/create", controllers.CreateRealisasiHeader)
 		private.DELETE("/realisasi/delete/:id", controllers.DeleteRealisasi)
 
 		private.GET("/realisasi/detail", controllers.GetAllRealisasiDetail)
 		private.POST("/realisasi/detail/create", controllers.CreateRealisasiDetail)
+
+		private.GET("/evaluasi", controllers.GetAllEvaluasi)
+		private.GET("/evaluasi/:id", controllers.GetEvaluasiById)
+		private.POST("/evaluasi/create", controllers.CreateEvaluasi)
+		private.DELETE("/evaluasi/delete/:id", controllers.DeleteEvaluasi)
+  
+		private.GET("/pengaduan", controllers.GetAllPengaduan)
+		private.GET("/pengaduan/:id", controllers.GetPengaduanById)
+		private.POST("/pengaduan/created", controllers.CreatePengaduan)
+		private.DELETE("/pengaduan/delete/:id", controllers.DeleteEvaluasi)
 	}
 }

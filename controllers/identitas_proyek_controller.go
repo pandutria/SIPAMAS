@@ -317,14 +317,6 @@ func DeleteIdentitas(c *gin.Context) {
 		return
 	}
 
-	if err := query.Delete(&photo).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
-	}
-
 	var document []models.IdentitasProyekDocument
 	if err := query.
 		Where("identitas_proyek_id = ?", data.ID).
@@ -337,6 +329,14 @@ func DeleteIdentitas(c *gin.Context) {
 	}
 
 	if err := query.Delete(&document).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&photo).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
 			"error":   err.Error(),

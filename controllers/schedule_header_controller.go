@@ -218,7 +218,7 @@ func DeleteSchedule(c *gin.Context) {
 	}
 
 	var week []models.ScheduleWeek
-	if err := query.Where("schedule_item_id = ?", itemIDs).Find(&week).Error; err != nil {
+	if err := query.Where("schedule_item_id IN ?", itemIDs).Find(&week).Error; err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{
 			"message": "Menghapus data gagal",
 			"error":   err.Error(),

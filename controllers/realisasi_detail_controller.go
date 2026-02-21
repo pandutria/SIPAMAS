@@ -42,14 +42,14 @@ func CreateRealisasiDetail(c *gin.Context) {
 
 	buktiFile, _ := c.FormFile("bukti_file")
 
-	if utils.NilIfEmpty(req.Nilai) == nil ||
-		utils.NilIfEmpty(utils.ToString(req.RealisasiHeaderId)) == nil ||
-		buktiFile == nil || utils.NilIfEmpty(utils.ToString(req.MingguNomor)) == nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Semua input wajib di isi",
-		})
-		return
-	}
+	// if utils.NilIfEmpty(req.Nilai) == nil ||
+	// 	utils.NilIfEmpty(utils.ToString(req.RealisasiHeaderId)) == nil ||
+	// 	 utils.NilIfEmpty(utils.ToString(req.MingguNomor)) == nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"message": "Semua input wajib di isi",
+	// 	})
+	// 	return
+	// }
 
 	buktiPath, err := utils.SaveUploadedFile(
 		c,
