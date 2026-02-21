@@ -11,7 +11,6 @@ export default function useRABHooks() {
     const [program, setProgram] = useState("");
     const [rabData, setRabData] = useState<RABProps[]>([]);
     const [tahunData, setTahunData] = useState<any>([]);
-    const [satkerData, setSatkerData] = useState<any>([]);
     const [rabDataByid, setRabDataById] = useState<RABProps | null>(null);
     const [selectedId, setSelectedId] = useState<any>(null);
     const navigate = useNavigate();
@@ -32,22 +31,6 @@ export default function useRABHooks() {
         }));
     };
 
-
-    const buildSatkerOptions = (data: any[]) => {
-        const uniqueMap = new Map<string, string>();
-
-        data.forEach(item => {
-            if (typeof item?.data_entry?.satuan_kerja === "string") {
-                uniqueMap.set(item?.data_entry?.satuan_kerja, item?.data_entry?.satuan_kerja);
-            }
-        });
-
-        return Array.from(uniqueMap.entries()).map(([key, value]) => ({
-            id: key,
-            text: value
-        }));
-    };
-
     useEffect(() => {
         const fetchRab = async () => {
             try {
@@ -56,8 +39,8 @@ export default function useRABHooks() {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                const data: RABProps[] = response.data.data;
 
+                const data: RABProps[] = response.data.data;
                 const latestRabMap = new Map<number, RABProps>();
 
                 data.forEach(item => {
@@ -71,20 +54,15 @@ export default function useRABHooks() {
 
                 const mappingData = Array.from(latestRabMap.values()).map(item => ({
                     ...item,
-                    tahun_anggaran: item.data_entry.tahun_anggaran?.toString(),
-                    satuan_kerja: item.data_entry.satuan_kerja?.toString(),
-                    kode_rup: item.data_entry.kode_rup?.toString(),
-                    kode_paket: item.data_entry.kode_paket?.toString(),
-                    nama_paket: item.data_entry.nama_paket?.toString(),
+                    proyek_id: `TND-0${item.proyek.id}`,
+                    tahun_anggaran: item.proyek.tahun_anggaran,
+                    nama: item.proyek.nama,
+                    kontraktor_pelaksana: item.proyek.kontraktor_pelaksana
                 }));
 
-
                 const tahunOpts = buildTahunOptions(data);
-                const satkerOpts = buildSatkerOptions(data);
-
                 setRabData(SortDescById(mappingData || []));
                 setTahunData(tahunOpts);
-                setSatkerData(satkerOpts);
             } catch (error) {
                 if (error) {
                     console.error("Terjadi Kesalahan");
@@ -126,7 +104,9 @@ export default function useRABHooks() {
                     }));
 
 
+                setProgram(response.data.data.program);
                 setRabDataById(response.data.data);
+
                 setRevisionCount(revisions);
             } catch (error) {
                 if (error) {
@@ -139,19 +119,9 @@ export default function useRABHooks() {
         fetchRabById();
     }, [selectedId, token]);
 
-    const handleRABPost = async (dataEntryId: number, dataRabDetail: RABDetailProps[]) => {
+    const handleRABPost = async (projectIdentityId: number, dataRabDetail: RABDetailProps[]) => {
         try {
-            if (!dataEntryId || !dataRabDetail) {
-                SwalMessage({
-                    type: "error",
-                    title: "Gagal!",
-                    text: "Harap isi field yang telah disediakan!"
-                });
-
-                return;
-            }
-
-            if (!program) {
+            if (!projectIdentityId || !dataRabDetail || !program) {
                 SwalMessage({
                     type: "error",
                     title: "Gagal!",
@@ -162,10 +132,11 @@ export default function useRABHooks() {
             }
 
             SwalLoading();
-            const responseRabHeader = await API.post("/rab/create", {
-                data_entry_id: dataEntryId,
-                program: program?.toString(),
-            }, {
+            const formData = new FormData();
+            formData.append("identitas_proyek_id", String(projectIdentityId));
+            formData.append("program", program);
+
+            const responseRabHeader = await API.post("/rab/create", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -176,14 +147,16 @@ export default function useRABHooks() {
 
             for (let index = 0; index < dataRabDetail.length; index++) {
                 const data = dataRabDetail[index];
-                responseRabDetail = await API.post("/rab/detail/create", {
-                    rab_header_id: rabHeaderId,
-                    description: data.description,
-                    volume: data.volume,
-                    unit: data.unit,
-                    unit_price: data.unit_price,
-                    total: data.total
-                }, {
+
+                const formData = new FormData();
+                formData.append("rab_header_id", rabHeaderId);
+                formData.append("keterangan", data.keterangan);
+                formData.append("volume", String(data.volume));
+                formData.append("satuan", data.satuan);
+                formData.append("harga", String(data.harga));
+                formData.append("total", String(data.total));
+
+                responseRabDetail = await API.post("/rab/detail/create", formData, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -198,7 +171,7 @@ export default function useRABHooks() {
             });
 
             setTimeout(() => {
-                navigate("/ppk/rencana-anggaran/");
+                navigate("/admin-direksi/rencana-anggaran/");
             }, 2000);
         } catch (error) {
             if (error) {
@@ -211,56 +184,39 @@ export default function useRABHooks() {
         }
     }
 
-    const handleRABPut = async (dataEntry: any, dataRabHeader: any, reason: string, dataRabDetailUpdate: RABDetailProps[]) => {
+    const handleRABPut = async (projectIdentityId: any, dataRabHeader: any, reason: string, dataRabDetailUpdate: RABDetailProps[]) => {
         try {
             SwalLoading();
-            const responseRabHeader = await API.post("/rab/create", {
-                rab_group_id: dataRabHeader.rab_group_id,
-                data_entry_id: dataEntry,
-                program: program ? program.toString() : dataRabHeader?.program,
-                alasan_text: reason,
-            }, {
+            const formData = new FormData();
+            formData.append("identitas_proyek_id", projectIdentityId);
+            formData.append("rab_group_id", dataRabHeader.rab_group_id);
+            formData.append("program", program);
+            formData.append("alasan_text", reason);
+
+            const responseRabHeader = await API.post("/rab/create", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
             const rabHeaderId = responseRabHeader.data.data.id;
-            const dataRabDetail = dataRabHeader.rab_details;
             let responseRabDetail;
 
-            if (dataRabDetailUpdate.length > 0) {
-                for (let index = 0; index < dataRabDetailUpdate.length; index++) {
-                    const data = dataRabDetailUpdate[index];
-                    responseRabDetail = await API.post("/rab/detail/create", {
-                        rab_header_id: rabHeaderId,
-                        description: data.description,
-                        volume: data.volume,
-                        unit: data.unit,
-                        unit_price: data.unit_price,
-                        total: data.total
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    });
-                }
-            } else {
-                for (let index = 0; index < dataRabDetail.length; index++) {
-                    const data = dataRabDetail[index];
-                    responseRabDetail = await API.post("/rab/detail/create", {
-                        rab_header_id: rabHeaderId,
-                        description: data.description,
-                        volume: data.volume,
-                        unit: data.unit,
-                        unit_price: data.unit_price,
-                        total: data.total
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    });
-                }
+            for (let index = 0; index < dataRabDetailUpdate.length; index++) {
+                const data = dataRabDetailUpdate[index];
+                const formData = new FormData();
+                formData.append("rab_header_id", rabHeaderId);
+                formData.append("keterangan", data.keterangan);
+                formData.append("volume", String(data.volume));
+                formData.append("satuan", data.satuan);
+                formData.append("harga", String(data.harga));
+                formData.append("total", String(data.total));
+
+                responseRabDetail = await API.post("/rab/detail/create", formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
             }
 
             const message = responseRabDetail?.data.message;
@@ -271,7 +227,7 @@ export default function useRABHooks() {
             });
 
             setTimeout(() => {
-                navigate("/ppk/rencana-anggaran/");
+                navigate("/admin-direksi/rencana-anggaran/");
             }, 2000);
         } catch (error) {
             if (error) {
@@ -281,6 +237,7 @@ export default function useRABHooks() {
                     type: "error"
                 })
             }
+            console.error(error)
         }
     }
 
@@ -348,7 +305,6 @@ export default function useRABHooks() {
         program,
         rabData,
         tahunData,
-        satkerData,
         setSelectedId,
         rabDataByid,
         handleRABPut,

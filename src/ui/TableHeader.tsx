@@ -2,41 +2,40 @@
 import { Search, Plus, Trash } from 'lucide-react';
 
 interface TableHeaderProps {
-    title: string;
+    title?: string;
+    showTitle?: boolean;
     showHapus?: boolean;
     showTambah?: boolean;
     showTahunQuery?: boolean;
+    showTahun?: boolean;
     onTambahClick?: () => void;
     onHapusClick?: () => void;
     tahunOptions?: any[];
     tahunOptionQuery?: any[];
-    satuanKerjaOptions?: any[];
     selectedTahun?: string;
     selectedTahunQuery?: string;
-    selectedSatuanKerja?: string;
     searchValue?: string;
     onTahunChange?: (value: string) => void;
     onTahunQueryChange?: (value: string) => void;
-    onSatuanKerjaChange?: (value: string) => void;
     onSearchChange?: (value: string) => void;
     className?: string;
-    type?: 'ppk' | 'pokja';   
+    type?: 'ppk' | 'pokja';
 }
 
 export default function TableHeader({
     title,
+    showTitle = true,
     onTambahClick,
     onHapusClick,
     showTambah = true,
     showHapus = false,
     showTahunQuery = true,
+    showTahun=true,
     selectedTahun = '',
     selectedTahunQuery = '',
-    selectedSatuanKerja = '',
     searchValue = '',
     onTahunChange,
     onTahunQueryChange,
-    onSatuanKerjaChange,
     onSearchChange,
     className,
     tahunOptions = [],
@@ -44,20 +43,21 @@ export default function TableHeader({
         { text: '2024' },
         { text: '2025' }
     ],
-    satuanKerjaOptions = [],
     type = "ppk",
 }: TableHeaderProps) {
     return (
         <div className={`w-full bg-white flex flex-col rounded-lg p-3 sm:p-4 md:p-5 lg:p-6 mb-3 sm:mb-4 md:mb-5 lg:mb-6 shadow-sm ${className}`}>
-            <div className="mb-3 sm:mb-4 md:mb-5">
-                <h1 className="font-poppins-bold text-lg sm:text-xl md:text-2xl text-gray-800">
-                    {title}
-                </h1>
-            </div>
+            {showTitle && (
+                <div className="mb-3 sm:mb-4 md:mb-5">
+                    <h1 className="font-poppins-bold text-lg sm:text-xl md:text-2xl text-gray-800">
+                        {title}
+                    </h1>
+                </div>
+            )}
 
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5 md:gap-3 w-full lg:w-auto">
-                    {type === 'ppk' && (
+                    {type === 'ppk' && showTahun && (
                         <>
                             <select
                                 value={selectedTahun}
@@ -66,19 +66,6 @@ export default function TableHeader({
                             >
                                 <option value="">Pilih Tahun</option>
                                 {tahunOptions.map((item, index) => (
-                                    <option key={index} value={item.text}>
-                                        {item.text}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <select
-                                value={selectedSatuanKerja}
-                                onChange={(e) => onSatuanKerjaChange?.(e.target.value)}
-                                className="text-xs sm:text-sm px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer bg-white text-gray-700 font-poppins-regular hover:border-gray-400 w-full sm:w-56"
-                            >
-                                <option value="">Pilih Satuan Kerja</option>
-                                {satuanKerjaOptions.map((item, index) => (
                                     <option key={index} value={item.text}>
                                         {item.text}
                                     </option>

@@ -14,7 +14,6 @@ export default function useRealisasiHooks() {
     const [reason, setReason] = useState(null);
     const [file, setFile] = useState<File | null>(null);
     const [tahunData, setTahunData] = useState<any>([]);
-    const [satkerData, setSatkerData] = useState<any>([]);
     const [selectedId, setSelectedId] = useState<any>(null);
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
@@ -33,13 +32,13 @@ export default function useRealisasiHooks() {
                     const map = new Map<number, RealizationDetailProps>();
 
                     details.forEach((d) => {
-                        const existing = map.get(d.week_number);
+                        const existing = map.get(d.minggu_nomor);
 
                         if (!existing) {
-                            map.set(d.week_number, d);
+                            map.set(d.minggu_nomor, d);
                         } else {
                             if (d.alasan_count > existing.alasan_count) {
-                                map.set(d.week_number, d);
+                                map.set(d.minggu_nomor, d);
                             }
                         }
                     });
@@ -49,14 +48,12 @@ export default function useRealisasiHooks() {
 
                 const mappingData = data?.map((item: RealizationProps) => ({
                     ...item,
-                    detail: item.detail
-                        ? normalizeDetailByWeek(item.detail)
+                    detail: item.details
+                        ? normalizeDetailByWeek(item.details)
                         : [],
-                    tahun_anggaran: item?.schedule.rab?.data_entry.tahun_anggaran,
-                    satuan_kerja: item.schedule.rab?.data_entry.satuan_kerja,
-                    kode_rup: item.schedule.rab?.data_entry.kode_rup,
-                    kode_paket: item.schedule.rab?.data_entry.kode_paket,
-                    nama_paket: item.schedule.rab?.data_entry.nama_paket,
+                    tahun_anggaran: item?.schedule.rab?.proyek.tahun_anggaran,
+                    proyek_id: `TND-0${item.schedule.rab?.proyek.id}`,
+                    nama: item.schedule.rab?.proyek.nama,
                 }))
 
                 const tahunUnique = Array.from(
@@ -72,28 +69,13 @@ export default function useRealisasiHooks() {
                     text: tahun?.toString()
                 }));
 
-                const satkerUnique = Array.from(
-                    new Set(
-                        mappingData
-                            ?.map((item: { satuan_kerja: any; }) => item.satuan_kerja)
-                            .filter(Boolean)
-                    )
-                );
-
-                const satkerOptions = [
-                    ...satkerUnique.map((satker, index) => ({
-                        id: index + 2,
-                        text: satker
-                    }))
-                ];
-
                 setRealisasiData(SortDescById(mappingData || []));
-                setSatkerData(satkerOptions);
                 setTahunData(tahunOptions);
             } catch (error) {
                 if (error) {
                     console.error("Terjadi Kesalahan");
                 }
+                console.error(error)
             }
         }
 
@@ -109,7 +91,7 @@ export default function useRealisasiHooks() {
                 const data = response.data.data;
                 const dataRevision = {
                     ...data,
-                    detail: SortDescById(data.detail)
+                    details: SortDescById(data.details)
                 }
 
                 setRealisasiDataById(dataRevision);
@@ -147,9 +129,10 @@ export default function useRealisasiHooks() {
             }
 
             SwalLoading();
-            const responseHeader = await API.post("/realisasi/create", {
-                schedule_header_id: selectedSchedule?.id
-            }, {
+            const formParentData = new FormData();
+            formParentData.append("schedule_header_id", String(selectedSchedule.id));
+
+            const responseHeader = await API.post("/realisasi/create", formParentData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -157,12 +140,13 @@ export default function useRealisasiHooks() {
 
             const formData = new FormData();
             formData.append("realisasi_header_id", responseHeader?.data?.data?.id);
-            formData.append("week_number", week.toString());
-            formData.append("value", target.toString());
+            formData.append("minggu_nomor", String(week));
+            formData.append("nilai", String(target));
             formData.append("bukti_file", file);
             if (reason) {
                 formData.append("alasan_text", reason);
             }
+            
             const responseChild = await API.post("/realisasi/detail/create", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -176,7 +160,7 @@ export default function useRealisasiHooks() {
             });
 
             setTimeout(() => {
-                navigate("/ppk/realisasi-pekerjaan/");
+                navigate("/admin-direksi/realisasi-pekerjaan/");
             }, 2000);
         } catch (error: any) {
             if (error) {
@@ -186,6 +170,7 @@ export default function useRealisasiHooks() {
                     text: error.response.data.message
                 })
             }
+            console.error(error)
         }
     }
 
@@ -208,10 +193,10 @@ export default function useRealisasiHooks() {
 
             const weekScheduleLimit = selectedRealization!.schedule.items!.reduce(
                 (sum, item) => {
-                    const weekData = item.schedule_weeks.find(
-                        w => w.week_number === currentWeek
+                    const weekData = item.weeks.find(
+                        w => w.minggu_nomor === currentWeek
                     );
-                    return sum + Number(weekData?.value || 0);
+                    return sum + Number(weekData?.nilai || 0);
                 },
                 0
             );
@@ -222,10 +207,10 @@ export default function useRealisasiHooks() {
                 const map = new Map<number, RealizationDetailProps[]>();
 
                 for (const item of details) {
-                    if (!map.has(item.week_number)) {
-                        map.set(item.week_number, []);
+                    if (!map.has(item.minggu_nomor)) {
+                        map.set(item.minggu_nomor, []);
                     }
-                    map.get(item.week_number)!.push(item);
+                    map.get(item.minggu_nomor)!.push(item);
                 }
 
                 const result = new Map<number, number>();
@@ -236,20 +221,20 @@ export default function useRealisasiHooks() {
                     if (maxAlasan === 0) {
                         result.set(
                             week,
-                            items.reduce((s, i) => s + Number(i.value || 0), 0)
+                            items.reduce((s, i) => s + Number(i.nilai || 0), 0)
                         );
                     } else {
                         const chosen = items.reduce((a, b) =>
                             b.alasan_count > a.alasan_count ? b : a
                         );
-                        result.set(week, Number(chosen.value || 0));
+                        result.set(week, Number(chosen.nilai || 0));
                     }
                 }
 
                 return result;
             };
 
-            const normalized = normalizeTotal(selectedRealization.detail || []);
+            const normalized = normalizeTotal(selectedRealization.details || []);
 
             const totalUsed = Array.from(normalized.entries()).reduce(
                 (sum, [weekNum, value]) =>
@@ -277,8 +262,8 @@ export default function useRealisasiHooks() {
                 return;
             }
 
-            const previousValue = selectedRealization.detail?.some(
-                d => d.week_number === currentWeek
+            const previousValue = selectedRealization.details?.some(
+                d => d.minggu_nomor === currentWeek
             );
 
             if (previousValue && !reason) {
@@ -297,8 +282,8 @@ export default function useRealisasiHooks() {
                 "realisasi_header_id",
                 selectedRealization.id.toString()
             );
-            formData.append("week_number", currentWeek.toString());
-            formData.append("value", inputValue.toString());
+            formData.append("minggu_nomor", String(currentWeek));
+            formData.append("nilai", String(inputValue));
             formData.append("bukti_file", file);
 
             if (reason) {
@@ -351,7 +336,6 @@ export default function useRealisasiHooks() {
         target,
         file,
         tahunData,
-        satkerData,
         setSelectedId,
         realisasiDataById,
         handleRealizationPut,

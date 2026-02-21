@@ -5,17 +5,18 @@ import API from "../server/API";
 import SwalLoading from "../utils/SwalLoading";
 import { SortDescById } from "../utils/SortDescById";
 import { TotalWeek } from "../utils/TotalWeek";
+import { useNavigate } from "react-router-dom";
 
 export default function useScheduleHooks() {
     const [scheduleData, setScheduleData] = useState<ScheduleProps[]>([]);
     const [tahunData, setTahunData] = useState<any>([]);
-    const [satkerData, setSatkerData] = useState<any>([]);
     const token = localStorage.getItem("token");
     const [scheduleDataById, setScheduleDataById] = useState<ScheduleProps | null>(null);
     const [selectedId, setSelectedId] = useState<any>(null);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [revisionCount, setRevisionCount] = useState<any[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetcSchedule = async () => {
@@ -36,13 +37,12 @@ export default function useScheduleHooks() {
                         latestScheduleMap.set(item.schedule_group_id, item);
                     }
                 });
+
                 const mappingData = Array.from(latestScheduleMap.values()).map((item: ScheduleProps) => ({
                     ...item,
-                    tahun_anggaran: item.rab?.data_entry.tahun_anggaran,
-                    satuan_kerja: item.rab?.data_entry.satuan_kerja,
-                    kode_rup: item.rab?.data_entry?.satuan_kerja,
-                    kode_paket: item.rab?.data_entry?.kode_paket,
-                    nama_paket: item.rab?.data_entry?.nama_paket,
+                    tahun_anggaran: item.rab?.proyek.tahun_anggaran,
+                    proyek_id: `TND-0${item.rab?.proyek?.id}`,
+                    nama: item.rab?.proyek?.nama,
                     program: item.rab?.program,
                 }));
 
@@ -59,28 +59,13 @@ export default function useScheduleHooks() {
                     text: tahun?.toString()
                 }));
 
-                const satkerUnique = Array.from(
-                    new Set(
-                        mappingData
-                            ?.map((item: { satuan_kerja: any; }) => item.satuan_kerja)
-                            .filter(Boolean)
-                    )
-                );
-
-                const satkerOptions = [
-                    ...satkerUnique.map((satker, index) => ({
-                        id: index + 2,
-                        text: satker
-                    }))
-                ];
-
                 setScheduleData(SortDescById(mappingData || []));
                 setTahunData(tahunOptions);
-                setSatkerData(satkerOptions);
             } catch (error) {
                 if (error) {
                     console.error("Terjadi Kesalahan");
                 }
+                console.error(error)
             }
         }
 
@@ -120,6 +105,9 @@ export default function useScheduleHooks() {
                         created_at: item.created_at
                     }));
 
+                setStartDate(response.data.data.tanggal_mulai);
+                setEndDate(response.data.data.tanggal_akhir);
+
                 setRevisionCount(revisions)
                 setScheduleDataById(response.data.data);
             } catch (error) {
@@ -133,7 +121,7 @@ export default function useScheduleHooks() {
         fetcScheduleById();
     }, [selectedId, token]);
 
-    const handleSchedulePost = async (dataTenderByRab: RABProps, dataItem: ScheduleItemProps[], weeksTotal: number) => {
+    const handleSchedulePost = async (dataProjectIdentityByRab: RABProps, dataItem: ScheduleItemProps[], weeksTotal: number) => {
         try {
             if (dataItem.length < 0 || !startDate || !endDate) {
                 SwalMessage({
@@ -153,16 +141,16 @@ export default function useScheduleHooks() {
                     text: "Tanggal pelaksanaan dengan minggu pelaksanaan tidak sesuai!"
                 });
 
-                console.log(weeksTotal, weeksFromDate)
                 return;
             }
 
             SwalLoading();
-            const responseScheduleHeader = await API.post("/schedule/create", {
-                rab_id: dataTenderByRab.id,
-                tanggal_mulai: startDate,
-                tanggal_akhir: endDate
-            }, {
+            const formData = new FormData();
+            formData.append("rab_id", String(dataProjectIdentityByRab.id));
+            formData.append("tanggal_mulai", startDate);
+            formData.append("tanggal_akhir", endDate);
+
+            const responseScheduleHeader = await API.post("/schedule/create", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -170,27 +158,27 @@ export default function useScheduleHooks() {
 
             for (let index = 0; index < dataItem.length; index++) {
                 const scheduleItem = dataItem[index];
+                const formData = new FormData();
+                formData.append("schedule_header_id", String(responseScheduleHeader.data.data?.id));
+                formData.append("keterangan", scheduleItem.keterangan);
+                formData.append("nomor", (index + 1).toString());
+                formData.append("bobot", String(scheduleItem.bobot));
+                formData.append("jumlah", String(scheduleItem.jumlah));
 
-                const responseScheduleItem = await API.post("/schedule/item/create", {
-                    schedule_header_id: responseScheduleHeader.data.data?.id,
-                    description: scheduleItem?.description,
-                    number: (index + 1).toString(),
-                    weight: scheduleItem?.weight,
-                    total_price: Number(scheduleItem?.total_price)
-                }, {
+                const responseScheduleItem = await API.post("/schedule/item/create", formData, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
 
-                for (let index = 0; index < scheduleItem.schedule_weeks.length; index++) {
-                    const scheduleWeek = scheduleItem.schedule_weeks[index];
+                for (let index = 0; index < scheduleItem.weeks.length; index++) {
+                    const scheduleWeek = scheduleItem.weeks[index];
+                    const formData = new FormData();
+                    formData.append("schedule_item_id", String(responseScheduleItem.data.data?.id));
+                    formData.append("minggu_nomor", String(index + 1));
+                    formData.append("nilai", String(scheduleWeek.nilai));
 
-                    await API.post('/schedule/week/create', {
-                        schedule_item_id: responseScheduleItem.data.data?.id,
-                        week_number: index + 1,
-                        value: scheduleWeek.value
-                    }, {
+                    await API.post('/schedule/week/create', formData, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -205,7 +193,7 @@ export default function useScheduleHooks() {
             });
 
             setTimeout(() => {
-                window.location.href = "/ppk/jadwal-pelaksanaan"
+                navigate("/admin-direksi/jadwal-pelaksanaan");
             }, 2000);
         } catch (error: any) {
             if (error) {
@@ -224,7 +212,7 @@ export default function useScheduleHooks() {
         if (name == "end") return setEndDate(value);
     }
 
-    const handleSchedulePut = async (dataTenderByRab: ScheduleProps, scheduleGroupId: number, dataItem: ScheduleItemProps[], reason: string, weeksTotal: number) => {
+    const handleSchedulePut = async (dataProjectIdentityByRab: ScheduleProps, scheduleGroupId: number, dataItem: ScheduleItemProps[], reason: string, weeksTotal: number) => {
         try {
             if (dataItem.length < 0) {
                 SwalMessage({
@@ -236,7 +224,7 @@ export default function useScheduleHooks() {
                 return;
             }
 
-            const weeksFromDate = TotalWeek(startDate ? startDate : dataTenderByRab.tanggal_mulai, endDate ? endDate : dataTenderByRab.tanggal_akhir);
+            const weeksFromDate = TotalWeek(startDate, endDate);
             if (weeksTotal != weeksFromDate) {
                 SwalMessage({
                     type: "error",
@@ -248,13 +236,14 @@ export default function useScheduleHooks() {
             }
 
             SwalLoading();
-            const responseScheduleHeader = await API.post("/schedule/create", {
-                rab_id: dataTenderByRab.rab_id ? dataTenderByRab.rab_id : dataTenderByRab.id,
-                schedule_group_id: scheduleGroupId,
-                tanggal_mulai: startDate ? startDate : dataTenderByRab.tanggal_mulai,
-                tanggal_akhir: endDate ? endDate : dataTenderByRab.tanggal_akhir,
-                alasan_text: reason,
-            }, {
+            const formData = new FormData();
+            formData.append("rab_id", String(dataProjectIdentityByRab.rab_id));
+            formData.append("schedule_group_id", String(scheduleGroupId));
+            formData.append("tanggal_mulai", startDate);
+            formData.append("tanggal_akhir", endDate);
+            formData.append("alasan_text", reason);
+
+            const responseScheduleHeader = await API.post("/schedule/create", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -262,26 +251,30 @@ export default function useScheduleHooks() {
 
             for (let index = 0; index < dataItem.length; index++) {
                 const scheduleItem = dataItem[index];
+                const formData = new FormData();
+                formData.append("schedule_header_id", String(responseScheduleHeader.data.data.id));
+                formData.append("keterangan", scheduleItem.keterangan);
+                formData.append("nomor", (index + 1).toString());
+                formData.append("jumlah", String(scheduleItem.jumlah));
+                formData.append("bobot", String(scheduleItem.bobot));
 
-                const responseScheduleItem = await API.post("/schedule/item/create", {
-                    schedule_header_id: responseScheduleHeader.data.data?.id,
-                    description: scheduleItem?.description,
-                    number: (index + 1).toString(),
-                    weight: scheduleItem?.weight,
-                    total_price: Number(scheduleItem?.total_price)
-                }, {
+                const responseScheduleItem = await API.post("/schedule/item/create", formData, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
 
-                for (let index = 0; index < scheduleItem.schedule_weeks.length; index++) {
-                    const scheduleWeek = scheduleItem.schedule_weeks[index];
+                for (let index = 0; index < scheduleItem.weeks.length; index++) {
+                    const scheduleWeek = scheduleItem.weeks[index];
+                    const formData = new FormData();
+                    formData.append("schedule_item_id", responseScheduleItem.data.data.id);
+                    formData.append("minggu_nomor", String(index + 1));
+                    formData.append("nilai", String(scheduleWeek.nilai));
 
-                    await API.post('/schedule/week/create', {
-                        schedule_item_id: responseScheduleItem.data.data?.id,
-                        week_number: index + 1,
-                        value: scheduleWeek.value
+                    await API.post('/schedule/week/create', formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
                     });
                 }
             }
@@ -293,7 +286,7 @@ export default function useScheduleHooks() {
             });
 
             setTimeout(() => {
-                window.location.href = "/ppk/jadwal-pelaksanaan"
+                navigate("/admin-direksi/jadwal-pelaksanaan")
             }, 2000);
         } catch (error: any) {
             if (error) {
@@ -356,6 +349,7 @@ export default function useScheduleHooks() {
                     text: error.response.data.message
                 })
             }
+            console.error(error)
         }
     }
 
@@ -363,7 +357,6 @@ export default function useScheduleHooks() {
         handleSchedulePost,
         scheduleData,
         tahunData,
-        satkerData,
         setSelectedId,
         scheduleDataById,
         handleSchedulePut,

@@ -38,10 +38,10 @@ export default function useUserHooks() {
                 });
                 const users = SortDescById(response.data.data).map((item: any) => ({
                     ...item,
-                    role: item.role?.name || '-',
                     status: item.is_active ? "Aktif" : "Tidak Aktif"
                 }));
 
+                console.log(users)
                 setListUser(users);
             } catch (error) {
                 if (error) {
@@ -261,9 +261,10 @@ export default function useUserHooks() {
     };
 
     const handleShowUser = (data: UserProps) => {
+        console.log(data)
         setEmail(data?.email ?? '');
         setPassword('');
-        setRoleId(data?.role_id?.toString() ?? '');
+        setRoleId(data?.role?.toString() ?? '');
         setIsActive(data?.is_active?.toString() ?? '')
         setFullname(data?.fullname ?? '');
         setNik(data?.nik ?? '');

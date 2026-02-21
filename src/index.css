@@ -39,6 +39,11 @@
     --color-hover: #FEE2E2; */
 }
 
+.scrollbar-hidden::-webkit-scrollbar {
+    height: 0;
+    display: none;
+}
+
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -74,7 +79,7 @@
 }
 
 .bounce {
-  animation: smoothBounce 8s infinite ease-out;
+    animation: smoothBounce 8s infinite ease-out;
 }
 
 @keyframes fade-in {

@@ -12,8 +12,6 @@ import PokjaHasilKelompokKerja from "../pages/pokja/PokjaHasilKelompokKerja"
 import PokjaHasilPenjabatPengadaan from "../pages/pokja/PokjaHasilPenjabatPengadaan"
 import KepalaHasilPenjabatPengadaan from "../pages/kepala/hasil/KepalaHasilPenjabatPengadaan"
 import KepalaHasilKelompokKerja from "../pages/kepala/hasil/KepalaHasilKelompokKerja"
-import AdminManajemenPengguna from "../pages/admin/AdminManajemenPengguna"
-import AdminKelompokKerja from "../pages/admin/AdminKelompokKerja"
 import EditProfile from "../pages/EditProfile"
 import PokjaLaporanPenjabatPengadaanUpdateView from "../pages/pokja/edit/PokjaLaporanPenjabatPengadaanUpdateView"
 import PokjaLaporanKelompok from "../pages/pokja/PokjaLaporankelompok"
@@ -34,7 +32,24 @@ import KepalaJadwalPelaksanaanView from "../pages/kepala/laporan/show/KepalaJadw
 import NotFound from "../pages/NotFound"
 import ForgotPassword from "../pages/auth/ForgotPassword"
 import ResetPassword from "../pages/auth/ResetPassword"
-// import Konfigurasi from "../pages/Konfigurasi"
+import SuperAdminManajemenPengguna from "../pages/superadmin/SuperAdminManajemenPengguna"
+import SuperAdminKelompokKerja from "../pages/superadmin/SuperAdminKelompokKerja"
+import MasyarakatHistory from "../pages/masyarakat/MasyarakatHistory"
+import AdminDireksiIndentitasProyek from "../pages/admin-direksi/AdminDireksiIndentitasProyek"
+import AdminDireksiIdentitasProyekAdd from "../pages/admin-direksi/add/AdminDireksiIdentitasProyekAdd"
+import AdminDireksiIdentitasProyekUpdateView from "../pages/admin-direksi/edit/AdminDireksiIdentitasProyekUpdateView"
+import AdminDireksiRencanaAnggaran from "../pages/admin-direksi/AdminDireksiRencanaAnggaran"
+import AdminDireksiRencanaAnggaranAdd from "../pages/admin-direksi/add/AdminDireksiRencanaAnggaranAdd"
+import AdminDireksiRencanaAnggaranUpdateView from "../pages/admin-direksi/edit/AdminDireksiRencanaAnggaranUpdateView"
+import AdminDireksiJadwalPelaksanaan from "../pages/admin-direksi/AdminDireksiJadwalPelaksanaan"
+import AdminDireksiJadwalPelaksanaanAdd from "../pages/admin-direksi/add/AdminDireksiJadwalPelaksanaanAdd"
+import AdminDireksiJadwalPelaksanaanUpdateView from "../pages/admin-direksi/edit/AdminDireksiJadwalPelaksanaanUpdateView"
+import AdminDireksiRealisasi from "../pages/admin-direksi/AdminDireksiRealisasi"
+import AdminDireksiRealisasiAdd from "../pages/admin-direksi/add/AdminDireksiRealisasiAdd"
+import AdminDireksiRealisasiUpdateView from "../pages/admin-direksi/edit/AdminDireksiRealisasiUpdateView"
+import AdminDireksiProjectKurvaS from "../pages/admin-direksi/AdminDireksiProjectKurvaS"
+import AdminDireksiDokumentasi from "../pages/admin-direksi/AdminDireksiDokumentasi"
+import AdminDireksiDokumentasiUpdateView from "../pages/admin-direksi/edit/AdminDireksiDokumentasiUpdateView"
 
 export default function Router() {
   return (
@@ -46,10 +61,12 @@ export default function Router() {
         <Route path="*" element={<NotFound/>}/>
 
         {/* Auth */}
-        {/* <Route path="/konfigurasi" element={<Konfigurasi/>} /> */}
         <Route path="/masuk" element={<Login/>} />
         <Route path="/lupa-kata-sandi" element={<ForgotPassword/>} />
         <Route path="/reset-kata-sandi" element={<ResetPassword />} />
+
+        {/* Masyarakat */}
+        <Route path="/masyarakat/riwayat-laporan" element={<MasyarakatHistory/>}/>
 
         {/* PPK */}
         <Route path="/ppk/rencana-anggaran" element={<PPKRencanaAnggaran/>}/>
@@ -98,9 +115,34 @@ export default function Router() {
 
         <Route path="/kepala/project-kurva-s" element={<KepalaProjectKurvaS/>}/>
 
-        {/* Admin */}
-        <Route path="/admin/manajemen-pengguna" element={<AdminManajemenPengguna/>}/>        
-        <Route path="/admin/kelompok-kerja" element={<AdminKelompokKerja/>}/>
+        {/* Super Admin */}
+        <Route path="/superadmin/manajemen-pengguna" element={<SuperAdminManajemenPengguna/>}/>        
+        <Route path="/superadmin/kelompok-kerja" element={<SuperAdminKelompokKerja/>}/>
+
+        {/* Admin Direksi */}
+        <Route path="/admin-direksi/identitas-proyek" element={<AdminDireksiIndentitasProyek/>}/>
+        <Route path="/admin-direksi/identitas-proyek/tambah" element={<AdminDireksiIdentitasProyekAdd/>}/>
+        <Route path="/admin-direksi/identitas-proyek/ubah/:id" element={<AdminDireksiIdentitasProyekUpdateView/>}/>
+        <Route path="/admin-direksi/identitas-proyek/lihat/:id" element={<AdminDireksiIdentitasProyekUpdateView/>}/>
+
+        <Route path="/admin-direksi/rencana-anggaran" element={<AdminDireksiRencanaAnggaran/>}/>
+        <Route path="/admin-direksi/rencana-anggaran/tambah" element={<AdminDireksiRencanaAnggaranAdd/>}/>
+        <Route path="/admin-direksi/rencana-anggaran/ubah/:id" element={<AdminDireksiRencanaAnggaranUpdateView/>}/>
+        <Route path="/admin-direksi/rencana-anggaran/lihat/:id" element={<AdminDireksiRencanaAnggaranUpdateView/>}/>
+
+        <Route path="/admin-direksi/jadwal-pelaksanaan" element={<AdminDireksiJadwalPelaksanaan/>}/>
+        <Route path="/admin-direksi/jadwal-pelaksanaan/tambah" element={<AdminDireksiJadwalPelaksanaanAdd/>}/>
+        <Route path="/admin-direksi/jadwal-pelaksanaan/ubah/:id" element={<AdminDireksiJadwalPelaksanaanUpdateView/>}/>
+        <Route path="/admin-direksi/jadwal-pelaksanaan/lihat/:id" element={<AdminDireksiJadwalPelaksanaanUpdateView/>}/>
+
+        <Route path="/admin-direksi/realisasi-pekerjaan" element={<AdminDireksiRealisasi/>} />
+        <Route path="/admin-direksi/realisasi-pekerjaan/tambah" element={<AdminDireksiRealisasiAdd/>} />
+        <Route path="/admin-direksi/realisasi-pekerjaan/ubah/:id" element={<AdminDireksiRealisasiUpdateView/>} />
+        <Route path="/admin-direksi/realisasi-pekerjaan/lihat/:id" element={<AdminDireksiRealisasiUpdateView/>} />
+
+        <Route path="/admin-direksi/project-kurva-s" element={<AdminDireksiProjectKurvaS/>}/>
+        <Route path="/admin-direksi/dokumentasi" element={<AdminDireksiDokumentasi/>}/>
+        <Route path="/admin-direksi/dokumentasi/lihat/:id" element={<AdminDireksiDokumentasiUpdateView/>}/>
       </Routes>
     </BrowserRouter>
   )

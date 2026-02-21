@@ -58,13 +58,13 @@ export default function RabDetailTable({ dataFile, handleDeleteRow, showDelete =
                   className="hover:bg-primary/2 transition-all duration-200 border-b border-gray-100"
                 >
                   <td className="px-6 py-4 text-center font-poppins-medium text-sm text-gray-800 max-w-sm">
-                    <div className="truncate hover:text-clip" title={item.description}>
-                      {item.description}
+                    <div className="truncate hover:text-clip" title={item.keterangan}>
+                      {item.keterangan}
                     </div>
                   </td>
                   <td className="px-6 py-4 font-poppins-regular text-center text-sm text-gray-700">
                     <span className="inline-flex items-center justify-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-poppins-medium text-xs whitespace-nowrap">
-                      {item.unit}
+                      {item.satuan}
                     </span>
                   </td>
                   <td className="px-6 py-4 font-poppins-semibold text-sm text-gray-800 text-center">
@@ -73,7 +73,7 @@ export default function RabDetailTable({ dataFile, handleDeleteRow, showDelete =
                     </span>
                   </td>
                   <td className="px-6 py-4 font-poppins-semibold text-sm text-gray-800 text-center">
-                    {FormatRupiah(item.unit_price)}
+                    {FormatRupiah(item.harga)}
                   </td>
                   <td className="px-6 py-4 font-poppins-bold text-sm text-primary text-center bg-primary/3 hover:bg-primary/5 transition-all duration-200">
                     {FormatRupiah(item.total)}

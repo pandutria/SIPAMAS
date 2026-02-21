@@ -1,10 +1,8 @@
 import axios from "axios"
 
 const API = axios.create({
-    // baseURL: "http://localhost:8096/api"
-    baseURL: "https://backend-monev-api.setionugraha.my.id/api"
+    baseURL: "http://100.100.181.124:8081/api"
 });
 
 export default API;
-// export const BASE_URL_FILE = "http://localhost:8096";
-export const BASE_URL_FILE = "https://backend-monev-api.setionugraha.my.id";
+export const BASE_URL_FILE = "http://100.100.181.124:8081";

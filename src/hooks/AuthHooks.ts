@@ -66,7 +66,7 @@ export default function useAuthHooks() {
                 password
             });
 
-            const token = response.data.access_token;
+            const token = response.data.token;
             const message = response.data.message;
 
             localStorage.setItem("token", token);

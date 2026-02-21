@@ -102,8 +102,8 @@ export default function SearchData({ setSelectedRealization }: searchDataProps) 
         setIsSearching(true);
         setTimeout(() => {
             const realisasiBySearch = realisasiData.filter((item) => {
-                const paketFilter = item.schedule.rab?.data_entry.kode_paket?.toLowerCase()?.includes(paket.toLowerCase());
-                const tahunFilter = item.schedule.rab?.data_entry.tahun_anggaran?.includes(tahunAnggaran);
+                const paketFilter = item.schedule.rab?.proyek.nama?.toLowerCase()?.includes(paket.toLowerCase());
+                const tahunFilter = item.schedule.rab?.proyek.tahun_anggaran?.includes(tahunAnggaran);
                 return paketFilter && tahunFilter;
             });
 
@@ -149,7 +149,7 @@ export default function SearchData({ setSelectedRealization }: searchDataProps) 
                     >
                         <span className={`font-poppins-medium ${selectedOption ? 'text-gray-800' : 'text-gray-400'}`}>
                             {label === "Paket" ? (
-                                selectedOption ? `${selectedOption.label} (${selectedOption.text})` : realisasiData?.[realisasiData.length - 1]?.schedule.rab?.data_entry.nama_paket ? `${realisasiData[realisasiData.length - 1].schedule.rab?.data_entry.nama_paket} (${realisasiData[realisasiData.length - 1].schedule.rab?.data_entry.kode_paket})` : "Tidak Ada"
+                                selectedOption ? `${selectedOption.label} (${selectedOption.text})` : realisasiData?.[realisasiData.length - 1]?.schedule.rab?.proyek.nama ? `${realisasiData[realisasiData.length - 1].schedule.rab?.proyek.nama} (${realisasiData[realisasiData.length - 1].schedule.rab?.proyek.nama})` : "Tidak Ada"
                             ) : (
                                 selectedOption ? selectedOption.text : `Pilih ${label}`
                             )}

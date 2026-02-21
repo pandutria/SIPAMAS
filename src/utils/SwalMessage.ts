@@ -38,7 +38,7 @@ export const SwalMessage = ({
                 ? '#16a34a'
                 : type === 'error'
                 ? '#dc2626'
-                : '#f60',
+                : '#00BF50',
         cancelButtonColor: '#6b7280',
         showClass: {
             popup: 'swal2-show',

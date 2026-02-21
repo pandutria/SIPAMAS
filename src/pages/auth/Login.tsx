@@ -1,6 +1,6 @@
 import { Mail, Lock, RefreshCw } from 'lucide-react';
 import useAuthHooks from '../../hooks/AuthHooks';
-import logo from "/image/logo/logo-monalisa.png";
+import logo from "/image/logo/logo-sipamas.png";
 import { ArrowLeft } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import background from "/image/auth/background.jpg";

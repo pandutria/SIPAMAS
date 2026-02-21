@@ -187,7 +187,7 @@ declare global {
     email: string
     password: string
     role_id: number
-    role: RoleProps
+    role: string;
 
     fullname: string
     is_active?: boolean
@@ -205,6 +205,7 @@ declare global {
     sk_number?: string
     pbj_number?: string
     competence_number?: string
+    jabatan: string;
 
     satker_code?: number
     gp_id?: number
@@ -279,17 +280,76 @@ declare global {
     updated_at: string;
   }
 
+  export interface ProjectIdentityProps {
+    id: number;
+
+    nama: string;
+    tahun_anggaran: string;
+    kategori?: string;
+    provinsi?: string;
+    kabupaten?: string;
+    kecamatan?: string;
+    kecamatan_kode?: string;
+    kelurahan?: string;
+    latitude?: string;
+    longitude?: string;
+    nilai_kontrak?: string;
+    kontraktor_pelaksana?: string;
+    konsultas_pengawas?: string;
+    sumber_dana?: string;
+    kontrak_file?: string;
+    surat_perintah_file?: string;
+    surat_penunjukan_file?: string;
+    berita_acara_file?: string;
+    created_by_id?: number;
+
+    identitas_proyek_group_id: number;
+    alasan_count?: number;
+    alasan_text?: string;
+
+    created_at: string;
+    updated_at: string;
+    created_by: UserProps;
+
+    photos: ProjectIdentityPhotoProps[];
+    documents: ProjectIdentityDocumentProps[];
+  }
+
+  export interface ProjectIdentityPhotoProps {
+    id?: number;
+
+    identitas_proyek_id?: number;
+    title?: string;
+    type?: string;
+    photo_file?: string;
+
+    created_at?: string;
+    updated_at?: string;
+  }
+
+  export interface ProjectIdentityDocumentProps {
+    id: number;
+
+    identitas_proyek_id?: number;
+    name: string;
+    kategori: string;
+    photo_file: File | string;
+
+    created_at?: string;
+    updated_at?: string;
+  }
+
   export interface RABProps {
     id: number;
     alasan_count: number;
     alasan_text: string;
-    program: string;    
+    program: string;
 
-    data_entry_id: number;
-    data_entry: DataEntryProps;
+    identitas_proyek_id: number;
+    proyek: ProjectIdentityProps;
 
     rab_group_id: number;
-    rab_details: RABDetailProps[];
+    details: RABDetailProps[];
     created_at: string;
   }
 
@@ -299,10 +359,10 @@ declare global {
 
     rab_header?: RABProps | null;
 
-    description: string;
+    keterangan: string;
     volume: number;
-    unit: string;
-    unit_price: number;
+    satuan: string;
+    harga: number;
     total: number;
   }
 
@@ -314,7 +374,7 @@ declare global {
     alasan_count: number;
     alasan_text?: string | null;
 
-    items?: ScheduleItemProps[];
+    items: ScheduleItemProps[];
     schedule_group_id: number;
 
     tanggal_mulai: string;
@@ -332,15 +392,15 @@ declare global {
     schedule_header_id: number;
     schedule_header?: ScheduleHeaderProps | null;
 
-    number?: string;
-    description: string;
-    total_price: number | string;
-    weight: number;
+    nomor?: string;
+    keterangan: string;
+    jumlah: number | string;
+    bobot: number;
 
     created_at: string;
     updated_at: string;
 
-    schedule_weeks: ScheduleWeekProps[];
+    weeks: ScheduleWeekProps[];
   }
 
   interface ScheduleWeekProps {
@@ -349,19 +409,15 @@ declare global {
     schedule_item_id: number;
     schedule_item?: ScheduleItemProps[] | null;
 
-    week_number: number;
-    value: number;
-  } 
+    minggu_nomor: number;
+    nilai: number;
+  }
 
   export interface RealizationProps {
     id: number;
     schedule_header_id: number;
-    detail: RealizationDetailProps[];
+    details: RealizationDetailProps[];
     schedule: ScheduleProps;
-
-    week_number?: number | null;
-    value?: number | null;
-    bukti_file?: string | null;
 
     created_by_id: number;
     created_at: string;
@@ -371,8 +427,8 @@ declare global {
     id: number;
     bukti_file: string;
     realisasi_header_id: number;
-    value: string;
-    week_number: number;
+    nilai: string;
+    minggu_nomor: number;
 
     alasan_text: string;
     alasan_count: number;

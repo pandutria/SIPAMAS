@@ -18,30 +18,30 @@ export default function WeekScheduleTable({ totalMinggu, dataFile, handleDeleteR
     const [expandedWeeks, setExpandedWeeks] = useState<{ [key: number]: boolean }>({});
     const getWeeklyCumulativeValue = (weekIdx: number) => {
         return dataFile?.reduce((sum: number, item: ScheduleItemProps) => {
-            const cumulativeForItem = item.schedule_weeks
+            const cumulativeForItem = item.weeks
                 .slice(0, weekIdx + 1)
                 .reduce((acc, val) => {
-                    return acc + (Number(val.value) || 0);
+                    return acc + (Number(val.nilai) || 0);
                 }, 0);
             return sum + cumulativeForItem;
         }, 0) || 0;
     };
 
     const getWeeklyRealizationValue = (weekIdx: number) => {
-        return realizationData?.find((item: any) => Number(item.week_number) === weekIdx + 1)?.value || 0;
+        return realizationData?.find((item: any) => Number(item.minggu_nomor) === weekIdx + 1)?.nilai || 0;
     };
 
     const getRealizationCumulativeValue = (weekIdx: number) => {
         let cumulative = 0;
         for (let i = 0; i <= weekIdx; i++) {
-            const weekValue = realizationData?.find((item: any) => Number(item.week_number) === i + 1)?.value || 0;
+            const weekValue = realizationData?.find((item: any) => Number(item.minggu_nomor) === i + 1)?.nilai || 0;
             cumulative += Number(weekValue);
         }
         return cumulative;
     };
 
     const getWeeklyEvidence = (weekIdx: number) => {
-        return realizationData?.filter((item: any) => Number(item.week_number) === weekIdx + 1) || [];
+        return realizationData?.filter((item: any) => Number(item.minggu_nomor) === weekIdx + 1) || [];
     };
 
     const toggleWeekExpansion = (weekIdx: number) => {
@@ -118,30 +118,30 @@ export default function WeekScheduleTable({ totalMinggu, dataFile, handleDeleteR
                                     {dataFile?.map((item: ScheduleItemProps, index: any) => (
                                         <tr key={index} className="hover:bg-primary/5 transition-all duration-200 border-b border-gray-100">
                                             <td className="px-6 py-4 font-poppins-medium text-sm text-gray-800 max-w-xs">
-                                                <div className="truncate hover:text-clip" title={item.description}>
-                                                    {item.description}
+                                                <div className="truncate hover:text-clip" title={item.keterangan}>
+                                                    {item.keterangan}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <span className="inline-flex items-center justify-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-poppins-medium text-xs ring-1 ring-blue-200">
-                                                    {FormatRupiah(Number(item.total_price))}
+                                                    {FormatRupiah(Number(item.jumlah))}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <span className="inline-flex items-center justify-center px-3 py-1 bg-amber-50 text-amber-700 rounded-full font-poppins-medium text-xs ring-1 ring-amber-200">
-                                                    {item.weight}%
+                                                    {item.bobot}%
                                                 </span>
                                             </td>
-                                            {item.schedule_weeks?.map((val, i) => (
+                                            {item.weeks?.map((val, i) => (
                                                 <td
                                                     key={i}
                                                     className="px-4 py-4 text-center border-l border-gray-200 bg-primary/2 hover:bg-primary/5 transition-all duration-200"
                                                 >
-                                                    <div className={`flex items-center justify-center h-8 rounded font-poppins-bold text-sm transition-all duration-200 ${Number(val.value) > 0
+                                                    <div className={`flex items-center justify-center h-8 rounded font-poppins-bold text-sm transition-all duration-200 ${Number(val.nilai) > 0
                                                         ? 'bg-green-100 text-green-700 ring-1 ring-green-200'
                                                         : 'text-gray-400'
                                                         }`}>
-                                                        {Number(val.value) > 0 ? val.value : "-" as any}
+                                                        {Number(val.nilai) > 0 ? val.nilai : "-" as any}
                                                     </div>
                                                 </td>
                                             ))}
@@ -168,7 +168,7 @@ export default function WeekScheduleTable({ totalMinggu, dataFile, handleDeleteR
                                             <span className="inline-flex items-center justify-center px-4 py-1.5 bg-blue-100 text-blue-800 rounded-full font-poppins-bold text-sm ring-2 ring-blue-300 shadow-sm">
                                                 {FormatRupiah(
                                                     dataFile?.reduce(
-                                                        (sum: number, item: ScheduleItemProps) => sum + Number(item.total_price),
+                                                        (sum: number, item: ScheduleItemProps) => sum + Number(item.jumlah),
                                                         0
                                                     )
                                                 )}
@@ -176,7 +176,7 @@ export default function WeekScheduleTable({ totalMinggu, dataFile, handleDeleteR
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <span className="inline-flex items-center justify-center px-4 py-1.5 bg-amber-100 text-amber-800 rounded-full font-poppins-bold text-sm ring-2 ring-amber-300 shadow-sm">
-                                                {dataFile?.reduce((sum: number, item: ScheduleItemProps) => sum + item.weight, 0)}%
+                                                {dataFile?.reduce((sum: number, item: ScheduleItemProps) => sum + item.bobot, 0)}%
                                             </span>
                                         </td>
                                         {Array.from({ length: totalMinggu }).map((_, i) => (
@@ -203,7 +203,7 @@ export default function WeekScheduleTable({ totalMinggu, dataFile, handleDeleteR
                                                 <div className="inline-flex items-center justify-center min-w-12 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-poppins-bold text-sm ring-1 ring-blue-300 shadow-sm hover:shadow-md transition-all duration-200">
                                                     {dataFile?.reduce(
                                                         (sum: number, item: ScheduleItemProps) =>
-                                                            sum + (Number(item.schedule_weeks[weekIdx].value) || 0),
+                                                            sum + (Number(item.weeks[weekIdx].nilai) || 0),
                                                         0
                                                     )}
                                                 </div>
@@ -323,7 +323,7 @@ export default function WeekScheduleTable({ totalMinggu, dataFile, handleDeleteR
                                                             Realisasi Terkini
                                                         </div>
                                                         <div className="text-2xl font-poppins-bold text-blue-700">
-                                                            {currentEvidence.value}%
+                                                            {currentEvidence.nilai}%
                                                         </div>
                                                         {currentEvidence.alasan_text && (
                                                             <div className="mt-2 text-xs text-gray-600 font-poppins-regular">

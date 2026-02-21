@@ -54,7 +54,7 @@ export default function RealizationModal({ selectedSchedule, setShowRealisasiMod
     if (type === 'post') {
         maxWeeksFromData =
             selectedSchedule?.items
-                ?.map((item: any) => item.schedule_weeks?.length || 0)
+                ?.map((item: any) => item.weeks?.length || 0)
                 ?.reduce((max: number, len: number) => Math.max(max, len), 0) || 0;
 
         passedWeeks = PassedWeek(selectedSchedule?.tanggal_mulai);
@@ -65,7 +65,7 @@ export default function RealizationModal({ selectedSchedule, setShowRealisasiMod
     } else {
         maxWeeksFromData =
             selectedSchedule?.schedule?.items
-                ?.map((item: any) => item.schedule_weeks?.length || 0)
+                ?.map((item: any) => item.weeks?.length || 0)
                 ?.reduce((max: number, len: number) => Math.max(max, len), 0) || 0;
 
         passedWeeks = PassedWeek(selectedSchedule?.schedule?.tanggal_mulai);
@@ -87,11 +87,11 @@ export default function RealizationModal({ selectedSchedule, setShowRealisasiMod
             return;
         }
 
-        const hasRevision = selectedSchedule?.detail?.some(
-            (item: RealizationDetailProps) => item.week_number === Number(week)
+        const hasRevision = selectedSchedule?.details?.some(
+            (item: RealizationDetailProps) => item.minggu_nomor === Number(week)
         );
 
-        setShowRevision(!!hasRevision);
+        setShowRevision(hasRevision);
     }, [selectedSchedule, week]);
 
     return (

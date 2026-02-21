@@ -65,7 +65,7 @@ export default function AdminManajemenPengguna() {
                     ? [
                         item.fullname,
                         item.email,
-                        item.role?.name,
+                        item.role,
                     ]
                         .join(' ')
                         .toLowerCase()
@@ -87,7 +87,7 @@ export default function AdminManajemenPengguna() {
         return <LoadingSpinner />
     }
 
-    if (user?.role.name != "admin" || !user) {
+    if (user?.role != "admin" || !user) {
         return <Navigate to="/" replace />
     }
 

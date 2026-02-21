@@ -1,27 +1,27 @@
 export type WeekAggregate = {
-  week_number: number;
-  value: number;
+  minggu_nomor: number;
+  nilai: number;
 };
 
 export function ScheduleWeekAggregate(
-  items: { schedule_weeks?: { week_number: number; value: number }[] }[]
+  items: { weeks?: { minggu_nomor: number; nilai: number }[] }[]
 ): WeekAggregate[] {
   if (!Array.isArray(items) || items.length === 0) return [];
 
   const acc: Record<number, WeekAggregate> = {};
 
   for (const item of items) {
-    item.schedule_weeks?.forEach(week => {
-      const weekNo = Number(week.week_number);
-      const val = Number(week.value ?? 0);
+    item.weeks?.forEach(week => {
+      const weekNo = Number(week.minggu_nomor);
+      const val = Number(week.nilai ?? 0);
 
       if (!acc[weekNo]) {
-        acc[weekNo] = { week_number: weekNo, value: 0 };
+        acc[weekNo] = { minggu_nomor: weekNo, nilai: 0 };
       }
 
-      acc[weekNo].value += val;
+      acc[weekNo].nilai += val;
     });
   }
 
-  return Object.values(acc).sort((a, b) => a.week_number - b.week_number);
+  return Object.values(acc).sort((a, b) => a.minggu_nomor - b.minggu_nomor);
 }

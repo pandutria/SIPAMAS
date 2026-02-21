@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Eye, Edit2, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, Edit2, CheckCircle, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { useState } from 'react';
+import { BASE_URL_FILE } from '../server/API';
 
 interface TableColumn {
     key: string;
@@ -14,6 +15,8 @@ interface TableContentProps {
     showEdit?: boolean;
     showPreview?: boolean;
     showSelect?: boolean;
+    showDownload?: boolean;
+    downloadKey?: string;
     onEdit?: (item: any) => void;
     onPreview?: (item: any) => void;
     idKey?: string;
@@ -29,6 +32,8 @@ export default function TableContent({
     showEdit = true,
     showPreview = true,
     showSelect = false,
+    showDownload = false,
+    downloadKey = 'file_url',
     onEdit,
     onPreview,
     idKey = 'id',
@@ -71,9 +76,7 @@ export default function TableContent({
         setSelectedIds(newSelectedIds);
         onSelectedIdsChange?.(newSelectedIds);
 
-        const selectedData = data.filter(d =>
-            newSelectedIds.includes(d[idKey])
-        );
+        const selectedData = data.filter(d => newSelectedIds.includes(d[idKey]));
         onSelectedDataChange?.(selectedData);
     };
 
@@ -86,15 +89,18 @@ export default function TableContent({
     };
 
     const handlePrevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
 
     const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const handleDownload = (item: any) => {
+        const path = item[downloadKey];
+        if (!path) return;
+        const cleanPath = path.replace(/\\/g, '/');
+        window.open(`${BASE_URL_FILE}/${cleanPath}`, '_blank');
     };
 
     return (
@@ -123,7 +129,7 @@ export default function TableContent({
                                     {column.label}
                                 </th>
                             ))}
-                            {(showEdit || showPreview || showSelect) && (
+                            {(showEdit || showPreview || showSelect || showDownload) && (
                                 <th className="px-2 sm:px-6 py-3 sm:py-4 text-center font-poppins-semibold text-xs sm:text-sm text-gray-800 uppercase tracking-wider">
                                     Aksi
                                 </th>
@@ -134,7 +140,7 @@ export default function TableContent({
                         {currentData.length === 0 && data.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan={columns.length + (isSelect ? 1 : 0) + (showEdit || showPreview || showSelect ? 1 : 0)}
+                                    colSpan={columns.length + (isSelect ? 1 : 0) + (showEdit || showPreview || showSelect || showDownload ? 1 : 0)}
                                     className="px-4 sm:px-8 py-8 sm:py-12 text-center"
                                 >
                                     <div className="flex flex-col items-center gap-3">
@@ -174,7 +180,7 @@ export default function TableContent({
                                             {column.key === 'id' ? startIndex + index + 1 : item[column.key]}
                                         </td>
                                     ))}
-                                    {(showEdit || showPreview || showSelect) && (
+                                    {(showEdit || showPreview || showSelect || showDownload) && (
                                         <td className="px-2 sm:px-6 py-2 sm:py-4">
                                             <div className="flex items-center justify-center gap-1 sm:gap-3 flex-wrap">
                                                 {showEdit && (
@@ -205,6 +211,17 @@ export default function TableContent({
                                                     >
                                                         <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                                                         <span className="hidden sm:inline">Pilih</span>
+                                                    </button>
+                                                )}
+                                                {showDownload && (
+                                                    <button
+                                                        onClick={() => handleDownload(item)}
+                                                        disabled={!item[downloadKey]}
+                                                        className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-all duration-200 cursor-pointer font-poppins-medium text-xs active:scale-95 hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        title="Download"
+                                                    >
+                                                        <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                        <span className="hidden sm:inline">Download</span>
                                                     </button>
                                                 )}
                                             </div>

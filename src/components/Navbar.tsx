@@ -14,7 +14,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { handleLogout } = useAuthHooks();
-  const type = user ? user.role.name : 'guest';
+  const type = user ? user.role : 'guest';
 
   const ppkLaporanItems = [
     { label: 'Rencana Anggaran', path: '/ppk/rencana-anggaran' },
@@ -46,9 +46,24 @@ export default function Navbar() {
   ];
 
   const adminItems = [
-    { label: 'Manajemen Pengguna', path: '/admin/manajemen-pengguna' },
-    { label: 'Kelompok Kerja', path: '/admin/kelompok-kerja' },
+    { label: 'Manajemen Pengguna', path: '/superadmin/manajemen-pengguna' },
+    { label: 'Kelompok Kerja', path: '/superadmin/kelompok-kerja' },
   ];
+
+  const adminDireksiLaporanItems = [
+    { label: 'Identitas Proyek', path: '/admin-direksi/identitas-proyek' },
+    { label: 'Rencana Anggaran', path: '/admin-direksi/rencana-anggaran' },
+    { label: 'Jadwal Pelaksanaan', path: '/admin-direksi/jadwal-pelaksanaan' },
+    { label: 'Realisasi Pekerjaan', path: '/admin-direksi/realisasi-pekerjaan' },
+    { label: 'Project Progress (Kurva S)', path: '/admin-direksi/project-kurva-s' },
+    { label: 'Dokumentasi', path: '/admin-direksi/dokumentasi' },
+    { label: 'Evaluasi', path: '/admin-direksi/evaluasi' },
+  ];
+
+  const masyarakatItems = [
+    { label: 'Buat Laporan Baru', path: '/masyarakat/buat-laporan-baru' },
+    { label: 'Riwayat Laporan', path: '/masyarakat/riwayat-laporan' },
+  ]
 
   if (loading) {
     return;
@@ -240,7 +255,7 @@ export default function Navbar() {
             </div>
           )}
 
-          {type === 'admin' && (
+          {type === 'super-admin' && (
             <div className="hidden md:flex items-center gap-2">
               <button
                 className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10"
@@ -264,6 +279,85 @@ export default function Navbar() {
                 {isLaporanOpen && (
                   <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50">
                     {adminItems.map((item, index) => (
+                      <button
+                        key={index}
+                        className="w-full font-poppins-regular text-left font-poppins text-sm px-6 py-3 hover:bg-primary/10 hover:text-primary transition-colors duration-200 cursor-pointer"
+                        onClick={() => {
+                          navigate(item.path);
+                          setIsLaporanOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {type === 'masyarakat' && (
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10"
+                onClick={() => navigate("/")}
+              >
+                Dashboard
+              </button>
+
+              <div className="relative">
+                <button
+                  className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10 flex items-center gap-2"
+                  onClick={() => {
+                    setIsLaporanOpen(!isLaporanOpen)
+                    setIsHasilOpen(false)
+                  }}
+                >
+                  Manajemen
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isLaporanOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50">
+                    {masyarakatItems.map((item, index) => (
+                      <button
+                        key={index}
+                        className="w-full font-poppins-regular text-left font-poppins text-sm px-6 py-3 hover:bg-primary/10 hover:text-primary transition-colors duration-200 cursor-pointer"
+                        onClick={() => {
+                          navigate(item.path);
+                          setIsLaporanOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {type === 'admin-direksi' && (
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10"
+                onClick={() => navigate("/")}
+              >
+                Dashboard
+              </button>
+
+              <div className="relative">
+                <button
+                  className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10 flex items-center gap-2"
+                  onClick={() => setIsLaporanOpen(!isLaporanOpen)}
+                >
+                  Laporan Saya
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isLaporanOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50">
+                    {adminDireksiLaporanItems.map((item, index) => (
                       <button
                         key={index}
                         className="w-full font-poppins-regular text-left font-poppins text-sm px-6 py-3 hover:bg-primary/10 hover:text-primary transition-colors duration-200 cursor-pointer"
@@ -710,7 +804,7 @@ export default function Navbar() {
         </div>
       )}
 
-      {type === 'admin' && (
+      {type === 'super-admin' && (
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
             ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
@@ -742,6 +836,180 @@ export default function Navbar() {
                 `}
               >
                 {adminItems.map((item, index) => (
+                  <button
+                    key={index}
+                    className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      navigate(item.path);
+                      setIsLaporanOpen(false);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 pt-2 mt-2">
+              <div className="flex items-center gap-3 px-4 py-3">
+                <div className={`w-10 h-10 rounded-full ${user?.file_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
+                  {user?.file_photo ? (
+                    <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.file_photo}`} alt="" /> 
+                  ) : (
+                    <span className="font-poppins-medium text-primary text-sm">
+                      {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                    </span>
+                  )}
+                </div>
+                <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
+              </div>
+
+              <button
+                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10 flex items-center gap-3"
+                onClick={() => {
+                  navigate('/ubah-profile');
+                  setIsMenuOpen(false);
+                }}
+              >
+                <User className="h-4 w-4" />
+                Edit Profile
+              </button>
+
+              <button
+                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-red-600 cursor-pointer hover:bg-red-50 flex items-center gap-3"
+                onClick={() => {
+                  handleLogout();
+                  setIsMenuOpen(false);
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {type === 'masyarakat' && (
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
+            ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
+          `}
+        >
+          <div className="mt-4 space-y-2">
+            <button
+              className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
+              onClick={() => {
+                navigate("/");
+                setIsMenuOpen(false);
+              }}
+            >
+              Dashboard
+            </button>
+
+            <div>
+              <button
+                className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20 flex items-center justify-between"
+                onClick={() => setIsLaporanOpen(!isLaporanOpen)}
+              >
+                Manajemen Pengguna
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ml-4
+                  ${isLaporanOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}
+                `}
+              >
+                {masyarakatItems.map((item, index) => (
+                  <button
+                    key={index}
+                    className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      navigate(item.path);
+                      setIsLaporanOpen(false);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 pt-2 mt-2">
+              <div className="flex items-center gap-3 px-4 py-3">
+                <div className={`w-10 h-10 rounded-full ${user?.file_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
+                  {user?.file_photo ? (
+                    <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.file_photo}`} alt="" /> 
+                  ) : (
+                    <span className="font-poppins-medium text-primary text-sm">
+                      {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                    </span>
+                  )}
+                </div>
+                <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
+              </div>
+
+              <button
+                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10 flex items-center gap-3"
+                onClick={() => {
+                  navigate('/ubah-profile');
+                  setIsMenuOpen(false);
+                }}
+              >
+                <User className="h-4 w-4" />
+                Edit Profile
+              </button>
+
+              <button
+                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-red-600 cursor-pointer hover:bg-red-50 flex items-center gap-3"
+                onClick={() => {
+                  handleLogout();
+                  setIsMenuOpen(false);
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {type === 'admin-direksi' && (
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
+            ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
+          `}
+        >
+          <div className="mt-4 space-y-2">
+            <button
+              className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
+              onClick={() => {
+                navigate("/");
+                setIsMenuOpen(false);
+              }}
+            >
+              Dashboard
+            </button>
+
+            <div>
+              <button
+                className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20 flex items-center justify-between"
+                onClick={() => setIsLaporanOpen(!isLaporanOpen)}
+              >
+                Laporan Saya
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ml-4
+                  ${isLaporanOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}
+                `}
+              >
+                {adminDireksiLaporanItems.map((item, index) => (
                   <button
                     key={index}
                     className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"

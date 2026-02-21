@@ -1,4 +1,4 @@
-import logo from "/image/logo/logo-monalisa.png";
+import logo from "/image/logo/logo-sipamas.png";
 
 interface LoadingSpinnerProps {
   fullScreen?: boolean;

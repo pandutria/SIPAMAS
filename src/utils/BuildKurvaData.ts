@@ -3,7 +3,7 @@ import { PassedWeek } from "./PassedWeek";
 export function buildKurvaData(
   schedule?: ScheduleProps | null,
   realization?: {
-    detail?: { week_number: string | number; value: string | number | null }[]
+    detail?: { minggu_nomor: string | number; nilai: string | number | null }[]
   } | null
 ): { minggu: number; rencana: number; aktual: number }[] {
   if (!schedule?.items?.length) return [];
@@ -12,23 +12,23 @@ export function buildKurvaData(
   const aktualMap = new Map<number, number>();
 
   for (const item of schedule.items) {
-    for (const w of item.schedule_weeks ?? []) {
-      const week = Number(w.week_number);
-      const value = Number(w.value ?? 0);
+    for (const w of item.weeks ?? []) {
+      const week = Number(w.minggu_nomor);
+      const nilai = Number(w.nilai ?? 0);
 
-      if (!Number.isFinite(week) || !Number.isFinite(value)) continue;
+      if (!Number.isFinite(week) || !Number.isFinite(nilai)) continue;
 
-      rencanaMap.set(week, (rencanaMap.get(week) ?? 0) + value);
+      rencanaMap.set(week, (rencanaMap.get(week) ?? 0) + nilai);
     }
   }
 
   for (const d of realization?.detail ?? []) {
-    const week = Number(d.week_number);
-    const value = Number(d.value ?? 0);
+    const week = Number(d.minggu_nomor);
+    const nilai = Number(d.nilai ?? 0);
 
-    if (!Number.isFinite(week) || !Number.isFinite(value)) continue;
+    if (!Number.isFinite(week) || !Number.isFinite(nilai)) continue;
 
-    aktualMap.set(week, (aktualMap.get(week) ?? 0) + value);
+    aktualMap.set(week, (aktualMap.get(week) ?? 0) + nilai);
   }
 
   const passedWeek = PassedWeek(schedule.tanggal_mulai);
