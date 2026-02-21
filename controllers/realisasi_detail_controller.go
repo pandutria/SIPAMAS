@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -30,13 +31,9 @@ func GetAllRealisasiDetail(c *gin.Context) {
 
 func CreateRealisasiDetail(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreateRealisasiDetailRequest
 
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Membuat data gagal",
-			"error":   err.Error(),
-		})
+	var req dtos.CreateRealisasiDetailRequest
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 

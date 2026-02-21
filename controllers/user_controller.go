@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -18,21 +19,21 @@ func GetAllUser(c *gin.Context) {
 	if err := query.Find(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengambil data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }
 
 func CreateUser(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreateAndUpdateUserRequest
 
+	var req dtos.CreateAndUpdateUserRequest
 	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Membuat data gagal",
@@ -114,21 +115,14 @@ func CreateUser(c *gin.Context) {
 
 func UpdateProfile(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreateAndUpdateUserRequest
-	userID, exists := c.Get("user_id")
 
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Unauthorized",
-		})
+	var req dtos.CreateAndUpdateUserRequest
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 
-	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Membuat data gagal",
-			"error":   err.Error(),
-		})
+	user, err := components.GetCurrentUser(c, query)
+	if err != nil {
 		return
 	}
 
@@ -162,57 +156,44 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	var data models.User
-	if err := query.First(&data, userID).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Mengubah data gagal",
-			"error":   err.Error(),
-		})
-		return
-	}
-
-	utils.SetIfNotEmpty(&data.FullName, req.FullName)
-	utils.SetIfNotEmpty(&data.Email, req.Email)
-	utils.SetIfNotEmpty(&data.Role, req.Role)
-	utils.SetIfNotEmpty(&data.Nik, req.Nik)
-	utils.SetIfNotEmpty(&data.PhoneNumber, req.PhoneNumber)
-	utils.SetIfNotEmpty(&data.Address, req.Address)
-	utils.SetIfNotEmpty(&data.Nip, req.Nip)
-	utils.SetIfNotEmpty(&data.SkNumber, req.SkNumber)
-	utils.SetIfNotEmpty(&data.SkNumber, req.SkNumber)
-	utils.SetIfNotEmpty(&data.Jabatan, req.Jabatan)
+	utils.SetIfNotEmpty(&user.FullName, req.FullName)
+	utils.SetIfNotEmpty(&user.Email, req.Email)
+	utils.SetIfNotEmpty(&user.Role, req.Role)
+	utils.SetIfNotEmpty(&user.Nik, req.Nik)
+	utils.SetIfNotEmpty(&user.PhoneNumber, req.PhoneNumber)
+	utils.SetIfNotEmpty(&user.Address, req.Address)
+	utils.SetIfNotEmpty(&user.Nip, req.Nip)
+	utils.SetIfNotEmpty(&user.SkNumber, req.SkNumber)
+	utils.SetIfNotEmpty(&user.SkNumber, req.SkNumber)
+	utils.SetIfNotEmpty(&user.Jabatan, req.Jabatan)
 
 	if profilePath != nil {
-		data.ProfilePhoto = profilePath
+		user.ProfilePhoto = profilePath
 	}
 
 	if skPath != nil {
-		data.SkFile = skPath
+		user.SkFile = skPath
 	}
 
-	if err := query.Save(&data).Error; err != nil {
+	if err := query.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengubah data gagal",
-			"error":  err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengubah data berhasil",
-		"data":    data,
+		"data":    user,
 	})
 }
 
 func Login(c *gin.Context) {
 	query := config.DB
-	var req dtos.LoginRequest
 
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Login gagal",
-			"error":   err.Error(),
-		})
+	var req dtos.LoginRequest
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 
@@ -275,6 +256,70 @@ func Me(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengambil data berhasil",
+		"data":    user,
+	})
+}
+
+func DeleteUser(c *gin.Context) {
+	query := config.DB
+	id := c.Param("id")
+	var data models.User
+
+	if err := query.First(&data, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Menghapus data berhasil",
+		"data":    data,
+	})
+}
+
+func UpdatePassword(c *gin.Context) {
+	query := config.DB
+
+	var req dtos.UpdatePasswordRequest
+	if components.BindRequest(c, &req) == false {
+		return
+	}
+
+	user, err := components.GetCurrentUser(c, query)
+	if err != nil {
+		return
+	}
+
+	if err := query.Where("id = ?", user.ID).Find(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Pengguna tidak valid!",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	user.Password = utils.HashSHA512(req.Password)
+
+	if err := config.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Mengubah password gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Mengubah password berhasil",
 		"data":    user,
 	})
 }

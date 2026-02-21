@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -45,13 +46,9 @@ func GetIdentitasProyekPhotoById(c *gin.Context) {
 
 func CreateIdentitasProyekPhoto(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreateIdentitasProyekPhotoRequest
 
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Membuat data gagal",
-			"error":   err.Error(),
-		})
+	var req dtos.CreateIdentitasProyekPhotoRequest
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 

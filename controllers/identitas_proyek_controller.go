@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -53,29 +54,14 @@ func GetIdentitasById(c *gin.Context) {
 
 func CreateIdentitas(c *gin.Context) {
 	query := config.DB
+
 	var req dtos.CreateUpdateIdentitasRequest
-	userId, isNull := c.Get("user_id")
-
-	if !isNull {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Pengguna harus masuk terlebih dahulu",
-		})
+	if !components.BindRequest(c, &req) {
 		return
 	}
 
-	var user models.User
-	if err := query.First(&user, userId).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Pengguna harus masuk terlebih dahulu",
-		})
-		return
-	}
-
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Membuat data gagal",
-			"error":   err.Error(),
-		})
+	user, err := components.GetCurrentUser(c, query)
+	if err != nil {
 		return
 	}
 
@@ -172,13 +158,9 @@ func CreateIdentitas(c *gin.Context) {
 func UpdateIdentitas(c *gin.Context) {
 	query := config.DB
 	id := c.Param("id")
-	var req dtos.CreateUpdateIdentitasRequest
 
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Mengubah data gagal",
-			"error":   err.Error(),
-		})
+	var req dtos.CreateUpdateIdentitasRequest
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 

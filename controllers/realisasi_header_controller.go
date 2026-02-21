@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -76,22 +77,14 @@ func GetRealisasiById(c *gin.Context) {
 
 func CreateRealisasiHeader(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreateRealisasiRequest
-	userId, isNull := c.Get("user_id")
 
-	if !isNull {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Pengguna harus masuk terlebih dahulu",
-		})
+	var req dtos.CreateRealisasiRequest
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 
-	var user models.User
-	if err := query.First(&user, userId).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Membuat data gagal",
-			"error":   err.Error(),
-		})
+	user, err := components.GetCurrentUser(c, query)
+	if err != nil {
 		return
 	}
 

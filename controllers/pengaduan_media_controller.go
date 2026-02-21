@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -30,13 +31,9 @@ func GetAllPengaduanMedia(c *gin.Context) {
 
 func CreatePengaduanMedia(c *gin.Context) {
 	query := config.DB
-	var req dtos.CreatePengaduanMediaRequest
 
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Membuat data gagal",
-			"error":   err.Error(),
-		})
+	var req dtos.CreatePengaduanMediaRequest
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 
@@ -84,6 +81,29 @@ func CreatePengaduanMedia(c *gin.Context) {
 	})
 }
 
-func UpdateStatusPengaduan(c *gin.Context) {
+func DeletePengaduanMedia(c *gin.Context) {
 	query := config.DB
+	id := c.Param("id")
+	var data models.PengaduanMedia
+
+	if err := query.First(&data, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Menghapus data berhasil",
+		"data":    data,
+	})
 }

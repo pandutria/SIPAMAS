@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -67,29 +68,14 @@ func GetScheduleHeaderById(c *gin.Context) {
 
 func CreateScheduleHeader(c *gin.Context) {
 	query := config.DB
+
 	var req dtos.CreateScheduleHeaderRequest
-	userId, isNull := c.Get("user_id")
-
-	if !isNull {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Pengguna harus masuk terlebih dahulu",
-		})
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 
-	var user models.User
-	if err := query.First(&user, userId).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Pengguna harus masuk terlebih dahulu",
-		})
-		return
-	}
-
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Membuat data gagal",
-			"error":   err.Error(),
-		})
+	user, err := components.GetCurrentUser(c, query)
+	if err != nil {
 		return
 	}
 

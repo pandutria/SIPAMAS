@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
@@ -16,14 +17,14 @@ func GetAllEvaluasi(c *gin.Context) {
 	if err := query.Find(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengambil data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }
 
@@ -35,64 +36,49 @@ func GetEvaluasiById(c *gin.Context) {
 	if err := query.First(&data, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengambil data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }
 
 func CreateEvaluasi(c *gin.Context) {
 	query := config.DB
+
 	var req dtos.CreateEvaluasiRequest
-	userId, isNull := c.Get("user_id")
-
-	if !isNull {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Pengguna harus masuk terlebih dahulu",
-		})
+	if components.BindRequest(c, &req) == false {
 		return
 	}
 
-	var user models.User
-	if err := query.First(&user, userId).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Pengguna harus masuk terlebih dahulu",
-		})
-		return
-	}
-
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Membuat data gagal",
-			"error": err.Error(),
-		})
+	user, err := components.GetCurrentUser(c, query)
+	if err != nil {
 		return
 	}
 
 	data := models.Evaluasi{
 		RealisasiHeaderId: req.RealisasiHeaderId,
-		Catatan: req.Catatan,
-		Tindakan: req.Tindakan,
-		Skor: req.Skor,
-		CreatedById: user.ID,
+		Catatan:           req.Catatan,
+		Tindakan:          req.Tindakan,
+		Skor:              req.Skor,
+		CreatedById:       user.ID,
 	}
 
 	if err := query.Create(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Membuat data gagal",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
-		"data": data,
+		"data":    data,
 	})
 }
 

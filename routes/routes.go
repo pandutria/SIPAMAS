@@ -19,6 +19,7 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		private.GET("/auth/me", controllers.Me)
 		private.PUT("/auth/update", controllers.UpdateProfile)
+		private.PUT("/auth/password/update", controllers.UpdatePassword)
 
 		private.GET("/user", controllers.GetAllUser)
 
@@ -69,10 +70,21 @@ func SetupRoutes(r *gin.Engine) {
 		private.GET("/evaluasi/:id", controllers.GetEvaluasiById)
 		private.POST("/evaluasi/create", controllers.CreateEvaluasi)
 		private.DELETE("/evaluasi/delete/:id", controllers.DeleteEvaluasi)
-  
+
 		private.GET("/pengaduan", controllers.GetAllPengaduan)
 		private.GET("/pengaduan/:id", controllers.GetPengaduanById)
 		private.POST("/pengaduan/created", controllers.CreatePengaduan)
 		private.DELETE("/pengaduan/delete/:id", controllers.DeleteEvaluasi)
+
+		private.GET("/pengaduan/media", controllers.GetAllPengaduanMedia)
+		private.POST("/pengaduan/media/create", controllers.CreatePengaduanMedia)
+		private.DELETE("/pengaduan/media/delete/:id", controllers.DeletePengaduanMedia)
+
+		private.GET("/pengaduan/timeline", controllers.GetAllPengaduanTimeLine)
+		private.DELETE("/pengaduan/timeline/delete/:id", controllers.DeletePengaduanTimeline)
+
+		private.GET("/pengaduan/review", controllers.GetAllPengaduanReview)
+		private.POST("/pengaduan/review/create", controllers.CreatePengaduanReview)
+		private.DELETE("/pengaduan/review/delete/:id", controllers.DeletePengaduanReview)
 	}
 }
