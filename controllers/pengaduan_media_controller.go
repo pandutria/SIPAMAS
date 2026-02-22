@@ -41,7 +41,7 @@ func CreatePengaduanMedia(c *gin.Context) {
 	mediaPath, err := utils.SaveUploadedFile(
 		c,
 		mediaFile,
-		"assets/photo",
+		"assets/file",
 	)
 
 	if err != nil {

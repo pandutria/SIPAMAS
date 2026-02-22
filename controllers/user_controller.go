@@ -237,20 +237,9 @@ func Login(c *gin.Context) {
 
 func Me(c *gin.Context) {
 	query := config.DB
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
 
-	var user models.User
-	if err := query.First(&user, userID).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "User tidak ditemukan",
-			"error":   err.Error(),
-		})
+	user, err := components.GetCurrentUser(c, query)
+	if err != nil {
 		return
 	}
 

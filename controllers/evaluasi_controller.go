@@ -14,7 +14,7 @@ func GetAllEvaluasi(c *gin.Context) {
 	query := config.DB
 	var data []models.Evaluasi
 
-	if err := query.Find(&data).Error; err != nil {
+	if err := query.Unscoped().Find(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
 			"error":   err.Error(),
@@ -33,7 +33,7 @@ func GetEvaluasiById(c *gin.Context) {
 	id := c.Param("id")
 	var data models.Evaluasi
 
-	if err := query.First(&data, id).Error; err != nil {
+	if err := query.Unscoped().First(&data, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
 			"error":   err.Error(),

@@ -12,6 +12,7 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		public.POST("/user/create", controllers.CreateUser)
 		public.POST("/auth/login", controllers.Login)
+		public.GET("/realisasi", controllers.GetAllRealisasiHeader)
 	}
 
 	private := r.Group("/api")
@@ -58,7 +59,6 @@ func SetupRoutes(r *gin.Engine) {
 		private.GET("/schedule/week", controllers.GetAllScheduleWeek)
 		private.POST("/schedule/week/create", controllers.CreateScheduleWeek)
 
-		private.GET("/realisasi", controllers.GetAllRealisasiHeader)
 		private.GET("/realisasi/:id", controllers.GetRealisasiById)
 		private.POST("/realisasi/create", controllers.CreateRealisasiHeader)
 		private.DELETE("/realisasi/delete/:id", controllers.DeleteRealisasi)
@@ -73,8 +73,9 @@ func SetupRoutes(r *gin.Engine) {
 
 		private.GET("/pengaduan", controllers.GetAllPengaduan)
 		private.GET("/pengaduan/:id", controllers.GetPengaduanById)
-		private.POST("/pengaduan/created", controllers.CreatePengaduan)
-		private.DELETE("/pengaduan/delete/:id", controllers.DeleteEvaluasi)
+		private.POST("/pengaduan/create", controllers.CreatePengaduan)
+		private.PUT("/pengaduan/status/update/:id", controllers.UpdateStatusPengaduan)
+		private.DELETE("/pengaduan/delete/:id", controllers.DeletePengaduan)
 
 		private.GET("/pengaduan/media", controllers.GetAllPengaduanMedia)
 		private.POST("/pengaduan/media/create", controllers.CreatePengaduanMedia)

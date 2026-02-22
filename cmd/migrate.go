@@ -21,5 +21,9 @@ func main() {
 		&models.RealisasiHeader{},
 		&models.RealisasiDetail{},
 		&models.Evaluasi{},
+		&models.Pengaduan{},
+		&models.PengaduanMedia{},
+		&models.PengaduanTimeline{},
+		&models.PengaduanReview{},
 	)
 }

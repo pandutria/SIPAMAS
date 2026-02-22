@@ -160,12 +160,14 @@ func DeleteRealisasi(c *gin.Context) {
 		return
 	}
 
-	if err := query.Delete(&detail).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
+	if len(detail) > 0 {
+		if err := query.Delete(&detail).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
 	}
 
 	if err := query.Delete(&data).Error; err != nil {

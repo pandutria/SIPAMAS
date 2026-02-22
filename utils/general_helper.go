@@ -59,7 +59,7 @@ func SetIfNotEmpty(dest **string, val string) {
 func UploadIfExists(c *gin.Context, field string) (*string, error) {
 	file, err := c.FormFile(field)
 	if err != nil {
-		return nil, nil // tidak upload = bukan error
+		return nil, nil 
 	}
 
 	path, err := SaveUploadedFile(c, file, "assets/file")
@@ -69,4 +69,3 @@ func UploadIfExists(c *gin.Context, field string) (*string, error) {
 
 	return path, nil
 }
-

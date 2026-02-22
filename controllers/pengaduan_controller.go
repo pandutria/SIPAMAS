@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"gin-gorm/components"
 	"gin-gorm/config"
 	"gin-gorm/dtos"
@@ -20,6 +19,7 @@ func GetAllPengaduan(c *gin.Context) {
 		Preload("CreatedBy").
 		Preload("Medias").
 		Preload("Timelines").
+		Preload("Timelines.CreatedBy").
 		Preload("Review").
 		Find(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -134,31 +134,19 @@ func UpdateStatusPengaduan(c *gin.Context) {
 
 	if data.Status == "Diproses" {
 		judul = "Status Laporan Diperbarui"
-		keterangan = fmt.Sprintf(
-			"Laporan %s kini dalam proses pengerjaan oleh tim lapangan.",
-			data.ID,
-		)
+		keterangan = "Laporan %s kini dalam proses pengerjaan oleh tim lapangan."
 
 	} else if data.Status == "Selesai" {
 		judul = "Laporan Telah Diselesaikan"
-		keterangan = fmt.Sprintf(
-			"Laporan %s telah selesai diproses. Terima kasih atas partisipasi Anda.",
-			data.ID,
-		)
+		keterangan = "Laporan %s telah selesai diproses. Terima kasih atas partisipasi Anda."
 
 	} else if data.Status == "Ditolak" {
 		judul = "Laporan Ditolak"
-		keterangan = fmt.Sprintf(
-			"Laporan %s ditolak. Silakan periksa kembali detail laporan atau hubungi admin untuk informasi lebih lanjut.",
-			data.ID,
-		)
+		keterangan = "Laporan %s ditolak. Silakan periksa kembali detail laporan atau hubungi admin untuk informasi lebih lanjut."
 
 	} else {
 		judul = "Status Laporan"
-		keterangan = fmt.Sprintf(
-			"Laporan %s mengalami perubahan status.",
-			data.ID,
-		)
+		keterangan = "Laporan %s mengalami perubahan status."
 	}
 
 	timeline := models.PengaduanTimeline{
@@ -185,6 +173,90 @@ func UpdateStatusPengaduan(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengubah data berhasil",
+		"data":    data,
+	})
+}
+
+func DeletePengaduan(c *gin.Context) {
+	query := config.DB
+	id := c.Param("id")
+	var data models.Pengaduan
+
+	if err := query.First(&data, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var media []models.PengaduanMedia
+	if err := query.Where("pengaduan_id = ?", data.ID).Find(&media).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var timeline []models.PengaduanTimeline
+	if err := query.Where("pengaduan_id = ?", data.ID).Find(&timeline).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var review []models.PengaduanReview
+	if err := query.Where("pengaduan_id = ?", data.ID).Find(&review).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if len(media) > 0 {
+		if err := query.Delete(&media).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
+	}
+
+	if len(timeline) > 0 {
+		if err := query.Delete(&timeline).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
+	}
+
+	if len(review) > 0 {
+		if err := query.Delete(&review).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
+	}
+
+	if err := query.Delete(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Menghapus data berhasil",
 		"data":    data,
 	})
 }

@@ -212,20 +212,24 @@ func DeleteSchedule(c *gin.Context) {
 		return
 	}
 
-	if err := query.Delete(&week).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
+	if len(week) > 0 {
+		if err := query.Delete(&week).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
 	}
 
-	if err := query.Delete(&item).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
+	if len(item) > 0 {
+		if err := query.Delete(&item).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
 	}
 
 	if err := query.Delete(&data).Error; err != nil {
