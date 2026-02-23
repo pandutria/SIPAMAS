@@ -3,6 +3,7 @@ import useProjectIdentity from '../hooks/ProjectIdentity'
 import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import FormatRupiah from '../utils/FormatRupiah';
 
 const iconSelesai = L.divIcon({
     className: '',
@@ -287,7 +288,7 @@ export default function LokasiProyek() {
                             {selectedProject.nilai_kontrak && (
                                 <div className="mt-3 pt-3 border-t border-gray-100">
                                     <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest mb-1">Nilai Kontrak</p>
-                                    <p className="font-poppins-bold text-[13px] text-primary">{selectedProject.nilai_kontrak}</p>
+                                    <p className="font-poppins-bold text-[13px] text-primary">{FormatRupiah(Number(selectedProject.nilai_kontrak))}</p>
                                 </div>
                             )}
                         </div>
