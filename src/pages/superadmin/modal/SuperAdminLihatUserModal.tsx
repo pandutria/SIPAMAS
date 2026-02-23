@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { X } from 'lucide-react';
 import useUserHooks from '../../../hooks/UserHooks';
-import useRoleHooks from '../../../hooks/RoleHooks';
 import FormSelect from '../../../ui/FormSelect';
 import { useEffect, useState } from 'react';
-import usePokjaGroupHooks from '../../../hooks/PokjaGroupHooks';
 import FormInput from '../../../ui/FormInput';
 import FormUploadFile from '../../../ui/FormUploadFile';
 import { useAuth } from '../../../context/AuthContext';
@@ -17,45 +15,52 @@ interface UbahUserModalProps {
   data: UserProps
 }
 
-export default function AdminLihatUserModal({ isOpen, onClose, data }: UbahUserModalProps) {
+export default function SuperAdminLihatUserModal({ isOpen, onClose, data }: UbahUserModalProps) {
   const {
     email,
-    roleId,
+    role,
     fullname,
     nik,
     nip,
-    pokjaGroupId,
     address,
     phoneNumber,
-    opdOrganization,
-    group,
     skNumber,
-    pbjNumber,
-    competenceNumber,
+    jabatan,
     skFile,
-    pbjFile,
-    competenceFile,
-    filePhoto,
+    profilePhoto,
     handleChangeUser,
     handleFileChangeUser,
     handleShowUser
   } = useUserHooks();
 
-  const { role } = useRoleHooks();
   const { loading } = useAuth();
-  const { pokjaGroup } = usePokjaGroupHooks();
-  const [showGroupPokja, setShowGroupPokja] = useState(false);
   const [isInit, setIsInit] = useState(false);
 
-  const opdOrganisasiOptions = [
-    { id: '1', name: 'Dinas Pekerjaan Umum' },
-    { id: '2', name: 'Dinas Perhubungan' },
-    { id: '3', name: 'Dinas Kesehatan' }
+  const roleOptions = [
+    {
+      id: 1,
+      name: "Super Admin",
+      value: "super-admin"
+    },
+    {
+      id: 2,
+      name: "Admin Direksi",
+      value: "admin-direksi"
+    },
+    {
+      id: 3,
+      name: "Admin PPK",
+      value: "admin-ppk"
+    },
+    {
+      id: 4,
+      name: "Masyarakat",
+      value: "masyarakat"
+    },
   ];
 
   useEffect(() => {
     const fetchData = () => {
-      setShowGroupPokja(roleId === '3');
       if (data && !isInit) {
         handleShowUser(data);
         setIsInit(true);
@@ -63,9 +68,9 @@ export default function AdminLihatUserModal({ isOpen, onClose, data }: UbahUserM
     }
 
     fetchData();
-  }, [roleId, data, handleShowUser, isInit]);
+  }, [data, handleShowUser, isInit]);
 
-  if (loading || !role || !pokjaGroup) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
@@ -104,19 +109,11 @@ export default function AdminLihatUserModal({ isOpen, onClose, data }: UbahUserM
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormSelect title="Role" name="roleId" value={roleId} onChange={handleChangeUser} disabled={true}>
-                {role.map((item, index) => (
-                  <option key={index} value={item.id}>{item.name}</option>
+              <FormSelect title="Role" name="role" value={role} onChange={handleChangeUser} disabled={true}>
+                {roleOptions.map((item, index) => (
+                  <option key={index} value={item.value}>{item.name}</option>
                 ))}
               </FormSelect>
-
-              {showGroupPokja && (
-                <FormSelect title="Kelompok Pokja" name="pokjaGroupId" value={pokjaGroupId} onChange={handleChangeUser} disabled={true}>
-                  {pokjaGroup.map((item, index) => (
-                    <option key={index} value={item.id}>{item.name}</option>
-                  ))}
-                </FormSelect>
-              )}
 
               <FormInput title="Email" name="email" value={email} onChange={handleChangeUser} placeholder="Masukkan email" disabled={true} />
             </div>
@@ -132,27 +129,13 @@ export default function AdminLihatUserModal({ isOpen, onClose, data }: UbahUserM
               <FormInput title="Alamat" name="address" value={address} onChange={handleChangeUser} placeholder="Masukkan alamat" disabled={true} />
               <FormInput title="Telepon/HP" name="phoneNumber" value={phoneNumber} onChange={handleChangeUser} placeholder="Masukkan telepon" disabled={true} />
 
-              <FormSelect title="OPD Organisasi" name="opdOrganization" value={opdOrganization} onChange={handleChangeUser} disabled={true}>
-                {opdOrganisasiOptions.map((item, index) => (
-                  <option key={index} value={item.name}>{item.name}</option>
-                ))}
-              </FormSelect>
-
-              <FormInput title="Pangkat Golongan" name="group" value={group} onChange={handleChangeUser} placeholder="Masukkan Pangkat Golongan" disabled={true} />
               <FormInput title="NIK" name="nik" value={nik} onChange={handleChangeUser} placeholder="Masukkan NIK" disabled={true} />
               <FormInput title="NIP" name="nip" value={nip} onChange={handleChangeUser} placeholder="Masukkan NIP" disabled={true} />
+              <FormInput title="Jabatan" name="jabatan" value={jabatan} onChange={handleChangeUser} placeholder="Masukkan Jabatan" disabled={true} />
               <FormInput title="No. SK" name="skNumber" value={skNumber} onChange={handleChangeUser} placeholder="Masukkan No. SK" disabled={true} />
 
               <FormUploadFile type='show' title="Lihat SK" name="sk_file" value={skFile as any} onChange={handleFileChangeUser} disabled={true} />
-
-              <FormInput title="No. PBJ Sertifikat" name="pbj_number" value={pbjNumber} onChange={handleChangeUser} placeholder="Masukkan No. PBJ Sertifikat" disabled={true} />
-
-              <FormUploadFile type='show' title="Lihat PBJ Sertifikat" name="pbj_file" value={pbjFile as any} onChange={handleFileChangeUser} disabled={true} />
-
-              <FormInput title="No. Kompetensi Sertifikat" name="competenceNumber" value={competenceNumber} onChange={handleChangeUser} placeholder="Masukkan No. Kompetensi sertifikat" disabled={true} />
-
-              <FormUploadFile type='show' title="Lihat Kompetensi Sertifikat" name="competence_file" value={competenceFile as any} onChange={handleFileChangeUser} disabled={true} />
-              <FormUploadFile type='show' title="Lihat Foto Pengguna" name="filePhoto" value={filePhoto as any} onChange={handleFileChangeUser} disabled={true} />
+              <FormUploadFile type='show' title="Lihat Foto Pengguna" name="profilePhoto" value={profilePhoto as any} onChange={handleFileChangeUser} disabled={true} />
             </div>
           </div>
         </div>

@@ -8,18 +8,22 @@ interface TableHeaderProps {
     showTambah?: boolean;
     showTahunQuery?: boolean;
     showTahun?: boolean;
+    showStatus?: boolean;
     onTambahClick?: () => void;
     onHapusClick?: () => void;
     tahunOptions?: any[];
     tahunOptionQuery?: any[];
     selectedTahun?: string;
     selectedTahunQuery?: string;
+    statusOptions?: any[];
+    onStatusChange?: (value: string) => void;
+    selectedStatus?: string,
     searchValue?: string;
     onTahunChange?: (value: string) => void;
     onTahunQueryChange?: (value: string) => void;
     onSearchChange?: (value: string) => void;
     className?: string;
-    type?: 'ppk' | 'pokja';
+    type?: 'user' | 'admin';
 }
 
 export default function TableHeader({
@@ -30,20 +34,29 @@ export default function TableHeader({
     showTambah = true,
     showHapus = false,
     showTahunQuery = true,
-    showTahun=true,
+    showTahun = true,
+    showStatus = false,
     selectedTahun = '',
     selectedTahunQuery = '',
     searchValue = '',
     onTahunChange,
     onTahunQueryChange,
     onSearchChange,
+    statusOptions = [
+        { text: "Menunggu" },
+        { text: "Diproses" },
+        { text: "Selesai" },
+        { text: "Ditolak" },
+    ],
+    onStatusChange,
+    selectedStatus,
     className,
     tahunOptions = [],
     tahunOptionQuery = [
         { text: '2024' },
         { text: '2025' }
     ],
-    type = "ppk",
+    type = "user",
 }: TableHeaderProps) {
     return (
         <div className={`w-full bg-white flex flex-col rounded-lg p-3 sm:p-4 md:p-5 lg:p-6 mb-3 sm:mb-4 md:mb-5 lg:mb-6 shadow-sm ${className}`}>
@@ -57,7 +70,7 @@ export default function TableHeader({
 
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5 md:gap-3 w-full lg:w-auto">
-                    {type === 'ppk' && showTahun && (
+                    {type === 'user' && showTahun && (
                         <>
                             <select
                                 value={selectedTahun}
@@ -74,7 +87,7 @@ export default function TableHeader({
                         </>
                     )}
 
-                    {type === 'pokja' && showTahunQuery && (
+                    {type === 'admin' && showTahunQuery && (
                         <select
                             value={selectedTahunQuery}
                             onChange={(e) => onTahunQueryChange?.(e.target.value)}
@@ -82,6 +95,21 @@ export default function TableHeader({
                         >
                             <option value="" disabled>Pilih Tahun</option>
                             {tahunOptionQuery.map((item, index) => (
+                                <option key={index} value={item.text}>
+                                    {item.text}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+
+                    {type === 'admin' && showStatus && (
+                        <select
+                            value={selectedStatus}
+                            onChange={(e) => onStatusChange?.(e.target.value)}
+                            className="text-xs sm:text-sm px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer bg-white text-gray-700 font-poppins-regular hover:border-gray-400 w-full sm:w-40"
+                        >
+                            <option value="" disabled>Pilih Status</option>
+                            {statusOptions.map((item, index) => (
                                 <option key={index} value={item.text}>
                                     {item.text}
                                 </option>

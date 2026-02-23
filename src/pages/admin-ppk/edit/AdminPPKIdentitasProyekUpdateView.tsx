@@ -1,23 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Plus, MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen, Trash2 } from "lucide-react";
+import { MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import BackButton from "../../../ui/BackButton";
 import FormInput from "../../../ui/FormInput";
 import FormSelect from "../../../ui/FormSelect";
 import FormUploadFile from "../../../ui/FormUploadFile";
 import { useEffect, useRef, useState } from "react";
-import AdminDireksiTambahDokumentasiModal from "../modal/AdminDireksiTambahDokumentasiModal";
-import AdminDireksiTambahDokumenModal from "../modal/AdminDireksiTambahDokumenModal";
 import TableContent from "../../../ui/TableContent";
 import TableHeader from "../../../ui/TableHeader";
-import SubmitButton from "../../../ui/SubmitButton";
 import L from "leaflet";
 import maps from "/icon/maps.png";
 import "leaflet/dist/leaflet.css";
 import useProjectIdentity from "../../../hooks/ProjectIdentity";
 import LocationData from "../../../data/LocationData";
-import { Navigate, useLocation, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
 import { BASE_URL_FILE } from "../../../server/API";
@@ -34,7 +31,7 @@ const customIcon = L.icon({
 function MapPicker({
   onLocationSelect,
   initialCoords,
-  disabled,
+  disabled=true,
 }: {
   onLocationSelect: (lat: number, lng: number) => void;
   initialCoords?: { lat: number; lng: number };
@@ -97,27 +94,21 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }
   );
 }
 
-export default function AdminDireksiIdentitasProyekUpdateView() {
-  const [showModalPhoto, setShowModalPhoto] = useState(false);
-  const [showModalDocument, setShowModalDocument] = useState(false);
+export default function AdminPPKIdentitasProyekUpdateView() {
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoType>("start");
   const [photoData, setPhotoData] = useState<Record<PhotoType, any[]>>({ start: [], end: [] });
   const [search, setSearch] = useState("");
   const [documentDataFilter, setDocumentDataFilter] = useState<any[]>([]);
   const [documentData, setDocumentData] = useState<any[]>([]);
   const [selectedRemove, setSelectedRemove] = useState<number[]>([]);
-  const location = useLocation();
-  const [isDisabled, setIsDisabled] = useState(false);
 
   const {
     handleChangeFile,
     handleChangeForm,
-    handleProjectIdentityPut,
     projectIdentityForm,
     setProjectIdentityForm,
     projectIdentityByIdData,
     setSelectedProjectIdentityId,
-    handleProjectIdentityPhotoDelete,
     handleProjectIdentityDocumentDelete,
   } = useProjectIdentity();
   const { kecamatanData, kelurahanData, setSelectedKecamatamCode } = LocationData();
@@ -145,16 +136,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
   ];
 
   useEffect(() => {
-    if (showModalPhoto) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    if (location.pathname.startsWith("/admin-direksi/identitas-proyek/lihat")) {
-      setIsDisabled(true);
-    }
-
+    document.body.style.overflow = "auto";
     if (id) {
       setSelectedProjectIdentityId(Number(id));
     }
@@ -178,48 +160,31 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
       item.name.toLowerCase().includes(search.toLowerCase())
     );
     setDocumentDataFilter(dataFiltering);
-  }, [showModalPhoto, documentData, search, projectIdentityByIdData]);
+  }, [documentData, search, projectIdentityByIdData]);
 
   if (loading || !projectIdentityByIdData) return <LoadingSpinner />;
-  if (!user || user.role != "admin-direksi") return <Navigate to="/" replace />;
+  if (!user || user.role != "admin-ppk") return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {showModalPhoto && (
-        <AdminDireksiTambahDokumentasiModal
-          setShowModal={setShowModalPhoto}
-          type={selectedPhoto}
-          setPhotoData={setPhotoData}
-          isEdit={true}
-        />
-      )}
-
-      {showModalDocument && (
-        <AdminDireksiTambahDokumenModal
-          setShowModal={setShowModalDocument}
-          setDocumentData={setDocumentData}
-          isEdit={true}
-        />
-      )}
-
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-16" data-aos="fade-up" data-aos-duration="1000">
-        <BackButton type="custom" link="/admin-direksi/identitas-proyek" />
+        <BackButton type="custom" link="/admin-ppk/identitas-proyek" />
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <h1 className="font-poppins-bold text-2xl text-gray-800">
-                {isDisabled ? "Lihat" : "Ubah"} Identitas Proyek
+                Lihat Identitas Proyek
               </h1>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-            <FormInput disabled={isDisabled} value={projectIdentityForm.nama} name="nama" onChange={handleChangeForm} title="Nama Proyek" placeholder="Masukkan nama proyek" />
-            <FormInput disabled={isDisabled} value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran" placeholder="Masukkan tahun anggaran" />
-            <FormSelect disabled={isDisabled} value={projectIdentityForm.kategori} name="kategori" onChange={handleChangeForm} title="Kategori Proyek">
+            <FormInput disabled={true} value={projectIdentityForm.nama} name="nama" onChange={handleChangeForm} title="Nama Proyek" placeholder="Masukkan nama proyek" />
+            <FormInput disabled={true} value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran" placeholder="Masukkan tahun anggaran" />
+            <FormSelect disabled={true} value={projectIdentityForm.kategori} name="kategori" onChange={handleChangeForm} title="Kategori Proyek">
               {projectCategory.map((item, index) => (
                 <option key={index} value={item.text}>{item.text}</option>
               ))}
@@ -235,7 +200,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
               <FormInput disabled={true} value={projectIdentityForm.provinsi} name="provinsi" onChange={handleChangeForm} title="Provinsi" placeholder="Masukkan provinsi" />
               <FormInput disabled={true} value={projectIdentityForm.kabupaten} name="kabupaten" onChange={handleChangeForm} title="Kabupaten/Kota" placeholder="Masukkan kabupaten/kota" />
               <FormSelect
-                disabled={isDisabled}
+                disabled={true}
                 value={projectIdentityForm.kecamatan}
                 name="kecamatan"
                 title="Kecamatan"
@@ -255,7 +220,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                   <option key={index} value={item.name}>{item.name}</option>
                 ))}
               </FormSelect>
-              <FormSelect disabled={isDisabled} value={projectIdentityForm.kelurahan} name="kelurahan" onChange={handleChangeForm} title="Desa / Kelurahan">
+              <FormSelect disabled={true} value={projectIdentityForm.kelurahan} name="kelurahan" onChange={handleChangeForm} title="Desa / Kelurahan">
                 {kelurahanData.map((item, index) => (
                   <option key={index} value={item.name}>{item.name}</option>
                 ))}
@@ -269,7 +234,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
               <div className="border border-gray-200 rounded-xl overflow-hidden">
                 <div className="relative w-full h-64 bg-gray-100">
                   <MapPicker
-                    disabled={isDisabled}
+                    disabled={true}
                     onLocationSelect={(lat, lng) => setCoords({ lat, lng })}
                     initialCoords={coords ?? undefined}
                   />
@@ -289,12 +254,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                   </div>
                 </div>
               </div>
-              {!isDisabled && (
-                <p className="text-xs font-poppins-regular text-gray-400 flex items-center gap-1">
-                  <MapPinIcon size={11} />
-                  Klik pada peta untuk memperbarui koordinat lokasi proyek
-                </p>
-              )}
             </div>
           </div>
 
@@ -319,16 +278,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                   </button>
                 ))}
               </div>
-
-              {!isDisabled && (
-                <button
-                  onClick={() => setShowModalPhoto(true)}
-                  className="font-poppins-semibold w-full sm:w-fit text-white bg-linear-to-r from-primary to-secondary py-2.5 px-5 cursor-pointer hover:opacity-90 hover:scale-95 duration-300 rounded-xl text-[13px] sm:text-[14px] flex justify-center items-center gap-2 shadow-sm"
-                >
-                  <Plus size={16} />
-                  Tambahkan Sekarang
-                </button>
-              )}
             </div>
 
             {photoData[selectedPhoto].length > 0 ? (
@@ -352,15 +301,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                       />
                     </a>
 
-                    {!isDisabled && (
-                      <button
-                        onClick={() => handleProjectIdentityPhotoDelete(item.id)}
-                        className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-md"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    )}
-
                     <div className="bg-white px-3 py-2.5">
                       <p className="text-[12px] font-poppins-medium text-gray-700 line-clamp-2">
                         {item.title}
@@ -368,20 +308,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                     </div>
                   </div>
                 ))}
-
-                {!isDisabled && (
-                  <button
-                    onClick={() => setShowModalPhoto(true)}
-                    className="group rounded-xl border-2 border-dashed border-gray-200 hover:border-primary min-h-44 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:bg-green-50 cursor-pointer"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors duration-300">
-                      <Plus size={20} className="text-gray-400 group-hover:text-primary transition-colors duration-300" />
-                    </div>
-                    <p className="text-[12px] font-poppins-medium text-gray-400 group-hover:text-primary transition-colors duration-300">
-                      Tambah Foto
-                    </p>
-                  </button>
-                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -398,14 +324,14 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
           <SectionHeader icon={<DollarSign size={18} />} title="Nilai Kontrak & Pelaksanaan" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-            <FormInput disabled={isDisabled} value={projectIdentityForm.nilai_kontrak} name="nilai_kontrak" onChange={handleChangeForm} title="Nilai Proyek" placeholder="Masukkan nilai proyek" />
-            <FormSelect disabled={isDisabled} value={projectIdentityForm.sumber_dana} name="sumber_dana" onChange={handleChangeForm} title="Sumber Dana">
+            <FormInput disabled={true} value={projectIdentityForm.nilai_kontrak} name="nilai_kontrak" onChange={handleChangeForm} title="Nilai Proyek" placeholder="Masukkan nilai proyek" />
+            <FormSelect disabled={true} value={projectIdentityForm.sumber_dana} name="sumber_dana" onChange={handleChangeForm} title="Sumber Dana">
               {sumberDanaOptions.map((item, index) => (
                 <option key={index} value={item.text}>{item.text}</option>
               ))}
             </FormSelect>
-            <FormInput disabled={isDisabled} value={projectIdentityForm.kontraktor_pelaksana} name="kontraktor_pelaksana" onChange={handleChangeForm} title="Kontraktor Pelaksana" placeholder="Masukkan kontraktor pelaksana" />
-            <FormInput disabled={isDisabled} value={projectIdentityForm.konsultas_pengawas} name="konsultas_pengawas" onChange={handleChangeForm} title="Konsultas Pengawas" placeholder="Masukkan konsultas pengawas" />
+            <FormInput disabled={true} value={projectIdentityForm.kontraktor_pelaksana} name="kontraktor_pelaksana" onChange={handleChangeForm} title="Kontraktor Pelaksana" placeholder="Masukkan kontraktor pelaksana" />
+            <FormInput disabled={true} value={projectIdentityForm.konsultas_pengawas} name="konsultas_pengawas" onChange={handleChangeForm} title="Konsultas Pengawas" placeholder="Masukkan konsultas pengawas" />
           </div>
 
           <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent mt-8"></div>
@@ -413,10 +339,10 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
           <SectionHeader icon={<FileText size={18} />} title="Dokumen" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-            <FormUploadFile disabled={isDisabled} value={projectIdentityForm.kontrak_file} name="kontrak_file" onChange={handleChangeFile} title="Kontrak Kerja" />
-            <FormUploadFile disabled={isDisabled} value={projectIdentityForm.surat_perintah_file} name="surat_perintah_file" onChange={handleChangeFile} title="Surat Perintah Mulai Kerja (SPMK)" />
-            <FormUploadFile disabled={isDisabled} value={projectIdentityForm.surat_penunjukan_file} name="surat_penunjukan_file" onChange={handleChangeFile} title="Surat Penunjukan Penyedia Barang/Jasa (SPPBJ)" />
-            <FormUploadFile disabled={isDisabled} value={projectIdentityForm.berita_acara_file} name="berita_acara_file" onChange={handleChangeFile} title="Berita Acara Serah Terima (BAST/PHO/FHO)" />
+            <FormUploadFile disabled={true} value={projectIdentityForm.kontrak_file} name="kontrak_file" onChange={handleChangeFile} title="Kontrak Kerja" />
+            <FormUploadFile disabled={true} value={projectIdentityForm.surat_perintah_file} name="surat_perintah_file" onChange={handleChangeFile} title="Surat Perintah Mulai Kerja (SPMK)" />
+            <FormUploadFile disabled={true} value={projectIdentityForm.surat_penunjukan_file} name="surat_penunjukan_file" onChange={handleChangeFile} title="Surat Penunjukan Penyedia Barang/Jasa (SPPBJ)" />
+            <FormUploadFile disabled={true} value={projectIdentityForm.berita_acara_file} name="berita_acara_file" onChange={handleChangeFile} title="Berita Acara Serah Terima (BAST/PHO/FHO)" />
           </div>
 
           <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent mt-8"></div>
@@ -433,23 +359,13 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                   Addendum kontrak, jaminan pelaksanaan, jaminan pemeliharaan, dsb.
                 </p>
               </div>
-
-              {!isDisabled && (
-                <button
-                  onClick={() => setShowModalDocument(true)}
-                  className="font-poppins-semibold w-full lg:w-fit text-white bg-linear-to-r from-primary to-secondary py-2.5 px-5 cursor-pointer hover:opacity-90 hover:scale-95 duration-300 rounded-xl text-[13px] sm:text-[14px] flex justify-center items-center gap-2 shadow-sm"
-                >
-                  <Plus size={16} />
-                  Tambahkan Sekarang
-                </button>
-              )}
             </div>
 
             {documentData.length > 0 ? (
               <div>
                 <TableHeader
                   showTitle={false}
-                  showHapus={!isDisabled}
+                  showHapus={false}
                   showTambah={false}
                   showTahun={false}
                   searchValue={search}
@@ -461,7 +377,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                   data={documentDataFilter}
                   showPreview={false}
                   showEdit={false}
-                  isSelect={!isDisabled}
+                  isSelect={false}
                   onSelectedIdsChange={(item) => setSelectedRemove(item)}
                   showDownload={true}
                   downloadKey="photo_file"
@@ -476,12 +392,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
               </div>
             )}
           </div>
-
-          {!isDisabled && (
-            <div className="mt-8">
-              <SubmitButton text="Ubah Identitas Proyek" onClick={() => handleProjectIdentityPut(coords)} />
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -1,67 +1,92 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { X } from 'lucide-react';
 import useUserHooks from '../../../hooks/UserHooks';
-import useRoleHooks from '../../../hooks/RoleHooks';
 import FormSelect from '../../../ui/FormSelect';
 import { useEffect, useState } from 'react';
-import usePokjaGroupHooks from '../../../hooks/PokjaGroupHooks';
 import FormInput from '../../../ui/FormInput';
 import FormUploadFile from '../../../ui/FormUploadFile';
 import { useAuth } from '../../../context/AuthContext';
 import LoadingSpinner from '../../../ui/LoadingSpinner';
 import SubmitButton from '../../../ui/SubmitButton';
+import FormCheckboxStatus from '../../../ui/FormCheckboxStatus';
 
-interface TambahUserModalProps {
+interface UbahUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: any) => void;
+  data: UserProps
 }
 
-export default function AdminTambahUserModal({ isOpen, onClose }: TambahUserModalProps) {
+export default function SuperAdminUbahUserModal({ isOpen, onClose, data }: UbahUserModalProps) {
   const {
     email,
-    password,
-    roleId,
+    role,
     fullname,
     nik,
     nip,
-    pokjaGroupId,
     address,
     phoneNumber,
-    opdOrganization,
-    group,
+    password,
     skNumber,
-    pbjNumber,
-    competenceNumber,
     skFile,
-    pbjFile,
-    competenceFile,
-    filePhoto,
+    jabatan,
+    profilePhoto,
     handleChangeUser,
     handleFileChangeUser,
-    handleUserPost,
+    handleShowUser,
+    handleUserPut,
+    isActive,
+    setIsActive
   } = useUserHooks();
 
-  const { role } = useRoleHooks();
   const { loading } = useAuth();
-  const { pokjaGroup } = usePokjaGroupHooks();
-  const [showGroupPokja, setShowGroupPokja] = useState(false);
+  const [isInit, setIsInit] = useState(false);
 
-  const opdOrganisasiOptions = [
-    { id: '1', name: 'Dinas Pekerjaan Umum' },
-    { id: '2', name: 'Dinas Perhubungan' },
-    { id: '3', name: 'Dinas Kesehatan' }
+  const roleOptions = [
+    {
+      id: 1,
+      name: "Super Admin",
+      value: "super-admin"
+    },
+    {
+      id: 2,
+      name: "Admin Direksi",
+      value: "admin-direksi"
+    },
+    {
+      id: 3,
+      name: "Admin PPK",
+      value: "admin-ppk"
+    },
+    {
+      id: 4,
+      name: "Masyarakat",
+      value: "masyarakat"
+    },
   ];
 
   useEffect(() => {
-    setShowGroupPokja(roleId === '3');
-  }, [roleId]);
+    const fetchData = () => {
+      if (data && !isInit) {
+        handleShowUser(data);
+        setIsInit(true);
+      }
+    }
 
-  if (loading || !role || !pokjaGroup) {
+    fetchData();
+  }, [data, handleShowUser, isInit]);
+
+  if (loading) {
     return <LoadingSpinner />;
   }
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    if (isInit) {
+      handleShowUser(null as any);
+      setIsInit(false);
+    }
+    return;
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center">
@@ -73,7 +98,7 @@ export default function AdminTambahUserModal({ isOpen, onClose }: TambahUserModa
       <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="font-poppins-bold text-xl text-gray-800">
-            Tambah Pengguna
+            Ubah Pengguna
           </h2>
           <button
             onClick={onClose}
@@ -90,22 +115,16 @@ export default function AdminTambahUserModal({ isOpen, onClose }: TambahUserModa
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormSelect title="Role" name="roleId" value={roleId} onChange={handleChangeUser}>
-                {role.map((item, index) => (
-                  <option key={index} value={item.id}>{item.name}</option>
+              <FormSelect title="Role" name="roleId" value={role} onChange={handleChangeUser}>
+                {roleOptions.map((item, index) => (
+                  <option key={index} value={item.value}>{item.name}</option>
                 ))}
               </FormSelect>
 
-              {showGroupPokja && (
-                <FormSelect title="Kelompok Pokja" name="pokjaGroupId" value={pokjaGroupId} onChange={handleChangeUser}>
-                  {pokjaGroup.map((item, index) => (
-                    <option key={index} value={item.id}>{item.name}</option>
-                  ))}
-                </FormSelect>
-              )}
-
               <FormInput type='email' title="Email" name="email" value={email} onChange={handleChangeUser} placeholder="Masukkan email" />
               <FormInput type='password' title="Kata Sandi" name="password" value={password} onChange={handleChangeUser} placeholder="Masukkan kata sandi" />
+
+              <FormCheckboxStatus title='Status Pengguna' value={isActive} onChange={setIsActive} />
             </div>
           </div>
 
@@ -119,33 +138,18 @@ export default function AdminTambahUserModal({ isOpen, onClose }: TambahUserModa
               <FormInput title="Alamat" name="address" value={address} onChange={handleChangeUser} placeholder="Masukkan alamat" />
               <FormInput type='number' title="Telepon/HP" name="phoneNumber" value={phoneNumber} onChange={handleChangeUser} placeholder="Masukkan telepon" />
 
-              <FormSelect title="OPD Organisasi" name="opdOrganization" value={opdOrganization} onChange={handleChangeUser}>
-                {opdOrganisasiOptions.map((item, index) => (
-                  <option key={index} value={item.name}>{item.name}</option>
-                ))}
-              </FormSelect>
-
-              <FormInput title="Pangkat Golongan" name="group" value={group} onChange={handleChangeUser} placeholder="Masukkan Pangkat Golongan" />
               <FormInput type='number' title="NIK" name="nik" value={nik} onChange={handleChangeUser} placeholder="Masukkan NIK" />
               <FormInput type='number' title="NIP" name="nip" value={nip} onChange={handleChangeUser} placeholder="Masukkan NIP" />
+              <FormInput title="Jabatan" name="jabatan" value={jabatan} onChange={handleChangeUser} placeholder="Masukkan Jabatan" />
               <FormInput title="No. SK" name="skNumber" value={skNumber} onChange={handleChangeUser} placeholder="Masukkan No. SK" />
-
               <FormUploadFile title="Unggah SK" name="sk_file" value={skFile as any} onChange={handleFileChangeUser} />
-
-              <FormInput title="No. PBJ Sertifikat" name="pbjNumber" value={pbjNumber} onChange={handleChangeUser} placeholder="Masukkan No. PBJ Sertifikat" />
-
-              <FormUploadFile title="Unggah PBJ Sertifikat" name="pbj_file" value={pbjFile as any} onChange={handleFileChangeUser} />
-
-              <FormInput title="No. Kompetensi Sertifikat" name="competenceNumber" value={competenceNumber} onChange={handleChangeUser} placeholder="Masukkan No. Kompetensi sertifikat" />
-
-              <FormUploadFile title="Unggah Kompetensi Sertifikat" name="competence_file" value={competenceFile as any} onChange={handleFileChangeUser} />
-              <FormUploadFile title="Unggah Foto Pengguna" name="photo_file" value={filePhoto as any} onChange={handleFileChangeUser} />
+              <FormUploadFile title="Unggah Foto Pengguna" name="profilePhoto" value={profilePhoto as any} onChange={handleFileChangeUser} />
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 p-6 border-t border-gray-200">          
-          <SubmitButton text='Simpan' onClick={() => handleUserPost()}/>
+        <div className="flex justify-end gap-4 p-6 border-t border-gray-200">
+          <SubmitButton text='Simpan' onClick={() => handleUserPut(data?.id)} />
         </div>
       </div>
     </div>

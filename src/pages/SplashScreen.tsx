@@ -56,7 +56,7 @@ export default function SplashScreen() {
             SIPAMAS
           </h1>
           <p className="mt-4 text-lg md:text-xl text-amber-50/95 font-medium max-w-md tracking-wide">
-            Sistem Pelaporan Masyarakat
+            Sistem Informasi Pelaporan Masyarakat
           </p>
         </div>
 

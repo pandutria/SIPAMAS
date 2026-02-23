@@ -1,40 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Login from "../pages/auth/Login"
 import Dashboard from "../pages/Dashboard"
-import PPKRencanaAnggaran from "../pages/ppk/PPKRencanaAnggaran"
-import PPKRencanaAnggaranAdd from "../pages/ppk/add/PPKRencanaAnggaranAdd"
-import PPKJadwalPelaksanaan from "../pages/ppk/PPKJadwalPelaksanaan"
-import PPKJadwalPelaksanaanAdd from "../pages/ppk/add/PPKJadwalPelaksanaanAdd"
-import PokjaLaporanPenjabatPengadaan from "../pages/pokja/PokjaLaporanPenjabatPengadaan"
-import PokjaLaporanPenjabatPengadaanAdd from "../pages/pokja/add/PokjaLaporanPenjabatPengadaanAdd"  
-import KepalaRencanaAnggaran from "../pages/kepala/laporan/KepalaRencanaAnggaran"
-import PokjaHasilKelompokKerja from "../pages/pokja/PokjaHasilKelompokKerja"
-import PokjaHasilPenjabatPengadaan from "../pages/pokja/PokjaHasilPenjabatPengadaan"
-import KepalaHasilPenjabatPengadaan from "../pages/kepala/hasil/KepalaHasilPenjabatPengadaan"
-import KepalaHasilKelompokKerja from "../pages/kepala/hasil/KepalaHasilKelompokKerja"
 import EditProfile from "../pages/EditProfile"
-import PokjaLaporanPenjabatPengadaanUpdateView from "../pages/pokja/edit/PokjaLaporanPenjabatPengadaanUpdateView"
-import PokjaLaporanKelompok from "../pages/pokja/PokjaLaporankelompok"
-import PokjaLaporanKelompokAdd from "../pages/pokja/add/PokjaLaporanKelompokAdd"
-import PokjaLaporanKelompokUpdateView from "../pages/pokja/edit/PokjaLaporanKelompokUpdateView"
-import PPKRencanaAnggaranUpdateView from "../pages/ppk/edit/PPKRencanaAnggaranUpdateView"
-import PPKJadwalPelaksanaanUpdateView from "../pages/ppk/edit/PPKJadwalPelaksanaanUpdateView"
-import PPKRealisasiAdd from "../pages/ppk/add/PPKRealisasiAdd"
-import PPKRealisasi from "../pages/ppk/PPKRealisasi"
-import PPKRealisasiUpdateView from "../pages/ppk/edit/PPKRealisasiUpdateView"
-import ProjectKurvaS from "../pages/ppk/ProjectKurvaS"
-import KepalaRencanaAnggaranView from "../pages/kepala/laporan/show/KepalaRencanaAnggaranView"
-import KepalaJadwalPelaksanaan from "../pages/kepala/laporan/KepalaJadwalPelaksanaan"
-import KepalaRealisasi from "../pages/kepala/laporan/KepalaRealisasi"
-import KepalaRealisasiView from "../pages/kepala/laporan/show/KepalaRealisasiView"
-import KepalaProjectKurvaS from "../pages/kepala/laporan/KepalaProjectKurvaS"
-import KepalaJadwalPelaksanaanView from "../pages/kepala/laporan/show/KepalaJadwalPelaksanaanView"
 import NotFound from "../pages/NotFound"
 import ForgotPassword from "../pages/auth/ForgotPassword"
 import ResetPassword from "../pages/auth/ResetPassword"
 import SuperAdminManajemenPengguna from "../pages/superadmin/SuperAdminManajemenPengguna"
-import SuperAdminKelompokKerja from "../pages/superadmin/SuperAdminKelompokKerja"
-import MasyarakatHistory from "../pages/masyarakat/MasyarakatHistory"
 import AdminDireksiIndentitasProyek from "../pages/admin-direksi/AdminDireksiIndentitasProyek"
 import AdminDireksiIdentitasProyekAdd from "../pages/admin-direksi/add/AdminDireksiIdentitasProyekAdd"
 import AdminDireksiIdentitasProyekUpdateView from "../pages/admin-direksi/edit/AdminDireksiIdentitasProyekUpdateView"
@@ -50,6 +21,25 @@ import AdminDireksiRealisasiUpdateView from "../pages/admin-direksi/edit/AdminDi
 import AdminDireksiProjectKurvaS from "../pages/admin-direksi/AdminDireksiProjectKurvaS"
 import AdminDireksiDokumentasi from "../pages/admin-direksi/AdminDireksiDokumentasi"
 import AdminDireksiDokumentasiUpdateView from "../pages/admin-direksi/edit/AdminDireksiDokumentasiUpdateView"
+import AdminDireksiEvaluasi from "../pages/admin-direksi/AdminDireksiEvaluasi"
+import AdminDireksiEvaluasiUpdateView from "../pages/admin-direksi/edit/AdminDireksiEvaluasiUpdateView"
+import AdminPPKIndentitasProyek from "../pages/admin-ppk/AdminPPKIndentitasProyek"
+import AdminPPKIdentitasProyekUpdateView from "../pages/admin-ppk/edit/AdminPPKIdentitasProyekUpdateView"
+import AdminPPKRencanaAnggaran from "../pages/admin-ppk/AdminPPKRencanaAnggaran"
+import AdminPPKRencanaAnggaranUpdateView from "../pages/admin-ppk/edit/AdminPPKRencanaAnggaranUpdateView"
+import AdminPPKJadwalPelaksanaan from "../pages/admin-ppk/AdminPPKJadwalPelaksanaan"
+import AdminPPKJadwalPelaksanaanUpdateView from "../pages/admin-ppk/edit/AdminPPKJadwalPelaksanaanUpdateView"
+import AdminPPKRealisasi from "../pages/admin-ppk/AdminPPKRealisasi"
+import AdminPPKRealisasiUpdateView from "../pages/admin-ppk/edit/AdminPPKRealisasiUpdateView"
+import AdminPPKProjectKurvaS from "../pages/admin-ppk/AdminPPKProjectKurvaS"
+import AdminPPKDokumentasi from "../pages/admin-ppk/AdminPPKDokumentasi"
+import AdminPPKDokumentasiUpdateView from "../pages/admin-ppk/edit/AdminPPKDokumentasiUpdateView"
+import AdminPPKEvaluasi from "../pages/admin-ppk/AdminPPKEvaluasi"
+import AdminPPKEvaluasiUpdateView from "../pages/admin-ppk/edit/AdminPPKEvaluasiUpdateView"
+import MasyarakatLaporanBaru from "../pages/masyarakat/MasyarakatLaporanBaru"
+import MasyarakatLaporanDetail from "../pages/masyarakat/MasyarakatLaporanDetail"
+import MasyarakatRiwayatLaporan from "../pages/masyarakat/MasyarakatRiwayatLaporan"
+import SuperAdminManajemenLaporan from "../pages/superadmin/SuperAdminManajemenLaporan"
 
 export default function Router() {
   return (
@@ -66,58 +56,13 @@ export default function Router() {
         <Route path="/reset-kata-sandi" element={<ResetPassword />} />
 
         {/* Masyarakat */}
-        <Route path="/masyarakat/riwayat-laporan" element={<MasyarakatHistory/>}/>
-
-        {/* PPK */}
-        <Route path="/ppk/rencana-anggaran" element={<PPKRencanaAnggaran/>}/>
-        <Route path="/ppk/rencana-anggaran/tambah" element={<PPKRencanaAnggaranAdd/>}/>
-        <Route path="/ppk/rencana-anggaran/ubah/:id" element={<PPKRencanaAnggaranUpdateView/>}/>
-        <Route path="/ppk/rencana-anggaran/lihat/:id" element={<PPKRencanaAnggaranUpdateView/>}/>
-
-        <Route path="/ppk/jadwal-pelaksanaan" element={<PPKJadwalPelaksanaan/>}/>
-        <Route path="/ppk/jadwal-pelaksanaan/tambah" element={<PPKJadwalPelaksanaanAdd/>}/>
-        <Route path="/ppk/jadwal-pelaksanaan/lihat/:id" element={<PPKJadwalPelaksanaanUpdateView/>}/>
-        <Route path="/ppk/jadwal-pelaksanaan/ubah/:id" element={<PPKJadwalPelaksanaanUpdateView/>}/>
-
-        <Route path="/ppk/realisasi-pekerjaan" element={<PPKRealisasi/>}/>
-        <Route path="/ppk/realisasi-pekerjaan/tambah" element={<PPKRealisasiAdd/>}/>
-        <Route path="/ppk/realisasi-pekerjaan/ubah/:id" element={<PPKRealisasiUpdateView/>}/>
-        <Route path="/ppk/realisasi-pekerjaan/lihat/:id" element={<PPKRealisasiUpdateView/>}/>
-
-        <Route path="/ppk/project-kurva-s" element={<ProjectKurvaS/>}/>
-
-        {/* Pokja */}
-        <Route path="/pokja/data-entry-penjabat-pengadaan" element={<PokjaLaporanPenjabatPengadaan/>}/>
-        <Route path="/pokja/data-entry-penjabat-pengadaan/tambah" element={<PokjaLaporanPenjabatPengadaanAdd/>}/>
-        <Route path="/pokja/data-entry-penjabat-pengadaan/ubah/:id" element={<PokjaLaporanPenjabatPengadaanUpdateView/>}/>
-        <Route path="/pokja/data-entry-penjabat-pengadaan/lihat/:id" element={<PokjaLaporanPenjabatPengadaanUpdateView/>}/>
-
-        <Route path="/pokja/data-entry-kelompok-kerja" element={<PokjaLaporanKelompok/>}/>
-        <Route path="/pokja/data-entry-kelompok-kerja/tambah" element={<PokjaLaporanKelompokAdd/>}/>
-        <Route path="/pokja/data-entry-kelompok-kerja/ubah/:id" element={<PokjaLaporanKelompokUpdateView/>}/>
-        <Route path="/pokja/data-entry-kelompok-kerja/lihat/:id" element={<PokjaLaporanKelompokUpdateView/>}/>
-
-        <Route path="/pokja/penjabat-pengadaan" element={<PokjaHasilPenjabatPengadaan/>}/>
-        <Route path="/pokja/kelompok-kerja" element={<PokjaHasilKelompokKerja/>}/>
-
-        {/* Kepala Biro & Kepala Biro */}
-        <Route path="/kepala/rencana-anggaran" element={<KepalaRencanaAnggaran/>}/>
-        <Route path="/kepala/rencana-anggaran/lihat/:id" element={<KepalaRencanaAnggaranView/>}/>
-
-        <Route path="/kepala/jadwal-pelaksanaan" element={<KepalaJadwalPelaksanaan/>}/>
-        <Route path="/kepala/jadwal-pelaksanaan/lihat/:id" element={<KepalaJadwalPelaksanaanView/>}/>
-
-        <Route path="/kepala/realisasi-pekerjaan" element={<KepalaRealisasi/>}/>
-        <Route path="/kepala/realisasi-pekerjaan/lihat/:id" element={<KepalaRealisasiView/>}/>
-
-        <Route path="/kepala/penjabat-pengadaan" element={<KepalaHasilPenjabatPengadaan/>}/>
-        <Route path="/kepala/kelompok-kerja" element={<KepalaHasilKelompokKerja/>}/>
-
-        <Route path="/kepala/project-kurva-s" element={<KepalaProjectKurvaS/>}/>
+        <Route path="/masyarakat/laporan-baru" element={<MasyarakatLaporanBaru/>}/>
+        <Route path="/masyarakat/laporan/detail/:id" element={<MasyarakatLaporanDetail/>}/>
+        <Route path="/masyarakat/riwayat-laporan" element={<MasyarakatRiwayatLaporan/>}/>
 
         {/* Super Admin */}
-        <Route path="/superadmin/manajemen-pengguna" element={<SuperAdminManajemenPengguna/>}/>        
-        <Route path="/superadmin/kelompok-kerja" element={<SuperAdminKelompokKerja/>}/>
+        <Route path="/superadmin/manajemen-pengguna" element={<SuperAdminManajemenPengguna/>}/> 
+        <Route path="/superadmin/manajemen-laporan" element={<SuperAdminManajemenLaporan/>}/> 
 
         {/* Admin Direksi */}
         <Route path="/admin-direksi/identitas-proyek" element={<AdminDireksiIndentitasProyek/>}/>
@@ -143,6 +88,29 @@ export default function Router() {
         <Route path="/admin-direksi/project-kurva-s" element={<AdminDireksiProjectKurvaS/>}/>
         <Route path="/admin-direksi/dokumentasi" element={<AdminDireksiDokumentasi/>}/>
         <Route path="/admin-direksi/dokumentasi/lihat/:id" element={<AdminDireksiDokumentasiUpdateView/>}/>
+
+        <Route path="/admin-direksi/evaluasi" element={<AdminDireksiEvaluasi/>}/>
+        <Route path="/admin-direksi/evaluasi/lihat/:id" element={<AdminDireksiEvaluasiUpdateView/>}/>
+
+        {/* Admin PPK */}
+        <Route path="/admin-ppk/identitas-proyek" element={<AdminPPKIndentitasProyek/>}/>
+        <Route path="/admin-ppk/identitas-proyek/lihat/:id" element={<AdminPPKIdentitasProyekUpdateView/>}/>
+
+        <Route path="/admin-ppk/rencana-anggaran" element={<AdminPPKRencanaAnggaran/>}/>
+        <Route path="/admin-ppk/rencana-anggaran/lihat/:id" element={<AdminPPKRencanaAnggaranUpdateView/>}/>
+
+        <Route path="/admin-ppk/jadwal-pelaksanaan" element={<AdminPPKJadwalPelaksanaan/>}/>
+        <Route path="/admin-ppk/jadwal-pelaksanaan/lihat/:id" element={<AdminPPKJadwalPelaksanaanUpdateView/>}/>
+
+        <Route path="/admin-ppk/realisasi-pekerjaan" element={<AdminPPKRealisasi/>}/>
+        <Route path="/admin-ppk/realisasi-pekerjaan/lihat/:id" element={<AdminPPKRealisasiUpdateView/>}/>
+
+        <Route path="/admin-ppk/project-kurva-s" element={<AdminPPKProjectKurvaS/>}/>
+        <Route path="/admin-ppk/dokumentasi" element={<AdminPPKDokumentasi/>}/>
+        <Route path="/admin-ppk/dokumentasi/lihat/:id" element={<AdminPPKDokumentasiUpdateView/>}/>
+
+        <Route path="/admin-ppk/evaluasi" element={<AdminPPKEvaluasi/>}/>
+        <Route path="/admin-ppk/evaluasi/lihat/:id" element={<AdminPPKEvaluasiUpdateView/>}/>
       </Routes>
     </BrowserRouter>
   )

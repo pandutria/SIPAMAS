@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import TableContent from "../../ui/TableContent";
 import TableHeader from "../../ui/TableHeader";
-import AdminTambahUserModal from "./modal/AdminTambahUserModal";
-import AdminUbahUserModal from "./modal/AdminUbahUserModal";
-import AdminLihatUserModal from "./modal/AdminLihatUserModal";
 import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "../../ui/LoadingSpinner";
 import { Navigate } from "react-router-dom";
 import useUserHooks from "../../hooks/UserHooks";
+import SuperAdminLihatUserModal from "./modal/SuperAdminLihatUserModal";
+import SuperAdminUbahUserModal from "./modal/SuperAdminUbahUserModal";
+import SuperAdminTambahUserModal from "./modal/SuperAdminTambahUserModal";
 
 export default function SuperAdminManajemenPengguna() {
     const [selectPreview, setSelectPreview] = useState<any>(null);
@@ -58,7 +58,7 @@ export default function SuperAdminManajemenPengguna() {
             }
         }
 
-        const filteringUserData = () => {
+        const filteringUserData = () => {   
             const dataFilter = listUser.filter((item: UserProps) => {
                 const keyword = search.toLowerCase();
                 const filter = search
@@ -94,11 +94,11 @@ export default function SuperAdminManajemenPengguna() {
     return (
         <div>
             <Navbar />
-            <AdminTambahUserModal
+            <SuperAdminTambahUserModal
                 isOpen={showModalAdd}
                 onClose={() => setShowModalAdd(false)}
             />
-            <AdminLihatUserModal
+            <SuperAdminLihatUserModal
                 isOpen={showModalPreview}
                 onClose={() => {
                     setShowModalPreview(false)
@@ -106,13 +106,12 @@ export default function SuperAdminManajemenPengguna() {
                 }}
                 data={selectPreview}
             />
-            <AdminUbahUserModal
+            <SuperAdminUbahUserModal
                 isOpen={showModalEdit}
                 onClose={() => {
                     setShowModalEdit(false);
                     setSelectedEdit(null);
-                }
-                }
+                }}
                 data={selectedEdit}
             />
 
@@ -121,7 +120,7 @@ export default function SuperAdminManajemenPengguna() {
                     title="Manajemen Pengguna"
                     showTambah={true}
                     onTambahClick={() => setShowModalAdd(true)}
-                    type="pokja"
+                    type="admin"
                     showTahunQuery={false}
                     searchValue={search}
                     onSearchChange={(item) => setSearch(item)}

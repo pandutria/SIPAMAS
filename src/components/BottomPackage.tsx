@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import useRealisasiHooks from "../hooks/RealisasiHooks";
 import { FormatPackage } from "../ui/FormatPackage";
@@ -9,19 +8,19 @@ export default function BottomPackage() {
     const [select, setSelect] = useState("2025");
     const tableData = useMemo(() => {
         const filtered = select
-            ? realisasiData.filter((item: any) =>
-                item?.schedule?.rab?.data_entry?.tahun_anggaran === select
+            ? realisasiData.filter((item) =>
+                item?.schedule?.rab?.proyek?.tahun_anggaran === select
             )
             : [];
 
-        return FormatPackage(filtered, 'bottom').slice(0, 10);
+        return FormatPackage(filtered, "bottom").slice(0, 10);
     }, [realisasiData, select]);
 
     return (
-        <div className="w-full min-h-screen p-4 sm:p-6 lg:p-8 mt-8" data-aos="fade-up" data-aos-duration="1000">
+        <div className="w-full min-h-screen p-4  sm:p-6 lg:p-8 mt-8" data-aos="fade-up" data-aos-duration="1000">
             <div className="max-w-350 mx-auto">
                 <div className="mb-8">
-                    <h1 className='font-poppins-bold text-2xl sm:text-4xl lg:text-3xl text-primary mb-2'>10 Paket Terbawah Realisasi Pekerjaan</h1>
+                    <h1 className='font-poppins-bold text-2xl sm:text-4xl lg:text-3xl text-primary mb-2'>10 Paket Teratas Realisasi Pekerjaan</h1>
                     <div className="flex flex-row gap-4 items-center">
                         <p className="font-poppins-medium text-[16px]">Tahun Anggaran: </p>
                         <select value={select} onChange={(e) => setSelect(e.target.value)} className="border-2 border-gray-600 px-6 rounded-md font-poppins-regular text-[14px] py-2">
@@ -37,11 +36,6 @@ export default function BottomPackage() {
                         <table className="w-full">
                             <thead>
                                 <tr className="bg-linear-to-r from-gray-50 to-gray-100">
-                                    <th className="px-6 py-6 text-left min-w-45">
-                                        <div className="bg-linear-to-r from-primary to-secondary text-white rounded-2xl px-6 py-4 font-poppins-bold text-sm shadow-lg transform hover:scale-105 transition-transform">
-                                            Satuan Kerja
-                                        </div>
-                                    </th>
                                     <th className="px-6 py-6 text-left min-w-37.5">
                                         <div className="bg-linear-to-r from-primary to-secondary text-white rounded-2xl px-6 py-4 font-poppins-bold text-sm shadow-lg transform hover:scale-105 transition-transform">
                                             Kode Identitas Proyek
@@ -86,17 +80,11 @@ export default function BottomPackage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {tableData?.slice(0, 10)?.map((item: any, index: number) => (
-                                    <tr key={index} className="hover:bg-linear-to-r hover:from-hover hover:to-transparent transition-all duration-200 group">
+                                {tableData?.slice(0, 10)?.map((item, index: number) => (
+                                    <tr key={index} className="transition-all duration-200 group">
                                         <td className="px-6 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-2 h-12 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                                <span className="font-poppins-semibold text-sm text-gray-800">{item.satuan_kerja}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className="inline-block bg-gray-100 px-4 py-2 rounded-lg font-poppins-medium text-sm text-gray-700 group-hover:bg-hover group-hover:text-primary transition-colors">
-                                                {item.kode_paket}
+                                            <span className="inline-block bg-primary px-4 py-2 rounded-lg font-poppins-medium text-sm text-white  transition-colors">
+                                                TND-0{item.kode_paket}
                                             </span>
                                         </td>
                                         <td className="px-6 py-5">

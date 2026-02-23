@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import Navbar from "../../../components/Navbar";
-import { Plus, Trash2, ImageOff, Camera, TrendingUp, MapPin } from "lucide-react";
+import { Plus, ImageOff, Camera, TrendingUp, MapPin } from "lucide-react";
 import { BASE_URL_FILE } from "../../../server/API";
 import useProjectIdentity from "../../../hooks/ProjectIdentity";
 import { Navigate, useParams } from "react-router-dom";
@@ -9,7 +9,6 @@ import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
 import useRealisasiHooks from "../../../hooks/RealisasiHooks";
 import BackButton from "../../../ui/BackButton";
-import AdminDireksiTambahDokumentasiModal from "../modal/AdminDireksiTambahDokumentasiModal";
 import FormInput from "../../../ui/FormInput";
 import ShowTableForm from "../../../ui/ShowTableForm";
 
@@ -33,7 +32,7 @@ const tabConfig: Record<PhotoType, { label: string; icon: React.ReactNode; color
   },
 };
 
-export default function AdminDireksiDokumentasiUpdateView() {
+export default function AdminPPKDokumentasiUpdateView() {
   const [showModalPhoto, setShowModalPhoto] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoType>("start");
   const [photoData, setPhotoData] = useState<Record<PhotoType, any[]>>({
@@ -43,7 +42,6 @@ export default function AdminDireksiDokumentasiUpdateView() {
   });
   const {
     projectIdentityByIdData,
-    handleProjectIdentityPhotoDelete,
     setSelectedProjectIdentityId,
   } = useProjectIdentity();
   const { realisasiData } = useRealisasiHooks();
@@ -110,7 +108,7 @@ export default function AdminDireksiDokumentasiUpdateView() {
     return <LoadingSpinner />;
   }
 
-  if (!user || user.role != "admin-direksi") {
+  if (!user || user.role != "admin-ppk") {
     return <Navigate to="/" replace />;
   }
 
@@ -120,21 +118,12 @@ export default function AdminDireksiDokumentasiUpdateView() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {showModalPhoto && (
-        <AdminDireksiTambahDokumentasiModal
-          setShowModal={setShowModalPhoto}
-          type={selectedPhoto}
-          setPhotoData={setPhotoData}
-          isEdit={true}
-        />
-      )}
-
       <div
         className="max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-16"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
-        <BackButton type="custom" link="/admin-direksi/dokumentasi" />
+        <BackButton type="custom" link="/admin-ppk/dokumentasi" />
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-4">
           <div className="flex items-center justify-between mb-8">
@@ -225,16 +214,6 @@ export default function AdminDireksiDokumentasiUpdateView() {
                 );
               })}
             </div>
-
-            {selectedPhoto !== "progres" && (
-              <button
-                onClick={() => setShowModalPhoto(true)}
-                className="font-poppins-semibold w-full sm:w-fit text-white bg-linear-to-r from-primary to-secondary py-2.5 px-5 cursor-pointer hover:opacity-90 hover:scale-95 duration-300 rounded-xl text-[13px] sm:text-[14px] flex justify-center items-center gap-2 shadow-sm"
-              >
-                <Plus size={16} />
-                Tambahkan Sekarang
-              </button>
-            )}
           </div>
 
           <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent mb-6"></div>
@@ -304,13 +283,6 @@ export default function AdminDireksiDokumentasiUpdateView() {
                         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </a>
 
-                      <button
-                        onClick={() => handleProjectIdentityPhotoDelete(item.id)}
-                        className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-md"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-
                       <div className="bg-white px-4 py-3">
                         <p className="text-[13px] font-poppins-medium text-gray-700 line-clamp-2 leading-relaxed">
                           {item.title || "Tanpa judul"}
@@ -318,18 +290,6 @@ export default function AdminDireksiDokumentasiUpdateView() {
                       </div>
                     </div>
                   ))}
-
-                  <button
-                    onClick={() => setShowModalPhoto(true)}
-                    className="group rounded-xl border-2 border-dashed border-gray-200 hover:border-primary min-h-64 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:bg-green-50 cursor-pointer"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors duration-300">
-                      <Plus size={22} className="text-gray-400 group-hover:text-primary transition-colors duration-300" />
-                    </div>
-                    <p className="text-[13px] font-poppins-medium text-gray-400 group-hover:text-primary transition-colors duration-300">
-                      Tambah Foto
-                    </p>
-                  </button>
                 </div>
               )}
             </>
