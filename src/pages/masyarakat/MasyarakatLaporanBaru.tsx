@@ -7,7 +7,6 @@ import BackButton from '../../ui/BackButton';
 import usePengaduanHooks from '../../hooks/PengaduanHooks';
 import FormSelect from '../../ui/FormSelect';
 import { useRef, useState } from 'react';
-import type { PengaduanMediaProps } from '../../types/global';
 import SubmitButton from '../../ui/SubmitButton';
 import { Plus, Trash2, FileVideo, ImageIcon, Upload } from 'lucide-react';
 

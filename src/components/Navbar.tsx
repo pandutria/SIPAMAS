@@ -1,91 +1,159 @@
-import { useState } from 'react';
-import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react';
+/* eslint-disable react-hooks/static-components */
+import { useState, useEffect, useRef } from 'react';
+import { Menu, X, ChevronDown, User, LogOut, MapPin, LayoutDashboard, FileText } from 'lucide-react';
 import logo from "/image/logo/logo-sipamas.png";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useAuthHooks from '../hooks/AuthHooks';
 import { BASE_URL_FILE } from '../server/API';
 
+const navConfig: Record<string, { dashboardPath: string; dropdownLabel: string; dropdownItems: { label: string; path: string }[] }> = {
+  'super-admin': {
+    dashboardPath: '/',
+    dropdownLabel: 'Manajemen',
+    dropdownItems: [
+      { label: 'Pengguna', path: '/superadmin/manajemen-pengguna' },
+      { label: 'Laporan', path: '/superadmin/manajemen-laporan' },
+    ],
+  },
+  'masyarakat': {
+    dashboardPath: '/',
+    dropdownLabel: 'Laporan',
+    dropdownItems: [
+      { label: 'Buat Laporan Baru', path: '/masyarakat/laporan-baru' },
+      { label: 'Riwayat Laporan', path: '/masyarakat/riwayat-laporan' },
+    ],
+  },
+  'admin-direksi': {
+    dashboardPath: '/',
+    dropdownLabel: 'Laporan Saya',
+    dropdownItems: [
+      { label: 'Identitas Proyek', path: '/admin-direksi/identitas-proyek' },
+      { label: 'Rencana Anggaran', path: '/admin-direksi/rencana-anggaran' },
+      { label: 'Jadwal Pelaksanaan', path: '/admin-direksi/jadwal-pelaksanaan' },
+      { label: 'Realisasi Pekerjaan', path: '/admin-direksi/realisasi-pekerjaan' },
+      { label: 'Project Progress (Kurva S)', path: '/admin-direksi/project-kurva-s' },
+      { label: 'Dokumentasi', path: '/admin-direksi/dokumentasi' },
+      { label: 'Evaluasi', path: '/admin-direksi/evaluasi' },
+    ],
+  },
+  'admin-ppk': {
+    dashboardPath: '/',
+    dropdownLabel: 'Laporan Saya',
+    dropdownItems: [
+      { label: 'Identitas Proyek', path: '/admin-ppk/identitas-proyek' },
+      { label: 'Rencana Anggaran', path: '/admin-ppk/rencana-anggaran' },
+      { label: 'Jadwal Pelaksanaan', path: '/admin-ppk/jadwal-pelaksanaan' },
+      { label: 'Realisasi Pekerjaan', path: '/admin-ppk/realisasi-pekerjaan' },
+      { label: 'Project Progress (Kurva S)', path: '/admin-ppk/project-kurva-s' },
+      { label: 'Dokumentasi', path: '/admin-ppk/dokumentasi' },
+      { label: 'Evaluasi', path: '/admin-ppk/evaluasi' },
+    ],
+  },
+};
+
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isLaporanOpen, setIsLaporanOpen] = useState<boolean>(false);
-  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLaporanOpen, setIsLaporanOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading } = useAuth();
   const { handleLogout } = useAuthHooks();
+  const profileRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const type = user ? user.role : 'guest';
+  const config = navConfig[type];
 
-  const adminItems = [
-    { label: 'Pengguna', path: '/superadmin/manajemen-pengguna' },
-    { label: 'Laporan', path: '/superadmin/manajemen-laporan' },
-  ];
+  const isActive = (path: string) => location.pathname === path;
+  const isDropdownActive = config?.dropdownItems.some(i => isActive(i.path));
 
-  const adminDireksiLaporanItems = [
-    { label: 'Identitas Proyek', path: '/admin-direksi/identitas-proyek' },
-    { label: 'Rencana Anggaran', path: '/admin-direksi/rencana-anggaran' },
-    { label: 'Jadwal Pelaksanaan', path: '/admin-direksi/jadwal-pelaksanaan' },
-    { label: 'Realisasi Pekerjaan', path: '/admin-direksi/realisasi-pekerjaan' },
-    { label: 'Project Progress (Kurva S)', path: '/admin-direksi/project-kurva-s' },
-    { label: 'Dokumentasi', path: '/admin-direksi/dokumentasi' },
-    { label: 'Evaluasi', path: '/admin-direksi/evaluasi' },
-  ];
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  const adminPpkLaporanItems = [
-    { label: 'Identitas Proyek', path: '/admin-ppk/identitas-proyek' },
-    { label: 'Rencana Anggaran', path: '/admin-ppk/rencana-anggaran' },
-    { label: 'Jadwal Pelaksanaan', path: '/admin-ppk/jadwal-pelaksanaan' },
-    { label: 'Realisasi Pekerjaan', path: '/admin-ppk/realisasi-pekerjaan' },
-    { label: 'Project Progress (Kurva S)', path: '/admin-ppk/project-kurva-s' },
-    { label: 'Dokumentasi', path: '/admin-ppk/dokumentasi' },
-    { label: 'Evaluasi', path: '/admin-ppk/evaluasi' },
-  ];
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setIsProfileOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setIsLaporanOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const masyarakatItems = [
-    { label: 'Buat Laporan Baru', path: '/masyarakat/laporan-baru' },
-    { label: 'Riwayat Laporan', path: '/masyarakat/riwayat-laporan' },
-  ]
+  const avatarText = user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
-  if (loading) {
-    return;
-  }
+  const NavLink = ({ label, path, icon: Icon }: { label: string; path: string; icon?: React.ElementType }) => (
+    <button
+      onClick={() => { navigate(path); setIsMenuOpen(false); }}
+      className={`relative font-poppins-medium text-[13.5px] px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-200 group ${isActive(path)
+        ? 'text-primary bg-primary/10'
+        : 'text-gray-600 hover:text-primary hover:bg-primary/8'
+      }`}
+    >
+      {Icon && <Icon size={15} className={isActive(path) ? 'text-primary' : 'text-gray-400 group-hover:text-primary'} />}
+      {label}
+      {isActive(path) && (
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-primary rounded-full" />
+      )}
+    </button>
+  );
+
+  if (loading) return null;
 
   return (
-    <nav className={`w-full px-4 md:px-8 shadow-lg fixed top-0 left-0 right-0 z-50 bg-white ${type == 'guest' ? 'py-3 md:py-6' : 'py-2 md:py-2'}`}>
-      <div className="max-w-8xl mx-auto flex items-center justify-between">
+    <nav
+      className={`w-full px-4 md:px-8 fixed top-0 left-0 right-0 z-9998 transition-all duration-300 ${scrolled
+        ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-black/5 py-5'
+        : 'bg-white shadow-sm py-4'
+      }`}
+    >
+      <div className="max-w-8xl mx-auto flex items-center justify-between gap-4">
+
         <div className="flex items-center gap-8">
-          <img onClick={() => navigate("/")} src={logo} className="w-auto h-6 cursor-pointer" />
+          <button onClick={() => navigate("/")} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-200">
+            <img src={logo} className="w-auto h-7" alt="Logo" />
+          </button>
 
-          {type === 'super-admin' && (
-            <div className="hidden md:flex items-center gap-2">
-              <button
-                className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10"
-                onClick={() => navigate("/")}
-              >
-                Dashboard
-              </button>
+          {type !== 'guest' && config && (
+            <div className="hidden md:flex items-center gap-1">
+              <NavLink label="Dashboard" path={config.dashboardPath} icon={LayoutDashboard} />
+              <NavLink label="Lokasi Proyek" path="/lokasi-proyek" icon={MapPin} />
 
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <button
-                  className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10 flex items-center gap-2"
-                  onClick={() => {
-                    setIsLaporanOpen(!isLaporanOpen)
-                  }}
+                  onClick={() => setIsLaporanOpen(v => !v)}
+                  className={`font-poppins-medium text-[13.5px] px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-200 ${isDropdownActive || isLaporanOpen
+                    ? 'text-primary bg-primary/10'
+                    : 'text-gray-600 hover:text-primary hover:bg-primary/8'
+                  }`}
                 >
-                  Manajemen
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
+                  <FileText size={15} className={isDropdownActive ? 'text-primary' : 'text-gray-400'} />
+                  {config.dropdownLabel}
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isLaporanOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50">
-                    {adminItems.map((item, index) => (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl shadow-black/10 border border-gray-100 py-2 z-9998 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-3 pb-2 pt-1">
+                      <p className="text-[10px] font-poppins-semibold text-gray-400 uppercase tracking-widest">{config.dropdownLabel}</p>
+                    </div>
+                    {config.dropdownItems.map((item, i) => (
                       <button
-                        key={index}
-                        className="w-full font-poppins-regular text-left font-poppins text-sm px-6 py-3 hover:bg-primary/10 hover:text-primary transition-colors duration-200 cursor-pointer"
-                        onClick={() => {
-                          navigate(item.path);
-                          setIsLaporanOpen(false);
-                        }}
+                        key={i}
+                        onClick={() => { navigate(item.path); setIsLaporanOpen(false); }}
+                        className={`w-full text-left text-[13px] font-poppins-regular px-4 py-2.5 mx-1 rounded-xl transition-all duration-150 cursor-pointer flex items-center gap-2.5 ${isActive(item.path)
+                          ? 'bg-primary/10 text-primary font-poppins-medium'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-primary'
+                        }`}
+                        style={{ width: 'calc(100% - 8px)' }}
                       >
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isActive(item.path) ? 'bg-primary' : 'bg-gray-200'}`} />
                         {item.label}
                       </button>
                     ))}
@@ -95,664 +163,184 @@ export default function Navbar() {
             </div>
           )}
 
-          {type === 'masyarakat' && (
-            <div className="hidden md:flex items-center gap-2">
-              <button
-                className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10"
-                onClick={() => navigate("/")}
-              >
-                Dashboard
-              </button>
-
-              <div className="relative">
-                <button
-                  className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10 flex items-center gap-2"
-                  onClick={() => {
-                    setIsLaporanOpen(!isLaporanOpen)
-                  }}
-                >
-                  Manajemen
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isLaporanOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50">
-                    {masyarakatItems.map((item, index) => (
-                      <button
-                        key={index}
-                        className="w-full font-poppins-regular text-left font-poppins text-sm px-6 py-3 hover:bg-primary/10 hover:text-primary transition-colors duration-200 cursor-pointer"
-                        onClick={() => {
-                          navigate(item.path);
-                          setIsLaporanOpen(false);
-                        }}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {type === 'admin-direksi' && (
-            <div className="hidden md:flex items-center gap-2">
-              <button
-                className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10"
-                onClick={() => navigate("/")}
-              >
-                Dashboard
-              </button>
-
-              <div className="relative">
-                <button
-                  className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10 flex items-center gap-2"
-                  onClick={() => setIsLaporanOpen(!isLaporanOpen)}
-                >
-                  Laporan Saya
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isLaporanOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50">
-                    {adminDireksiLaporanItems.map((item, index) => (
-                      <button
-                        key={index}
-                        className="w-full font-poppins-regular text-left font-poppins text-sm px-6 py-3 hover:bg-primary/10 hover:text-primary transition-colors duration-200 cursor-pointer"
-                        onClick={() => {
-                          navigate(item.path);
-                          setIsLaporanOpen(false);
-                        }}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {type === 'admin-ppk' && (
-            <div className="hidden md:flex items-center gap-2">
-              <button
-                className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10"
-                onClick={() => navigate("/")}
-              >
-                Dashboard
-              </button>
-
-              <div className="relative">
-                <button
-                  className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 py-2 transition-colors duration-200 rounded-lg cursor-pointer hover:bg-primary/10 flex items-center gap-2"
-                  onClick={() => setIsLaporanOpen(!isLaporanOpen)}
-                >
-                  Laporan Saya
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isLaporanOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50">
-                    {adminPpkLaporanItems.map((item, index) => (
-                      <button
-                        key={index}
-                        className="w-full font-poppins-regular text-left font-poppins text-sm px-6 py-3 hover:bg-primary/10 hover:text-primary transition-colors duration-200 cursor-pointer"
-                        onClick={() => {
-                          navigate(item.path);
-                          setIsLaporanOpen(false);
-                        }}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+          {type === 'guest' && (
+            <div className="hidden md:flex items-center gap-1">
+              <NavLink label="Dashboard" path="/" icon={LayoutDashboard} />
+              <NavLink label="Lokasi Proyek" path="/lokasi-proyek" icon={MapPin} />
             </div>
           )}
         </div>
 
-        {type === 'guest' && (
-          <>
-            <div className="hidden md:flex items-center">
+        <div className="flex items-center gap-2">
+          {type === 'guest' && (
+            <button
+              onClick={() => navigate("/masuk")}
+              className="hidden md:flex font-poppins-semibold text-[13px] text-white px-5 py-2.5 rounded-xl transition-all duration-200 hover:opacity-90 hover:scale-[0.98] shadow-sm"
+              style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #065f46 100%)' }}
+            >
+              Masuk
+            </button>
+          )}
+
+          {type !== 'guest' && (
+            <div className="hidden md:flex items-center" ref={profileRef}>
               <button
-                className="font-poppins-medium text-black hover:text-primary text-sm md:text-base px-4 md:px-6 transition-colors duration-200 rounded-t-lg cursor-pointer"
-                onClick={() => navigate("/masuk")}
+                onClick={() => setIsProfileOpen(v => !v)}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 ${isProfileOpen ? 'bg-primary/10' : 'hover:bg-gray-100'}`}
               >
-                Masuk
+                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ring-primary/20">
+                  {user?.profile_photo ? (
+                    <img className="w-full h-full object-cover" src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white text-[11px] font-poppins-bold"
+                      style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #065f46 100%)' }}>
+                      {avatarText}
+                    </div>
+                  )}
+                </div>
+                <div className="text-left hidden lg:block">
+                  <p className="font-poppins-semibold text-[13px] text-gray-800 leading-tight">{user?.fullname}</p>
+                  <p className="font-poppins-regular text-[10px] text-gray-400 capitalize leading-tight">{type.replace('-', ' ')}</p>
+                </div>
+                <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>
-            </div>
 
-            <button
-              className="md:hidden p-2 rounded-lg transition-colors duration-200 cursor-pointer"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? (
-                <X className="h-10 w-10 text-primary bg-primary/20 p-2 rounded-lg" />
-              ) : (
-                <Menu className="h-10 w-10 text-primary bg-primary/20 p-2 rounded-lg" />
-              )}
-            </button>
-          </>
-        )}
-
-        {type !== 'guest' && (
-          <>
-            <div className="hidden md:flex items-center">
-              <div className="relative">
-                <button
-                  className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/10 transition-colors duration-200 cursor-pointer"
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full ${user?.profile_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
-                      {user?.profile_photo ? (
-                        <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" /> 
-                      ) : (
-                        <span className="font-poppins-medium text-primary text-sm">
-                          {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                        </span>
-                      )}
-                    </div>
-                    <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
+              {isProfileOpen && (
+                <div className="absolute top-full right-4 mt-3 w-56 bg-white rounded-2xl shadow-2xl shadow-black/10 border border-gray-100 py-2 z-9998">
+                  <div className="px-4 py-3 border-b border-gray-50 mb-1">
+                    <p className="font-poppins-semibold text-[13px] text-gray-800">{user?.fullname}</p>
+                    <p className="font-poppins-regular text-[11px] text-gray-400">{user?.email}</p>
                   </div>
-                  <ChevronDown className={`h-4 w-4 text-black transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isProfileOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 z-50">
-                    <div className="">
-                      <button
-                        className="w-full text-left font-poppins text-sm px-6 py-3 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 cursor-pointer flex items-center gap-3"
-                        onClick={() => {
-                          navigate("/ubah-profile")
-                          setIsProfileOpen(false);
-                        }}
-                      >
-                        <User className="h-4 w-4" />
-                        Ubah Profile
-                      </button>
-                    </div>
-                    <div className="">
-                      <button
-                        className="w-full text-left font-poppins text-sm px-6 py-3 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 cursor-pointer flex items-center gap-3"
-                        onClick={() => {
-                          handleLogout();
-                          setIsProfileOpen(false);
-                        }}
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <button
-              className="md:hidden p-2 rounded-lg transition-colors duration-200 cursor-pointer"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? (
-                <X className="h-10 w-10 text-primary bg-primary/20 p-2 rounded-lg" />
-              ) : (
-                <Menu className="h-10 w-10 text-primary bg-primary/20 p-2 rounded-lg" />
+                  <button
+                    onClick={() => { navigate("/ubah-profile"); setIsProfileOpen(false); }}
+                    className="w-full text-left font-poppins-regular text-[13px] px-4 py-2.5 hover:bg-gray-50 hover:text-primary transition-colors duration-150 flex items-center gap-3 text-gray-600"
+                  >
+                    <User size={15} />
+                    Ubah Profile
+                  </button>
+                  <div className="mx-3 my-1 h-px bg-gray-100" />
+                  <button
+                    onClick={() => { handleLogout(); setIsProfileOpen(false); }}
+                    className="w-full text-left font-poppins-regular text-[13px] px-4 py-2.5 hover:bg-red-50 hover:text-red-600 transition-colors duration-150 flex items-center gap-3 text-red-500"
+                  >
+                    <LogOut size={15} />
+                    Logout
+                  </button>
+                </div>
               )}
-            </button>
-          </>
-        )}
-      </div>
+            </div>
+          )}
 
-      {type === 'guest' && (
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
-            ${isMenuOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
-          `}
-        >
           <button
-            className="w-full text-left font-poppins-medium text-base px-4 py-3 mt-2 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
-            onClick={() => navigate("/masuk")}
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 transition-all duration-200 hover:bg-primary/20"
+            onClick={() => setIsMenuOpen(v => !v)}
           >
-            Masuk
+            {isMenuOpen
+              ? <X size={18} className="text-primary" />
+              : <Menu size={18} className="text-primary" />
+            }
           </button>
         </div>
-      )}
+      </div>
 
-      {type === 'super-admin' && (
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
-            ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
-          `}
-        >
-          <div className="mt-4 space-y-2">
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-150 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+        <div className="pt-3 pb-4 flex flex-col gap-1 border-t border-gray-100 mt-2.5">
+
+          {type !== 'guest' && (
+            <div className="flex items-center gap-3 px-3 py-3 mb-1 rounded-xl mx-1" style={{ background: 'linear-gradient(135deg, var(--color-primary)/8% 0%, #065f46/5% 100%)' }}>
+              <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ring-primary/20">
+                {user?.profile_photo ? (
+                  <img className="w-full h-full object-cover" src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white text-[12px] font-poppins-bold"
+                    style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #065f46 100%)' }}>
+                    {avatarText}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-poppins-semibold text-[13px] text-gray-800">{user?.fullname}</p>
+                <p className="font-poppins-regular text-[11px] text-gray-400 capitalize">{type.replace('-', ' ')}</p>
+              </div>
+            </div>
+          )}
+
+          {(type !== 'guest' ? [
+            { label: 'Dashboard', path: config?.dashboardPath ?? '/', icon: LayoutDashboard },
+            { label: 'Lokasi Proyek', path: '/lokasi-proyek', icon: MapPin },
+          ] : [
+            { label: 'Dashboard', path: '/', icon: LayoutDashboard },
+            { label: 'Lokasi Proyek', path: '/lokasi-proyek', icon: MapPin },
+          ]).map((item) => (
             <button
-              className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
-              onClick={() => {
-                navigate("/");
-                setIsMenuOpen(false);
-              }}
+              key={item.path}
+              onClick={() => { navigate(item.path); setIsMenuOpen(false); }}
+              className={`w-full text-left font-poppins-medium text-[13.5px] px-4 py-3 rounded-xl flex items-center gap-3 transition-all duration-150 ${isActive(item.path) ? 'bg-primary/10 text-primary' : 'text-gray-700 hover:bg-gray-50 hover:text-primary'}`}
             >
-              Dashboard
+              <item.icon size={16} className={isActive(item.path) ? 'text-primary' : 'text-gray-400'} />
+              {item.label}
             </button>
+          ))}
 
+          {type !== 'guest' && config && (
             <div>
               <button
-                className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20 flex items-center justify-between"
-                onClick={() => setIsLaporanOpen(!isLaporanOpen)}
+                onClick={() => setIsLaporanOpen(v => !v)}
+                className={`w-full text-left font-poppins-medium text-[13.5px] px-4 py-3 rounded-xl flex items-center justify-between gap-3 transition-all duration-150 ${isDropdownActive ? 'bg-primary/10 text-primary' : 'text-gray-700 hover:bg-gray-50 hover:text-primary'}`}
               >
-                Manajemen Pengguna
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
+                <span className="flex items-center gap-3">
+                  <FileText size={16} className={isDropdownActive ? 'text-primary' : 'text-gray-400'} />
+                  {config.dropdownLabel}
+                </span>
+                <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ml-4
-                  ${isLaporanOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}
-                `}
-              >
-                {adminItems.map((item, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      navigate(item.path);
-                      setIsLaporanOpen(false);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-2 mt-2">
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className={`w-10 h-10 rounded-full ${user?.profile_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
-                  {user?.profile_photo ? (
-                    <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" /> 
-                  ) : (
-                    <span className="font-poppins-medium text-primary text-sm">
-                      {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                    </span>
-                  )}
+              <div className={`overflow-hidden transition-all duration-300 ${isLaporanOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="ml-4 mt-1 flex flex-col gap-0.5 pl-3 border-l-2 border-primary/20">
+                  {config.dropdownItems.map((item, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { navigate(item.path); setIsLaporanOpen(false); setIsMenuOpen(false); }}
+                      className={`w-full text-left text-[13px] px-3 py-2.5 rounded-lg transition-all duration-150 ${isActive(item.path) ? 'bg-primary/10 text-primary font-poppins-medium' : 'text-gray-600 font-poppins-regular hover:bg-gray-50 hover:text-primary'}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
                 </div>
-                <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
               </div>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10 flex items-center gap-3"
-                onClick={() => {
-                  navigate('/ubah-profile');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <User className="h-4 w-4" />
-                Edit Profile
-              </button>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-red-600 cursor-pointer hover:bg-red-50 flex items-center gap-3"
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
             </div>
+          )}
+
+          <div className="mt-2 pt-2 border-t border-gray-100 flex flex-col gap-1">
+            {type === 'guest' ? (
+              <button
+                onClick={() => { navigate("/masuk"); setIsMenuOpen(false); }}
+                className="w-full font-poppins-semibold text-[13.5px] text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-200"
+                style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #065f46 100%)' }}
+              >
+                Masuk ke Akun
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => { navigate('/ubah-profile'); setIsMenuOpen(false); }}
+                  className="w-full text-left font-poppins-regular text-[13px] px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors duration-150 flex items-center gap-3"
+                >
+                  <User size={15} />
+                  Ubah Profile
+                </button>
+                <button
+                  onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                  className="w-full text-left font-poppins-regular text-[13px] px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors duration-150 flex items-center gap-3"
+                >
+                  <LogOut size={15} />
+                  Logout
+                </button>
+              </>
+            )}
           </div>
         </div>
-      )}
-
-      {type === 'masyarakat' && (
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
-            ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
-          `}
-        >
-          <div className="mt-4 space-y-2">
-            <button
-              className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
-              onClick={() => {
-                navigate("/");
-                setIsMenuOpen(false);
-              }}
-            >
-              Dashboard
-            </button>
-
-            <div>
-              <button
-                className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20 flex items-center justify-between"
-                onClick={() => setIsLaporanOpen(!isLaporanOpen)}
-              >
-                Manajemen Pengguna
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ml-4
-                  ${isLaporanOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}
-                `}
-              >
-                {masyarakatItems.map((item, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      navigate(item.path);
-                      setIsLaporanOpen(false);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-2 mt-2">
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className={`w-10 h-10 rounded-full ${user?.profile_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
-                  {user?.profile_photo ? (
-                    <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" /> 
-                  ) : (
-                    <span className="font-poppins-medium text-primary text-sm">
-                      {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                    </span>
-                  )}
-                </div>
-                <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
-              </div>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10 flex items-center gap-3"
-                onClick={() => {
-                  navigate('/ubah-profile');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <User className="h-4 w-4" />
-                Edit Profile
-              </button>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-red-600 cursor-pointer hover:bg-red-50 flex items-center gap-3"
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {type === 'admin-direksi' && (
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
-            ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
-          `}
-        >
-          <div className="mt-4 space-y-2">
-            <button
-              className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
-              onClick={() => {
-                navigate("/");
-                setIsMenuOpen(false);
-              }}
-            >
-              Dashboard
-            </button>
-
-            <div>
-              <button
-                className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20 flex items-center justify-between"
-                onClick={() => setIsLaporanOpen(!isLaporanOpen)}
-              >
-                Laporan Saya
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ml-4
-                  ${isLaporanOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}
-                `}
-              >
-                {adminDireksiLaporanItems.map((item, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      navigate(item.path);
-                      setIsLaporanOpen(false);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-2 mt-2">
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className={`w-10 h-10 rounded-full ${user?.profile_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
-                  {user?.profile_photo ? (
-                    <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" /> 
-                  ) : (
-                    <span className="font-poppins-medium text-primary text-sm">
-                      {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                    </span>
-                  )}
-                </div>
-                <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
-              </div>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10 flex items-center gap-3"
-                onClick={() => {
-                  navigate('/ubah-profile');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <User className="h-4 w-4" />
-                Edit Profile
-              </button>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-red-600 cursor-pointer hover:bg-red-50 flex items-center gap-3"
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {type === 'admin-direksi' && (
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
-            ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
-          `}
-        >
-          <div className="mt-4 space-y-2">
-            <button
-              className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
-              onClick={() => {
-                navigate("/");
-                setIsMenuOpen(false);
-              }}
-            >
-              Dashboard
-            </button>
-
-            <div>
-              <button
-                className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20 flex items-center justify-between"
-                onClick={() => setIsLaporanOpen(!isLaporanOpen)}
-              >
-                Laporan Saya
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ml-4
-                  ${isLaporanOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}
-                `}
-              >
-                {adminDireksiLaporanItems.map((item, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      navigate(item.path);
-                      setIsLaporanOpen(false);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-2 mt-2">
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className={`w-10 h-10 rounded-full ${user?.profile_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
-                  {user?.profile_photo ? (
-                    <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" /> 
-                  ) : (
-                    <span className="font-poppins-medium text-primary text-sm">
-                      {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                    </span>
-                  )}
-                </div>
-                <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
-              </div>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10 flex items-center gap-3"
-                onClick={() => {
-                  navigate('/ubah-profile');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <User className="h-4 w-4" />
-                Edit Profile
-              </button>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-red-600 cursor-pointer hover:bg-red-50 flex items-center gap-3"
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {type === 'admin-ppk' && (
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
-            ${isMenuOpen ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
-          `}
-        >
-          <div className="mt-4 space-y-2">
-            <button
-              className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20"
-              onClick={() => {
-                navigate("/");
-                setIsMenuOpen(false);
-              }}
-            >
-              Dashboard
-            </button>
-
-            <div>
-              <button
-                className="w-full text-left font-poppins-medium text-base px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/20 flex items-center justify-between"
-                onClick={() => setIsLaporanOpen(!isLaporanOpen)}
-              >
-                Laporan Saya
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLaporanOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ml-4
-                  ${isLaporanOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}
-                `}
-              >
-                {adminPpkLaporanItems.map((item, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left font-poppins text-sm px-4 py-2.5 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      navigate(item.path);
-                      setIsLaporanOpen(false);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-2 mt-2">
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className={`w-10 h-10 rounded-full ${user?.profile_photo ? '' : 'bg-primary/20'} flex items-center justify-center`}>
-                  {user?.profile_photo ? (
-                    <img className='rounded-full w-10 h-10 object-cover' src={`${BASE_URL_FILE}/${user.profile_photo}`} alt="" /> 
-                  ) : (
-                    <span className="font-poppins-medium text-primary text-sm">
-                      {user?.fullname.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                    </span>
-                  )}
-                </div>
-                <span className="font-poppins-medium text-black text-sm">{user?.fullname}</span>
-              </div>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-black cursor-pointer hover:text-primary hover:bg-primary/10 flex items-center gap-3"
-                onClick={() => {
-                  navigate('/ubah-profile');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <User className="h-4 w-4" />
-                Edit Profile
-              </button>
-
-              <button
-                className="w-full text-left font-poppins-regular text-sm px-4 py-3 rounded-lg transition-all duration-200 text-red-600 cursor-pointer hover:bg-red-50 flex items-center gap-3"
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </nav>
   );
 }

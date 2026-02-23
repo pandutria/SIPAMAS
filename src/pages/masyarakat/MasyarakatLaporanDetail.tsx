@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Navigate } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import usePengaduanHooks from "../../hooks/PengaduanHooks";
 import { useEffect, useRef, useState } from "react";
@@ -6,7 +6,6 @@ import L from "leaflet";
 import maps from "/icon/maps.png";
 import "leaflet/dist/leaflet.css";
 import { BASE_URL_FILE } from "../../server/API";
-import type { PengaduanReviewProps } from "../../types/global";
 import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "../../ui/LoadingSpinner";
 import BackButton from "../../ui/BackButton";
@@ -20,13 +19,19 @@ const customIcon = L.icon({
 
 const statusConfig: Record<string, { label: string; badge: string; dot: string }> = {
     menunggu: { label: "Menunggu", badge: "bg-blue-100 text-blue-600 border border-blue-200", dot: "bg-blue-500" },
+    diterima: { label: "Diterima", badge: "bg-purple-100 text-purple-600 border border-purple-200", dot: "bg-purple-500" },
     diproses: { label: "Diproses", badge: "bg-orange-100 text-orange-600 border border-orange-200", dot: "bg-orange-500" },
     selesai: { label: "Sudah Selesai", badge: "bg-green-100 text-green-600 border border-green-200", dot: "bg-green-500" },
     ditolak: { label: "Ditolak", badge: "bg-red-100 text-red-600 border border-red-200", dot: "bg-red-500" },
 };
 
 function resolveStatusKey(raw: string): string {
-    return raw.toLowerCase().replace(/[_ ]/g, "").replace("dalam", "").replace("proses", "diproses") || raw.toLowerCase().trim();
+    const s = raw.toLowerCase().trim().replace(/[_ ]/g, "");
+    if (s.includes("terima") || s === "diterima") return "diterima";
+    if (s.includes("proses") || s.includes("diproses")) return "diproses";
+    if (s.includes("selesai")) return "selesai";
+    if (s.includes("tolak")) return "ditolak";
+    return "menunggu";
 }
 
 function MapDetail({ lat, lng, alamat }: { lat: string | null; lng: string | null; alamat: string | null }) {
@@ -108,11 +113,15 @@ function StarDisplay({ value }: { value: number }) {
 }
 
 export default function MasyarakatLaporanDetail() {
-    const { pengaduanDataById, setSelectedPengaduanId, handlePengaduanReviewPost } = usePengaduanHooks();
+    const {
+        pengaduanDataById,
+        setSelectedPengaduanId,
+        handlePengaduanReviewPost,
+        pengaduanReviewForm,
+        handleChangePengaduanReviewForm
+    } = usePengaduanHooks();
     const { id } = useParams();
     const { loading, user } = useAuth();
-    const [rating, setRating] = useState(0);
-    const [catatan, setCatatan] = useState("");
     const [lightbox, setLightbox] = useState<string | null>(null);
 
     useEffect(() => {
@@ -125,17 +134,12 @@ export default function MasyarakatLaporanDetail() {
     const isSelesai = statusKey === "selesai";
     const hasReview = !!data?.review;
 
-    const handleReviewSubmit = () => {
-        if (!rating) return;
-        handlePengaduanReviewPost({ rating, catatan, pengaduan_id: Number(id) } as PengaduanReviewProps);
-    };
-
     if (loading || !data) {
-        return <LoadingSpinner/>
+        return <LoadingSpinner />
     }
 
     if (!user || user.role != "masyarakat") {
-        return <Navigate to="/" replace/>
+        return <Navigate to="/" replace />
     }
 
     return (
@@ -153,7 +157,7 @@ export default function MasyarakatLaporanDetail() {
             )}
 
             <div className="max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-16">
-                <BackButton type="custom" link="/masyarakat/riwayat-laporan"/>
+                <BackButton type="custom" link="/masyarakat/riwayat-laporan" />
 
                 <div className="flex flex-col lg:flex-row gap-6 items-start">
                     <div className="flex-1 flex flex-col gap-5 w-full">
@@ -374,22 +378,36 @@ export default function MasyarakatLaporanDetail() {
                                 </div>
                             ) : isSelesai ? (
                                 <div className="flex flex-col gap-3">
-                                    <StarInput value={rating} onChange={setRating} />
-                                    {rating > 0 && (
+                                    <StarInput
+                                        value={Number(pengaduanReviewForm.rating)}
+                                        onChange={(v) =>
+                                            handleChangePengaduanReviewForm({
+                                                target: { name: "rating", value: String(v) },
+                                            } as React.ChangeEvent<HTMLInputElement>)
+                                        }
+                                    />
+
+                                    {Number(pengaduanReviewForm.rating) > 0 && (
                                         <p className="font-poppins-medium text-[12px] text-primary">
-                                            {["", "Sangat Buruk", "Kurang Baik", "Cukup", "Baik", "Sangat Baik"][rating]}
+                                            {["", "Sangat Buruk", "Kurang Baik", "Cukup", "Baik", "Sangat Baik"][Number(pengaduanReviewForm.rating)]}
                                         </p>
                                     )}
+
                                     <textarea
-                                        value={catatan}
-                                        onChange={(e) => setCatatan(e.target.value)}
+                                        value={pengaduanReviewForm.catatan}
+                                        onChange={(e) =>
+                                            handleChangePengaduanReviewForm({
+                                                target: { name: "catatan", value: e.target.value },
+                                            } as React.ChangeEvent<HTMLInputElement>)
+                                        }
                                         placeholder="Ceritakan Pengalaman Anda..."
                                         className="w-full font-poppins-regular text-[13px] border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-primary resize-none transition-colors duration-200 text-gray-700 placeholder:text-gray-300"
                                         rows={4}
                                     />
+
                                     <button
-                                        onClick={handleReviewSubmit}
-                                        disabled={!rating}
+                                        onClick={() => handlePengaduanReviewPost(Number(id))}
+                                        disabled={!pengaduanReviewForm.rating}
                                         className="w-full font-poppins-semibold text-white bg-linear-to-r from-primary to-secondary py-3 rounded-xl text-[14px] hover:opacity-90 hover:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-sm"
                                     >
                                         Kirim Ulasan

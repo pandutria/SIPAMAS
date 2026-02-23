@@ -13,7 +13,7 @@ export default function useRealisasiHooks() {
     const [target, setTarget] = useState<string>("");
     const [reason, setReason] = useState(null);
     const [file, setFile] = useState<File | null>(null);
-    const [tahunData, setTahunData] = useState<any>([]);
+    const [tahunData, setTahunData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>(null);
     const token = localStorage.getItem("token");
     const navigate = useNavigate();

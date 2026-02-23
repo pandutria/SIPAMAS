@@ -7,7 +7,6 @@ import usePengaduanHooks from "../../hooks/PengaduanHooks";
 import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "../../ui/LoadingSpinner";
 import { Navigate, useNavigate } from "react-router-dom";
-import type { PengaduanProps } from "../../types/global";
 import { Plus } from "lucide-react";
 
 const customIcon = L.icon({
@@ -17,7 +16,7 @@ const customIcon = L.icon({
   popupAnchor: [0, -36],
 });
 
-type StatusType = "Menunggu" | "Diproses" | "Selesai" | "Ditolak";
+type StatusType = "Menunggu" | "Diproses" | "Diterima" | "Selesai" | "Ditolak";
 
 const statusMap: Record<string, StatusType> = {
   "menunggu": "Menunggu",
@@ -26,6 +25,8 @@ const statusMap: Record<string, StatusType> = {
   "dalam_proses": "Diproses",
   "dalam proses": "Diproses",
   "proses": "Diproses",
+  "diterima": "Diterima",
+  "terima": "Diterima",
   "selesai": "Selesai",
   "ditolak": "Ditolak",
   "tolak": "Ditolak",
@@ -41,6 +42,11 @@ const statusConfig: Record<StatusType, { label: string; badge: string; badgeDot:
     label: "Diproses",
     badge: "bg-orange-100 text-orange-600 border border-orange-200",
     badgeDot: "bg-orange-500",
+  },
+  Diterima: {
+    label: "Diterima",
+    badge: "bg-purple-100 text-purple-600 border border-purple-200",
+    badgeDot: "bg-purple-500",
   },
   Selesai: {
     label: "Sudah Selesai",
@@ -140,7 +146,7 @@ export default function MasyarakatRiwayatLaporan() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  const filters: ("Semua" | StatusType)[] = ["Semua", "Menunggu", "Diproses", "Selesai"];
+  const filters: ("Semua" | StatusType)[] = ["Semua", "Menunggu", "Diterima", "Diproses", "Selesai"];
 
   useEffect(() => {
     const fetchFiltered = async () => {
@@ -158,6 +164,7 @@ export default function MasyarakatRiwayatLaporan() {
   const stats = {
     total: pengaduanDataFilter.length,
     menunggu: pengaduanDataFilter.filter((i) => resolveStatus(i.status) === "Menunggu").length,
+    diterima: pengaduanDataFilter.filter((i) => resolveStatus(i.status) === "Diterima").length,
     diproses: pengaduanDataFilter.filter((i) => resolveStatus(i.status) === "Diproses").length,
     selesai: pengaduanDataFilter.filter((i) => resolveStatus(i.status) === "Selesai").length,
     ditolak: pengaduanDataFilter.filter((i) => resolveStatus(i.status) === "Ditolak").length,
@@ -166,6 +173,7 @@ export default function MasyarakatRiwayatLaporan() {
   const statCards = [
     { label: "Jumlah Laporan", value: stats.total, icon: "📋", iconBg: "bg-blue-100", badge: null as string | null, badgeColor: "", valueColor: "text-blue-600" },
     { label: "Menunggu", value: stats.menunggu, icon: "🕐", iconBg: "bg-blue-100", badge: null, badgeColor: "", valueColor: "text-blue-500" },
+    { label: "Diterima", value: stats.diterima, icon: "✅", iconBg: "bg-purple-100", badge: null, badgeColor: "", valueColor: "text-purple-500" },
     { label: "Diproses", value: stats.diproses, icon: "⏳", iconBg: "bg-orange-100", badge: null, badgeColor: "", valueColor: "text-orange-500" },
     { label: "Selesai", value: stats.selesai, icon: "✓", iconBg: "bg-green-100", badge: null, badgeColor: "", valueColor: "text-green-500" },
     { label: "Laporan Ditolak", value: stats.ditolak, icon: "✕", iconBg: "bg-red-100", badge: null, badgeColor: "", valueColor: "text-red-500" },
@@ -197,7 +205,7 @@ export default function MasyarakatRiwayatLaporan() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
           {statCards.map((card, index) => (
             <div key={index} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 relative overflow-hidden hover:shadow-md transition-shadow duration-200">
               {card.badge && (

@@ -1,4 +1,4 @@
-import { Mail, Lock, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import useAuthHooks from '../../hooks/AuthHooks';
 import logo from "/image/logo/logo-sipamas.png";
 import { ArrowLeft } from 'lucide-react';
@@ -6,6 +6,8 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import background from "/image/auth/background.jpg";
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../ui/LoadingSpinner';
+import SubmitButton from '../../ui/SubmitButton';
+import FormInput from '../../ui/FormInput';
 
 export default function Login() {
   const { email, password, handleChange, handleLogin, captchaCode, captchaInput, refreshCaptcha, setCaptchaInput } = useAuthHooks();
@@ -13,15 +15,15 @@ export default function Login() {
   const navigate = useNavigate();
 
   if (loading) {
-    return <LoadingSpinner/>
+    return <LoadingSpinner />
   }
 
   if (user) {
-    return <Navigate to="/" replace/>
+    return <Navigate to="/" replace />
   }
   return (
     <div
-      className="h-screen flex items-center justify-center p-4 overflow-hidden"
+      className="h-screen font-poppins-medium flex items-center justify-center p-4 overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${background})`,
         backgroundSize: 'cover',
@@ -41,51 +43,32 @@ export default function Login() {
       >
         <div className="text-center mb-8">
           <div className="flex justify-center">
-            <ArrowLeft className="w-auto h-6 cursor-pointer hover:scale-90 transition-all" onClick={() => navigate("/")}/>
-            <img src={logo} className='w-auto h-4 mx-auto mb-4'/>
+            <ArrowLeft className="w-auto h-6 cursor-pointer hover:scale-90 transition-all" onClick={() => navigate("/")} />
+            <img src={logo} className='w-auto h-4 mx-auto mb-4' />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Selamat Datang</h1>
           <p className="text-gray-600">Silakan masuk ke akun Anda</p>
         </div>
         <div className="space-y-5">
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-              Alamat Email
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="email"
-                id="email"
-                name='email'
-                value={email}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg transition-all duration-200 focus:outline-none focus:border-third focus:ring-2 focus:ring-hover"
-                placeholder="contoh@email.com"
-              />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-              Kata Sandi
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="password"
-                id="password"
-                name='password'
-                value={password}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg transition-all duration-200 focus:outline-none focus:border-third focus:ring-2 focus:ring-hover"
-                placeholder="Masukkan kata sandi"
-              />
-            </div>
-          </div>
+
+          <FormInput
+            type='email'
+            name='email'
+            value={email}
+            onChange={handleChange}
+            title='Email'
+            placeholder="contoh@email.com"
+          />
+
+          <FormInput
+            type='password'
+            name='password'
+            value={password}
+            onChange={handleChange}
+            title='Kata Sandi'
+            placeholder="Masukkan kata sandi"
+          />
+
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Kode Verifikasi (CAPTCHA)
@@ -114,7 +97,7 @@ export default function Login() {
                 id="captcha"
                 value={captchaInput}
                 onChange={(e) => setCaptchaInput(e.target.value.toUpperCase())}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg transition-all duration-200 focus:outline-none focus:border-third focus:ring-2 focus:ring-hover"
+                className="w-full px-4 lg:text-[16px] text-[12px] py-3 border-2 border-gray-300 rounded-lg transition-all duration-200 focus:outline-none focus:border-third focus:ring-2 focus:ring-hover"
                 placeholder="Masukkan kode di atas"
                 maxLength={5}
                 onKeyDown={(e) => {
@@ -126,7 +109,7 @@ export default function Login() {
               />
             </div>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="mt-6 space-y-4">
             <button
               type="button"
               className="font-medium hover:underline text-primary"
@@ -134,14 +117,24 @@ export default function Login() {
             >
               Lupa kata sandi?
             </button>
+            <div className="-mt-6">
+              <SubmitButton
+                width='full'
+                text='Masuk'
+                onClick={() => handleLogin()}
+              />
+            </div>
+            <p className="text-center text-sm text-gray-600">
+              Belum Punya akun?{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/daftar')}
+                className="font-semibold text-primary hover:underline"
+              >
+                Daftar di sini
+              </button>
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={() => handleLogin()}
-            className="w-full bg-primary text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 hover:bg-secondary"
-          >
-            Masuk
-          </button>
         </div>
       </div>
     </div>

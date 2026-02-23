@@ -3,8 +3,12 @@ import image from "/image/home/image.png"
 import icon1 from "/image/home/icon1.png"
 import icon2 from "/image/home/icon2.png"
 import icon3 from "/image/home/icon3.png"
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Home() {
+    const navigate = useNavigate();
+    const { user } = useAuth();
     return (
         <div className="lg:mt-14 mt-18">
             <SafeAreaView className='lg:flex-row flex-col'>
@@ -15,7 +19,7 @@ export default function Home() {
                     </div>
                     <h1 className='font-poppins-bold lg:text-[46px] text-[30px] text-black'>Transparasi Bertemu <span className='text-primary'>Efisiensi</span> dalam Manajemen</h1>
                     <p className='text-gray-600 font-poppins-medium text-justify text-[14px]'>Pusat terpadu untuk memantau, mengevaluasi, dan melaporkan inisiatif pembangunan secara real-time. Aman, transparan, dan dibangun untuk dampak nyata</p>
-                    <button className='font-poppins-semibold text-white bg-linear-to-r from-primary to-secondary py-3 px-4 cursor-pointer hover:scale-95 duration-300 hover:opacity-95 rounded-md text-[14px]'>Mulai Sekarang</button>
+                    <button onClick={() => user ? false : navigate("/masuk")} className='font-poppins-semibold text-white bg-linear-to-r from-primary to-secondary py-3 px-4 cursor-pointer hover:scale-95 duration-300 hover:opacity-95 rounded-md text-[14px]'>Mulai Sekarang</button>
                     <div className="flex justify-center items-center gap-8 mt-4">
                         <div className="flex flex-col">
                             <h1 className='font-poppins-bold lg:text-[28px] text-[24px]'>100+</h1>

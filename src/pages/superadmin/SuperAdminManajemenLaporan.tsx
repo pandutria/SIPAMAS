@@ -5,6 +5,10 @@ import TableContent from '../../ui/TableContent'
 import { useEffect, useState } from 'react';
 import usePengaduanHooks from '../../hooks/PengaduanHooks';
 import SuperAdminModalLaporanDetail from './modal/SuperAdminModalLaporanDetail';
+import SuperAdminModalUbahStatusLaporan from './modal/SuperAdminModalUbahStatusLaporan';
+import { useAuth } from '../../context/AuthContext';
+import LoadingSpinner from '../../ui/LoadingSpinner';
+import { Navigate } from 'react-router-dom';
 
 export default function SuperAdminManajemenLaporan() {
     const [search, setSearch] = useState("");
@@ -16,6 +20,7 @@ export default function SuperAdminManajemenLaporan() {
     const [selectedEdit, setSelectedEdit] = useState<PengaduanProps | null>(null);
     const [selectedPreview, setSelectedPreview] = useState<PengaduanProps | null>(null);
     const [pengaduanDataFilter, setPengaduanDataFIlter] = useState<PengaduanProps[]>([]);
+    const { user, loading } = useAuth();
 
     useEffect(() => {
         const fetchEdit = () => {
@@ -68,6 +73,15 @@ export default function SuperAdminManajemenLaporan() {
         },
     ];
 
+    if (loading) {
+        return <LoadingSpinner/>
+    }
+
+
+    if (!user || user.role != "super-admin") {
+        return <Navigate to="/" replace/>
+    }
+
     return (
         <div>
             <Navbar />
@@ -79,6 +93,15 @@ export default function SuperAdminManajemenLaporan() {
                     setSelectedPreview(null)
                 }}
                 data={selectedPreview as any}
+            />
+
+            <SuperAdminModalUbahStatusLaporan
+                isOpen={showModalEdit}
+                onClose={() => {
+                    setShowModalEdit(false)
+                    setSelectedEdit(null)
+                }}
+                data={selectedEdit as any}
             />
 
             <div className="pt-28" data-aos="fade-up" data-aos-duration="1000">

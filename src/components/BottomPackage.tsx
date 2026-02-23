@@ -1,11 +1,19 @@
-import { useMemo, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useMemo, useState } from "react";
 import useRealisasiHooks from "../hooks/RealisasiHooks";
 import { FormatPackage } from "../ui/FormatPackage";
 import { ConvertToPercent } from "../utils/CovertToPercent";
 
 export default function BottomPackage() {
-    const { realisasiData } = useRealisasiHooks();
-    const [select, setSelect] = useState("2025");
+    const { realisasiData, tahunData } = useRealisasiHooks();
+    const [select, setSelect] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        if (tahunData?.length) {
+            setSelect(tahunData[tahunData.length - 1].text);
+        }
+    }, [tahunData]);
+
     const tableData = useMemo(() => {
         const filtered = select
             ? realisasiData.filter((item) =>
@@ -24,13 +32,14 @@ export default function BottomPackage() {
                     <div className="flex flex-row gap-4 items-center">
                         <p className="font-poppins-medium text-[16px]">Tahun Anggaran: </p>
                         <select value={select} onChange={(e) => setSelect(e.target.value)} className="border-2 border-gray-600 px-6 rounded-md font-poppins-regular text-[14px] py-2">
-                            <option disabled selected>Pilih RAB</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
+                            <option disabled>Pilih Tahun</option>
+                            {tahunData.map((item: any, index: number) => (
+                                <option key={index} value={item.text}>{item.text}</option>
+                            ))}
                         </select>
                     </div>
                 </div>
-                
+
                 <div className="bg-white rounded-3xl overflow-hidden border border-gray-100">
                     <div className="overflow-x-auto">
                         <table className="w-full">
@@ -103,7 +112,7 @@ export default function BottomPackage() {
                                         <td className="px-6 py-5 text-center">
                                             <div className="flex flex-col items-center gap-2">
                                                 <div className="w-full bg-gray-200 rounded-full h-2.5 max-w-25">
-                                                    <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style={{width: `${ConvertToPercent(item.perencanaan_minggu_ini, item.perencanaan)}%`}}></div>
+                                                    <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style={{ width: `${ConvertToPercent(item.perencanaan_minggu_ini, item.perencanaan)}%` }}></div>
                                                 </div>
                                                 <span className="font-poppins-bold text-sm text-blue-700">{ConvertToPercent(item.perencanaan_minggu_ini, item.perencanaan)}%</span>
                                             </div>
@@ -111,17 +120,16 @@ export default function BottomPackage() {
                                         <td className="px-6 py-5 text-center">
                                             <div className="flex flex-col items-center gap-2">
                                                 <div className="w-full bg-gray-200 rounded-full h-2.5 max-w-25">
-                                                    <div className="bg-green-600 h-2.5 rounded-full transition-all duration-500" style={{width: `${ConvertToPercent(item.aktual, item.perencanaan)}%`}}></div>
+                                                    <div className="bg-green-600 h-2.5 rounded-full transition-all duration-500" style={{ width: `${ConvertToPercent(item.aktual, item.perencanaan)}%` }}></div>
                                                 </div>
                                                 <span className="font-poppins-bold text-sm text-green-700">{ConvertToPercent(item.aktual, item.perencanaan)}%</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-center">
-                                            <div className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-poppins-bold text-sm shadow-md ${
-                                                item.perencanaan_minggu_ini <= item.aktual
-                                                    ? 'bg-linear-to-r from-green-500 to-green-600 text-white' 
-                                                    : 'bg-linear-to-r from-red-500 to-red-600 text-white'
-                                            }`}>
+                                            <div className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-poppins-bold text-sm shadow-md ${item.perencanaan_minggu_ini <= item.aktual
+                                                ? 'bg-linear-to-r from-green-500 to-green-600 text-white'
+                                                : 'bg-linear-to-r from-red-500 to-red-600 text-white'
+                                                }`}>
                                                 {item.perencanaan_minggu_ini <= item.aktual ? '↑' : item.perencanaan_minggu_ini > item.aktual ? '↓' : '→'}
                                                 <span>{(ConvertToPercent(item.aktual, item.perencanaan) - ConvertToPercent(item.perencanaan_minggu_ini, item.perencanaan)).toFixed(2)}%</span>
                                             </div>
@@ -147,9 +155,9 @@ export default function BottomPackage() {
                             <h3 className="font-poppins-bold text-2xl text-gray-800 mb-2">Belum Ada Data</h3>
                             <p className="font-poppins-regular text-gray-500 text-base mb-6 max-w-xs mx-auto">Silakan pilih tahun anggaran untuk menampilkan data realisasi pekerjaan</p>
                             <div className="flex justify-center gap-2">
-                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: "0s"}}></div>
-                                <div className="w-2 h-2 bg-secondary rounded-full animate-bounce" style={{animationDelay: "0.15s"}}></div>
-                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: "0.3s"}}></div>
+                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
+                                <div className="w-2 h-2 bg-secondary rounded-full animate-bounce" style={{ animationDelay: "0.15s" }}></div>
+                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.3s" }}></div>
                             </div>
                         </div>
                     )}

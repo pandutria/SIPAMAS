@@ -2,8 +2,10 @@ import SafeAreaView from "../ui/SafeAreaView";
 import image from "/image/peta/image.png"
 import peta from "/image/peta/peta.png"
 import arrow from "/image/peta/arrow.png"
+import { useNavigate } from "react-router-dom";
 
 export default function Peta() {
+    const navigate = useNavigate();
     return (
         <div className="" data-aos="fade-up" data-aos-duration="1000">
             <SafeAreaView className='lg:flex-row flex-col'>
@@ -18,7 +20,7 @@ export default function Peta() {
                         <p className='text-gray-400 font-poppins-medium text-justify lg:text-[14px] text-[12px]'>Kami percaya bahwa transparasi dimulai dari keterbukaan data. setiap proyek pembangunan ditampilkan berdasarkan lokasi geografis yang tepat pada peta interaktif kami.</p>
                         <p className='text-gray-400 font-poppins-medium text-justify lg:text-[14px] text-[12px]'>Hal ini memnungkinkan publik untuk mengetahui proyek apa saja  yang sedang berhalan di lingkungan mereka, memantau kemajuan secara visual, dan memastikan pembangunan merata hingga ke pelosok daerah.</p>
                     </div>
-                    <button className='font-poppins-semibold lg:mt-4 mt-6 flex w-fit justify-center items-center gap-4 text-white bg-linear-to-r from-primary to-secondary py-3 px-4 cursor-pointer hover:scale-95 duration-300 hover:opacity-95 rounded-md lg:text-[18px] text-[14px]'>
+                    <button onClick={() => navigate("/lokasi-proyek")} className='font-poppins-semibold lg:mt-4 mt-6 flex w-fit justify-center items-center gap-4 text-white bg-linear-to-r from-primary to-secondary py-3 px-4 cursor-pointer hover:scale-95 duration-300 hover:opacity-95 rounded-md lg:text-[18px] text-[14px]'>
                         <p>Lihat Peta Proyek</p>
                         <img className="lg:w-8 w-4 h-auto" src={arrow} alt="" />
                     </button>

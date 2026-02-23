@@ -40,6 +40,8 @@ import MasyarakatLaporanBaru from "../pages/masyarakat/MasyarakatLaporanBaru"
 import MasyarakatLaporanDetail from "../pages/masyarakat/MasyarakatLaporanDetail"
 import MasyarakatRiwayatLaporan from "../pages/masyarakat/MasyarakatRiwayatLaporan"
 import SuperAdminManajemenLaporan from "../pages/superadmin/SuperAdminManajemenLaporan"
+import LokasiProyek from "../pages/LokasiProyek"
+import Register from "../pages/auth/Register"
 
 export default function Router() {
   return (
@@ -47,11 +49,13 @@ export default function Router() {
       <Routes>
         {/* All User */}
         <Route path="/" element={<Dashboard />} />
+        <Route path="/lokasi-proyek" element={<LokasiProyek />} />
         <Route path="/ubah-profile" element={<EditProfile/>}/>
         <Route path="*" element={<NotFound/>}/>
 
         {/* Auth */}
         <Route path="/masuk" element={<Login/>} />
+        <Route path="/daftar" element={<Register/>} />
         <Route path="/lupa-kata-sandi" element={<ForgotPassword/>} />
         <Route path="/reset-kata-sandi" element={<ResetPassword />} />
 

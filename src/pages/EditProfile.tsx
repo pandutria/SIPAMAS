@@ -51,7 +51,7 @@ export default function EditProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 pt-8 pb-12">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 pt-8 pb-12 font-poppins-medium">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
         <BackButton/>
 

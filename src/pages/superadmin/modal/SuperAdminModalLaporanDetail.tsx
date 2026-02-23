@@ -1,38 +1,302 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import L from "leaflet";
+import maps from "/icon/maps.png";
+import "leaflet/dist/leaflet.css";
+import { BASE_URL_FILE } from "../../../server/API";
+
+const customIcon = L.icon({
+    iconUrl: maps,
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36],
+});
+
+const statusConfig: Record<string, { label: string; badge: string }> = {
+    menunggu: { label: "Menunggu", badge: "bg-blue-100 text-blue-600 border border-blue-200" },
+    diproses: { label: "Diproses", badge: "bg-orange-100 text-orange-600 border border-orange-200" },
+    selesai: { label: "Selesai", badge: "bg-green-100 text-green-600 border border-green-200" },
+    ditolak: { label: "Ditolak", badge: "bg-red-100 text-red-600 border border-red-200" },
+};
+
+function resolveStatusKey(raw: string): string {
+    const s = raw.toLowerCase().trim().replace(/[_ ]/g, "");
+    if (s.includes("proses") || s.includes("diproses")) return "diproses";
+    if (s.includes("selesai")) return "selesai";
+    if (s.includes("tolak")) return "ditolak";
+    return "menunggu";
+}
+
+function MapModal({ lat, lng, alamat }: { lat: string | null; lng: string | null; alamat: string | null }) {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
+
+    useEffect(() => {
+        if (!mapRef.current || mapInstanceRef.current) return;
+
+        const initMap = (latitude: number, longitude: number) => {
+            if (!mapRef.current) return;
+            const map = L.map(mapRef.current, { attributionControl: false, zoomControl: true })
+                .setView([latitude, longitude], 15);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+            L.marker([latitude, longitude], { icon: customIcon }).addTo(map);
+            mapInstanceRef.current = map;
+        };
+
+        const parsedLat = lat ? parseFloat(lat) : NaN;
+        const parsedLng = lng ? parseFloat(lng) : NaN;
+
+        if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+            initMap(parsedLat, parsedLng);
+        } else if (alamat) {
+            fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(alamat + ", Indonesia")}&format=json&limit=1&countrycodes=id`)
+                .then(r => r.json())
+                .then(d => d?.length > 0 ? initMap(parseFloat(d[0].lat), parseFloat(d[0].lon)) : initMap(-2.5489, 118.0149))
+                .catch(() => initMap(-2.5489, 118.0149));
+        } else {
+            initMap(-2.5489, 118.0149);
+        }
+
+        return () => {
+            mapInstanceRef.current?.remove();
+            mapInstanceRef.current = null;
+        };
+    }, [lat, lng, alamat]);
+
+    return <div ref={mapRef} className="w-full h-48 rounded-xl z-0" />;
+}
+
+function StarDisplay({ value }: { value: number }) {
+    return (
+        <div className="flex gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+                <svg key={i} className={`w-5 h-5 transition-colors duration-200 ${i < value ? "text-yellow-400" : "text-gray-200"}`} fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+            ))}
+        </div>
+    );
+}
+
+function InfoField({ label, value }: { label: string; value: React.ReactNode }) {
+    return (
+        <div className="flex flex-col gap-1">
+            <p className="font-poppins-regular text-[11px] text-gray-400 uppercase tracking-wide">{label}</p>
+            <div className="font-poppins-semibold text-[14px] text-gray-800">{value}</div>
+        </div>
+    );
+}
 
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit?: (data: any) => void;
-    data: PengaduanProps
+    data: PengaduanProps;
 }
 
 export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: ModalProps) {
+    const [lightbox, setLightbox] = useState<string | null>(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const fetchPreview = async () => {
+            if (isOpen) {
+                setTimeout(() => setVisible(true), 10);
+                document.body.style.overflow = "hidden";
+            } else {
+                setVisible(false);
+                document.body.style.overflow = "auto";
+            }
+        }
+
+        fetchPreview();
+        return () => { document.body.style.overflow = "auto"; };
+    }, [isOpen]);
+
+    if (!isOpen) return null;
+
+    const statusKey = resolveStatusKey(data.status);
+    const statusCfg = statusConfig[statusKey] ?? statusConfig["menunggu"];
+    const review = data.review;
+    const reviewer = data.created_by;
+
     return (
-        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
             <div
-                className="absolute inset-0 bg-black/20"
+                className={`absolute inset-0 bg-black/40 transition-opacity ${visible ? "opacity-100" : "opacity-0"}`}
                 onClick={onClose}
             />
 
-            <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                    <h2 className="font-poppins-bold text-xl text-gray-800">
-                        Detail Laporan
-                    </h2>
+            {lightbox && (
+                <div
+                    className="absolute inset-0 z-60 bg-black/90 flex items-center justify-center p-4"
+                    onClick={() => setLightbox(null)}
+                >
+                    <img src={lightbox} className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain" />
+                </div>
+            )}
+
+            <div className={`relative bg-white rounded-2xl shadow-2xl w-full mx-4 max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transition-all`}>
+                <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
+                    <div>
+                        <h2 className="font-poppins-bold text-xl text-gray-800">Detail Pelaporan</h2>
+                        <p className="font-poppins-regular text-[13px] text-gray-400 mt-0.5">
+                            Lihat detail laporan dari masyarakat
+                        </p>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-lg"
+                        className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200 ml-4 shrink-0"
                     >
-                        <X className="h-6 w-6 text-gray-500" />
+                        <X className="h-5 w-5 text-gray-500" />
                     </button>
                 </div>
 
-                <div className="overflow-y-auto p-6 space-y-8">
-                    
+                <div className="overflow-y-auto px-6 py-5 flex flex-col gap-5">
+                    {data.judul && (
+                        <div
+                            className="animate-fade-up"
+                            style={{ animationDelay: "0ms" }}
+                        >
+                            <InfoField label="Nama Proyek" value={data.judul} />
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4" style={{ animationDelay: "60ms" }}>
+                        <InfoField
+                            label="Nomor Tiket Pengaduan"
+                            value={
+                                <span className="text-primary">
+                                    #{data?.id.toString().padStart(4, "0")}
+                                </span>
+                            }
+                        />
+                        <InfoField label="Judul Laporan" value={data.judul ?? "-"} />
+                        <InfoField
+                            label="Tanggal Pelaporan"
+                            value={new Date(data.created_at).toLocaleDateString("id-ID", {
+                                day: "2-digit", month: "2-digit", year: "numeric",
+                                hour: "2-digit", minute: "2-digit"
+                            }).replace(/\//g, "-")}
+                        />
+                        <InfoField
+                            label="Status Pelaporan"
+                            value={
+                                <span className={`inline-flex items-center text-[12px] font-poppins-semibold px-3 py-1 rounded-full ${statusCfg.badge}`}>
+                                    {statusCfg.label}
+                                </span>
+                            }
+                        />
+                    </div>
+
+                    <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent"></div>
+
+                    <div className="flex flex-col gap-2">
+                        <p className="font-poppins-regular text-[11px] text-gray-400 uppercase tracking-wide">Lokasi Kejadian</p>
+                        {data.alamat && (
+                            <p className="font-poppins-semibold text-[14px] text-gray-800 mb-2">{data.alamat}</p>
+                        )}
+                        {(data.latitude || data.longitude) && (
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <div className="bg-white border border-gray-200 rounded-full px-3 py-1 flex items-center gap-1.5 shadow-sm w-fit">
+                                    <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    </svg>
+                                    <span className="font-poppins-regular text-[11px] text-gray-500">
+                                        {data.latitude}, {data.longitude}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                        <div className="rounded-xl overflow-hidden border border-gray-100 shadow-sm">
+                            <MapModal lat={data.latitude} lng={data.longitude} alamat={data.alamat} />
+                        </div>
+                    </div>
+
+                    <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent"></div>
+
+                    <div className="flex flex-col gap-2">
+                        <p className="font-poppins-semibold text-[15px] text-gray-800">Deskripsi Pengaduan</p>
+                        <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
+                            <p className="font-poppins-regular text-[13px] text-gray-600 leading-relaxed">
+                                {data.deskripsi ?? "Tidak ada deskripsi."}
+                            </p>
+                        </div>
+                    </div>
+
+                    {data.medias && data.medias.length > 0 && (
+                        <>
+                            <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent"></div>
+                            <div className="flex flex-col gap-3">
+                                <p className="font-poppins-semibold text-[15px] text-gray-800">Lampiran Pengaduan</p>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {data.medias.map((media, index) => {
+                                        const src = typeof media.media_file === "string"
+                                            ? `${BASE_URL_FILE}/${media.media_file}`
+                                            : URL.createObjectURL(media.media_file as File);
+                                        const isVideo = media.media_tipe === "video";
+                                        return (
+                                            <div
+                                                key={media.id}
+                                                className="group relative rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer aspect-video"
+                                                style={{ animationDelay: `${index * 60}ms` }}
+                                                onClick={() => !isVideo && setLightbox(src)}
+                                            >
+                                                {isVideo ? (
+                                                    <video src={src} className="w-full h-full object-cover" muted />
+                                                ) : (
+                                                    <img src={src} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                )}
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                                                    <svg className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {review && (
+                        <>
+                            <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent"></div>
+                            <div className="flex flex-col gap-3">
+                                <p className="font-poppins-semibold text-[15px] text-gray-800">Penilaian Masyarakat</p>
+                                <div className="border border-gray-100 rounded-xl p-4 flex flex-col gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                                            <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-poppins-semibold text-[13px] text-gray-800">
+                                                {reviewer?.fullname ?? "Masyarakat"}
+                                            </p>
+                                            <p className="font-poppins-regular text-[11px] text-gray-400">Masyarakat</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-green-50 border border-green-100 rounded-xl px-4 py-3 flex flex-col gap-2">
+                                        <StarDisplay value={review.rating ?? 0} />
+                                        {review.catatan && (
+                                            <p className="font-poppins-regular text-[13px] text-gray-600 italic">
+                                                "{review.catatan}"
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    <div className="h-2"></div>
                 </div>
             </div>
         </div>
-    )
+    );
 }

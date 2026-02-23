@@ -10,6 +10,8 @@ import icon9 from "/image/alur-mobile/icon9.png"
 import icon10 from "/image/alur-mobile/icon10.png"
 import iconBtn from "/image/alur-mobile/icon-btn.png"
 import SafeAreaView from "../ui/SafeAreaView"
+import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 const alurMobileData = [
     {
@@ -75,6 +77,8 @@ const alurMobileData = [
 ];
 
 export default function AlurMobile() {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     return (
         <div data-aos="fade-up" data-aos-duration="1000">
             <SafeAreaView className="flex-col gap-12">
@@ -94,7 +98,7 @@ export default function AlurMobile() {
                         </div>
                     ))}
                 </div>
-                <button className='font-poppins-semibold lg:mt-4 mt-6 flex w-fit justify-center items-center gap-4 text-white bg-linear-to-r from-primary to-secondary py-3 px-4 cursor-pointer hover:scale-95 duration-300 hover:opacity-95 rounded-md lg:text-[18px] text-[14px]'>
+                <button onClick={() => user ? navigate("/masyarakat/riwayat-laporan") : "/masuk"} className='font-poppins-semibold lg:mt-4 mt-6 flex w-fit justify-center items-center gap-4 text-white bg-linear-to-r from-primary to-secondary py-3 px-4 cursor-pointer hover:scale-95 duration-300 hover:opacity-95 rounded-md lg:text-[18px] text-[14px]'>
                     <p>Laporkan Aduan Anda</p>
                     <img className="lg:w-8 w-4 h-auto" src={iconBtn} alt="" />
                 </button>

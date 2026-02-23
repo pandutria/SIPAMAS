@@ -4,6 +4,7 @@ import API from "../server/API";
 import { SortDescById } from "../utils/SortDescById";
 import { SwalMessage } from "../utils/SwalMessage";
 import { useNavigate } from "react-router-dom";
+import SwalLoading from "../utils/SwalLoading";
 
 export default function usePengaduanHooks() {
     const [pengaduanData, setPengaduanData] = useState<PengaduanProps[]>([]);
@@ -16,6 +17,10 @@ export default function usePengaduanHooks() {
         judul: "",
         deskripsi: "",
         alamat: ""
+    });
+    const [pengaduanReviewForm, setPengaduanReviewForm] = useState({
+        catatan: "",
+        rating: ""
     });
 
     useEffect(() => {
@@ -65,7 +70,7 @@ export default function usePengaduanHooks() {
 
     const handlePengaduanPost = async(mediaForms: PengaduanMediaProps[]) => {
         try {
-            
+            SwalLoading();
             const formData = new FormData();
             formData.append("kategori", pengaduanForm.kategori);
             formData.append("judul", pengaduanForm.judul);
@@ -122,12 +127,88 @@ export default function usePengaduanHooks() {
         }));
     }
 
+    const handlePengaduanStatusPut = async(status: string, id: number) => {
+        try {
+            SwalLoading();
+            const formData = new FormData();
+            formData.append("status", status);
+
+            const response = await API.put(`/pengaduan/status/update/${id}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const message = response.data.message;
+            SwalMessage({
+                type: "success",
+                title: "Berhasil!",
+                text: message
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (error: any) {
+            SwalMessage({
+                type: "error",
+                title: "Gagal!",
+                text: error?.response.data.message
+            })
+        }
+    }
+
+    const handlePengaduanReviewPost = async(id: number) => {
+        try {
+            SwalLoading();
+            const formData = new FormData();
+            formData.append("pengaduan_id", String(id));
+            formData.append("rating", pengaduanReviewForm.rating);
+            formData.append("catatan", pengaduanReviewForm.catatan);
+
+            const response = await API.post("/pengaduan/review", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const message = response.data.message;
+            SwalMessage({
+                type: "success",
+                title: "Berhasil!",
+                text: message
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (error: any) {
+            SwalMessage({
+                type: "error",
+                title: "Gagal!",
+                text: error.response?.data.message
+            })
+        }
+    }
+
+    const handleChangePengaduanReviewForm = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPengaduanReviewForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }
+
     return {
         pengaduanData,
         pengaduanForm,
         handlePegaduanChangeForm,
         handlePengaduanPost,
         setSelectedPengaduanId,
-        pengaduanDataById
+        pengaduanDataById,
+        handlePengaduanStatusPut,
+        pengaduanReviewForm,
+        handleChangePengaduanReviewForm,
+        handlePengaduanReviewPost
     }
 }
