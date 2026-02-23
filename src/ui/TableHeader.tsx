@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Search, Plus, Trash } from 'lucide-react';
+import { Search, Plus, Trash, Filter } from 'lucide-react';
 
 interface TableHeaderProps {
     title?: string;
@@ -17,7 +17,7 @@ interface TableHeaderProps {
     selectedTahunQuery?: string;
     statusOptions?: any[];
     onStatusChange?: (value: string) => void;
-    selectedStatus?: string,
+    selectedStatus?: string;
     searchValue?: string;
     onTahunChange?: (value: string) => void;
     onTahunQueryChange?: (value: string) => void;
@@ -43,10 +43,10 @@ export default function TableHeader({
     onTahunQueryChange,
     onSearchChange,
     statusOptions = [
-        { text: "Menunggu" },
-        { text: "Diproses" },
-        { text: "Selesai" },
-        { text: "Ditolak" },
+        { text: 'Menunggu' },
+        { text: 'Diproses' },
+        { text: 'Selesai' },
+        { text: 'Ditolak' },
     ],
     onStatusChange,
     selectedStatus,
@@ -54,28 +54,32 @@ export default function TableHeader({
     tahunOptions = [],
     tahunOptionQuery = [
         { text: '2024' },
-        { text: '2025' }
+        { text: '2025' },
     ],
-    type = "user",
+    type = 'user',
 }: TableHeaderProps) {
+    const selectClass = "text-xs sm:text-sm px-3 py-2 sm:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-300 cursor-pointer bg-white text-gray-700 font-poppins-regular hover:border-primary/50 w-full sm:w-40 appearance-none"
+
     return (
-        <div className={`w-full bg-white flex flex-col rounded-lg p-3 sm:p-4 md:p-5 lg:p-6 mb-3 sm:mb-4 md:mb-5 lg:mb-6 shadow-sm ${className}`}>
+        <div className={`w-full bg-white flex flex-col rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 mb-3 sm:mb-4 md:mb-5 lg:mb-6 border border-gray-100 ${className}`}>
             {showTitle && (
-                <div className="mb-3 sm:mb-4 md:mb-5">
+                <div className="mb-4 sm:mb-5 flex items-center gap-3">
+                    <div className="w-1 h-7 rounded-full bg-primary shrink-0" />
                     <h1 className="font-poppins-bold text-lg sm:text-xl md:text-2xl text-gray-800">
                         {title}
                     </h1>
                 </div>
             )}
 
-            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-3 sm:gap-4">
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3 sm:gap-4">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5 md:gap-3 w-full lg:w-auto">
                     {type === 'user' && showTahun && (
-                        <>
+                        <div className="relative w-full sm:w-40">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
                             <select
                                 value={selectedTahun}
                                 onChange={(e) => onTahunChange?.(e.target.value)}
-                                className="text-xs sm:text-sm px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer bg-white text-gray-700 font-poppins-regular hover:border-gray-400 w-full sm:w-40"
+                                className={`${selectClass} pl-8`}
                             >
                                 <option value="">Pilih Tahun</option>
                                 {tahunOptions.map((item, index) => (
@@ -84,48 +88,54 @@ export default function TableHeader({
                                     </option>
                                 ))}
                             </select>
-                        </>
+                        </div>
                     )}
 
                     {type === 'admin' && showTahunQuery && (
-                        <select
-                            value={selectedTahunQuery}
-                            onChange={(e) => onTahunQueryChange?.(e.target.value)}
-                            className="text-xs sm:text-sm px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer bg-white text-gray-700 font-poppins-regular hover:border-gray-400 w-full sm:w-40"
-                        >
-                            <option value="" disabled>Pilih Tahun</option>
-                            {tahunOptionQuery.map((item, index) => (
-                                <option key={index} value={item.text}>
-                                    {item.text}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="relative w-full sm:w-40">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                            <select
+                                value={selectedTahunQuery}
+                                onChange={(e) => onTahunQueryChange?.(e.target.value)}
+                                className={`${selectClass} pl-8`}
+                            >
+                                <option value="" disabled>Pilih Tahun</option>
+                                {tahunOptionQuery.map((item, index) => (
+                                    <option key={index} value={item.text}>
+                                        {item.text}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     )}
 
                     {type === 'admin' && showStatus && (
-                        <select
-                            value={selectedStatus}
-                            onChange={(e) => onStatusChange?.(e.target.value)}
-                            className="text-xs sm:text-sm px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 cursor-pointer bg-white text-gray-700 font-poppins-regular hover:border-gray-400 w-full sm:w-40"
-                        >
-                            <option value="" disabled>Pilih Status</option>
-                            {statusOptions.map((item, index) => (
-                                <option key={index} value={item.text}>
-                                    {item.text}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="relative w-full sm:w-40">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                            <select
+                                value={selectedStatus}
+                                onChange={(e) => onStatusChange?.(e.target.value)}
+                                className={`${selectClass} pl-8`}
+                            >
+                                <option value="" disabled>Pilih Status</option>
+                                {statusOptions.map((item, index) => (
+                                    <option key={index} value={item.text}>
+                                        {item.text}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     )}
 
-                    <div className="relative w-full md:w-72">
+                    <div className="relative w-full md:w-72 group">
                         <input
                             type="text"
                             value={searchValue}
                             onChange={(e) => onSearchChange?.(e.target.value)}
-                            placeholder="Cari..."
-                            className="text-xs sm:text-sm pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 bg-white text-gray-700 w-full font-poppins-regular hover:border-gray-400"
+                            placeholder="Cari data..."
+                            className="text-xs sm:text-sm pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-300 bg-white text-gray-700 w-full font-poppins-regular hover:border-primary/50 hover:shadow-sm focus:shadow-md"
                         />
-                        <Search className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                        <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-4.5 sm:w-4.5 text-gray-400 transition-colors duration-300 group-focus-within:text-primary" />
                     </div>
                 </div>
 
@@ -133,18 +143,18 @@ export default function TableHeader({
                     {showTambah && (
                         <button
                             onClick={onTambahClick}
-                            className="flex items-center justify-center text-xs sm:text-sm gap-2 bg-primary border-2 border-primary hover:bg-transparent text-white hover:text-primary font-poppins-medium px-4 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 cursor-pointer shadow-sm hover:shadow-md whitespace-nowrap"
+                            className="flex items-center justify-center text-xs sm:text-sm gap-2 bg-primary border-2 border-primary hover:bg-transparent text-white hover:text-primary font-poppins-medium px-5 py-2 sm:py-2.5 rounded-xl transition-all duration-300 cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95 whitespace-nowrap"
                         >
-                            <Plus className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+                            <Plus className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0 transition-transform duration-300 group-hover:rotate-90" />
                             <span>Tambah</span>
                         </button>
                     )}
                     {showHapus && (
                         <button
                             onClick={onHapusClick}
-                            className="flex items-center justify-center text-xs sm:text-sm gap-2 bg-red-600 border-2 border-red-600 hover:bg-transparent text-white hover:text-red-600 font-poppins-medium px-4 py-2 sm:py-2.5 rounded-lg transition-colors duration-200 cursor-pointer shadow-sm hover:shadow-md whitespace-nowrap"
+                            className="flex items-center justify-center text-xs sm:text-sm gap-2 bg-red-500 border-2 border-red-500 hover:bg-transparent text-white hover:text-red-500 font-poppins-medium px-5 py-2 sm:py-2.5 rounded-xl transition-all duration-300 cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95 whitespace-nowrap"
                         >
-                            <Trash className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+                            <Trash className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
                             <span>Hapus Terpilih</span>
                         </button>
                     )}
