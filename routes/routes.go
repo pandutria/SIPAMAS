@@ -12,6 +12,8 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		public.POST("/user/create", controllers.CreateUser)
 		public.POST("/auth/login", controllers.Login)
+		public.POST("/auth/register", controllers.Register)
+		public.GET("/identitas-proyek", controllers.GetAllIdentitas)
 		public.GET("/realisasi", controllers.GetAllRealisasiHeader)
 	}
 
@@ -23,8 +25,8 @@ func SetupRoutes(r *gin.Engine) {
 		private.PUT("/auth/password/update", controllers.UpdatePassword)
 
 		private.GET("/user", controllers.GetAllUser)
+		private.PUT("/user/update/:id", controllers.UpdateUser)
 
-		private.GET("/identitas-proyek", controllers.GetAllIdentitas)
 		private.GET("/identitas-proyek/:id", controllers.GetIdentitasById)
 		private.POST("/identitas-proyek/create", controllers.CreateIdentitas)
 		private.PUT("/identitas-proyek/update/:id", controllers.UpdateIdentitas)

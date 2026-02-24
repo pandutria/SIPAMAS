@@ -14,6 +14,13 @@ type CreateAndUpdateUserRequest struct {
 	Jabatan     string `form:"jabatan"`
 }
 
+type Register struct {
+	Fullname string `form:"fullname"`
+	Email    string `form:"email"`
+	Address  string `form:"address"`
+	Password string `form:"password"`
+}
+
 type LoginRequest struct {
 	Email    string `form:"email"`
 	Password string `form:"password"`

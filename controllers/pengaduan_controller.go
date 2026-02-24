@@ -72,6 +72,22 @@ func CreatePengaduan(c *gin.Context) {
 		return
 	}
 
+	if utils.NilIfEmpty(req.Kategori) == nil ||
+		utils.NilIfEmpty(req.Deskripsi) == nil ||
+		utils.NilIfEmpty(req.Judul) == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Semua input wajib di isi",
+		})
+		return
+	}
+
+	if utils.NilIfEmpty(req.Alamat) == nil && (utils.NilIfEmpty(req.Latitude) == nil || utils.NilIfEmpty(req.Longitude) == nil) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Alamat atau Latitude & Longitude wajib diisi salah satu",
+		})
+		return
+	}
+
 	data := models.Pengaduan{
 		Kategori:    utils.NilIfEmpty(req.Kategori),
 		Judul:       utils.NilIfEmpty(req.Judul),
@@ -134,19 +150,19 @@ func UpdateStatusPengaduan(c *gin.Context) {
 
 	if data.Status == "Diproses" {
 		judul = "Status Laporan Diperbarui"
-		keterangan = "Laporan %s kini dalam proses pengerjaan oleh tim lapangan."
+		keterangan = "Laporan kini dalam proses pengerjaan oleh tim lapangan."
 
 	} else if data.Status == "Selesai" {
 		judul = "Laporan Telah Diselesaikan"
-		keterangan = "Laporan %s telah selesai diproses. Terima kasih atas partisipasi Anda."
+		keterangan = "Laporan telah selesai. Terima kasih atas partisipasi Anda."
 
 	} else if data.Status == "Ditolak" {
 		judul = "Laporan Ditolak"
-		keterangan = "Laporan %s ditolak. Silakan periksa kembali detail laporan atau hubungi admin untuk informasi lebih lanjut."
+		keterangan = "Laporan ditolak. Silakan periksa kembali detail laporan atau hubungi admin untuk informasi lebih lanjut."
 
 	} else {
 		judul = "Status Laporan"
-		keterangan = "Laporan %s mengalami perubahan status."
+		keterangan = "Laporan mengalami perubahan status."
 	}
 
 	timeline := models.PengaduanTimeline{

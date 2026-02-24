@@ -189,6 +189,144 @@ func UpdateProfile(c *gin.Context) {
 	})
 }
 
+func UpdateUser(c *gin.Context) {
+	query := config.DB
+	id := c.Param("id")
+	var req dtos.CreateAndUpdateUserRequest
+	if components.BindRequest(c, &req) == false {
+		return
+	}
+
+	var user models.User
+	if err := query.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Mengubah data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	profileFile, _ := c.FormFile("profile_file")
+	profilePath, err := utils.SaveUploadedFile(
+		c,
+		profileFile,
+		"assets/photo",
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Upload profile photo gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	skFile, _ := c.FormFile("sk_file")
+	skPath, err := utils.SaveUploadedFile(
+		c,
+		skFile,
+		"assets/file",
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Upload SK file gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	utils.SetIfNotEmpty(&user.FullName, req.FullName)
+	utils.SetIfNotEmpty(&user.Email, req.Email)
+	utils.SetIfNotEmpty(&user.Role, req.Role)
+	utils.SetIfNotEmpty(&user.Nik, req.Nik)
+	utils.SetIfNotEmpty(&user.PhoneNumber, req.PhoneNumber)
+	utils.SetIfNotEmpty(&user.Address, req.Address)
+	utils.SetIfNotEmpty(&user.Nip, req.Nip)
+	utils.SetIfNotEmpty(&user.SkNumber, req.SkNumber)
+	utils.SetIfNotEmpty(&user.SkNumber, req.SkNumber)
+	utils.SetIfNotEmpty(&user.Jabatan, req.Jabatan)
+
+	if profilePath != nil {
+		user.ProfilePhoto = profilePath
+	}
+
+	if skPath != nil {
+		user.SkFile = skPath
+	}
+
+	if err := query.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Mengubah data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Mengubah data berhasil",
+		"data":    user,
+	})
+}
+
+func Register(c *gin.Context) {
+	query := config.DB
+
+	var req dtos.Register
+	if components.BindRequest(c, &req) == false {
+		return
+	}
+
+	ktpFile, _ := c.FormFile("ktp_file")
+	ktpPath, err := utils.SaveUploadedFile(
+		c,
+		ktpFile,
+		"assets/file",
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Upload file gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if utils.NilIfEmpty(req.Fullname) == nil ||
+		utils.NilIfEmpty(req.Email) == nil ||
+		utils.NilIfEmpty(req.Address) == nil ||
+		utils.NilIfEmpty(req.Password) == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Semua input wajib di isi",
+		})
+		return
+	}
+
+	role := "masyarakat"
+
+	data := models.User{
+		FullName: utils.NilIfEmpty(req.Fullname),
+		Email:    utils.NilIfEmpty(req.Email),
+		Address:  utils.NilIfEmpty(req.Address),
+		Password: utils.HashSHA512(req.Password),
+		Role:     &role,
+		KtpFile:  ktpPath,
+	}
+
+	if err := query.Create(&data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Mendaftarkan akun gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Mendaftarkan akun berhasil",
+		"data":    data,
+	})
+}
+
 func Login(c *gin.Context) {
 	query := config.DB
 

@@ -56,14 +56,14 @@ func CreatePengaduanReview(c *gin.Context) {
 		return
 	}
 
-	if utils.NilIfEmpty(utils.ToString(req.PengaduanId)) == nil ||
-		utils.NilIfEmpty(utils.ToString(req.Rating)) == nil ||
-		utils.NilIfEmpty(utils.ToString(req.Catatan)) == nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Semua input wajib di isi",
-		})
-		return
-	}
+	// if utils.NilIfEmpty(utils.ToString(req.PengaduanId)) == nil ||
+	// 	utils.NilIfEmpty(utils.ToString(req.Rating)) == nil ||
+	// 	utils.NilIfEmpty(utils.ToString(req.Catatan)) == nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"message": "Semua input wajib di isi",
+	// 	})
+	// 	return
+	// }
 
 	data := models.PengaduanReview{
 		PengaduanId: req.PengaduanId,

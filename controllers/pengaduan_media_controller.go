@@ -54,7 +54,7 @@ func CreatePengaduanMedia(c *gin.Context) {
 
 	if utils.NilIfEmpty(req.MediaTipe) == nil ||
 		utils.NilIfEmpty(utils.ToString(req.PengaduanId)) == nil ||
-		mediaPath == nil {
+		utils.NilIfEmpty(*mediaPath) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Semua input wajib di isi",
 		})
