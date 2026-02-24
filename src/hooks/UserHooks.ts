@@ -33,7 +33,7 @@ export default function useUserHooks() {
                 });
                 const users = SortDescById(response.data.data).map((item: any) => ({
                     ...item,
-                    status: item.is_active ? "Aktif" : "Tidak Aktif"
+                    status: item.is_active == "true" ? "Aktif" : "Tidak Aktif"
                 }));
 
                 setListUser(users);
@@ -294,6 +294,7 @@ export default function useUserHooks() {
             jabatan: setJabatan,
             fullname: setFullname,
             nik: setNik,
+            isActive: setIsActive,
             nip: setNip,
             address: setAddress,
             phoneNumber: setPhoneNumber,
@@ -315,11 +316,12 @@ export default function useUserHooks() {
     };
 
     const handleShowUser = (data: UserProps) => {
+        console.log(data)
         setEmail(data?.email ?? '');
         setPassword('');
         setRole(data?.role ?? '');
         setJabatan(data?.jabatan ?? '');
-        setIsActive(data?.is_active?.toString() ?? '')
+        setIsActive(data?.is_active ?? '')
         setFullname(data?.fullname ?? '');
         setNik(data?.nik ?? '');
         setNip(data?.nip ?? '');

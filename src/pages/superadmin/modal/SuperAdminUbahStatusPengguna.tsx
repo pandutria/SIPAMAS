@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { X } from "lucide-react";
 import FormSelect from "../../../ui/FormSelect";
-import { useEffect, useState } from "react";
 import SubmitButton from "../../../ui/SubmitButton";
-import usePengaduanHooks from "../../../hooks/PengaduanHooks";
+import useUserHooks from "../../../hooks/UserHooks";
 
 interface ModalProps {
     isOpen: boolean;
@@ -12,42 +11,21 @@ interface ModalProps {
     data: PengaduanProps
 }
 
-export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data }: ModalProps) {
-    const [status, setStatus] = useState("");
-    const { handlePengaduanStatusPut } = usePengaduanHooks();
+export default function SuperAdminUbahStatusPengguna({ isOpen, onClose, data }: ModalProps) {
+    const { isActive, handleChangeUser, handleUserPut } = useUserHooks();
 
     const statusOptions = [
         {
             id: 1,
-            text: "Menunggu"
+            text: "Tidak Aktif",
+            value: "false"
         },
         {
             id: 2,
-            text: "Diproses"
-        },
-        {
-            id: 3,
-            text: "Diterima"
-        },
-        {
-            id: 4,
-            text: "Selesai"
-        },
-        {
-            id: 5,
-            text: "Ditolak"
+            text: "Aktif",
+            value: "true"
         },
     ];
-
-    useEffect(() => {
-        const fetchStatus = async() => {
-            if (data) {
-                setStatus(data.status ?? "");
-            }
-        }
-
-        fetchStatus();
-    }, [data]);
 
     if (!isOpen) {
         return null;
@@ -63,7 +41,7 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
             <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col font-poppins-medium">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h2 className="font-poppins-bold text-xl text-gray-800">
-                        Ubah Status Pengaduan
+                        Ubah Status Pengguna
                     </h2>
                     <button
                         onClick={onClose}
@@ -76,16 +54,17 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
                 <div className="overflow-y-auto p-6 space-y-2 flex flex-col">
                     <FormSelect
                         title="Status"
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
+                        value={isActive}
+                        name="isActive"
+                        onChange={handleChangeUser}
                     >
                         {statusOptions.map((item) => (
-                            <option key={item.id} value={item.text}>{item.text}</option>
+                            <option key={item.id} value={item.value}>{item.text}</option>
                         ))}
                     </FormSelect>
                     <SubmitButton
                         text="Ubah"
-                        onClick={() => handlePengaduanStatusPut(status, data.id)}
+                        onClick={() => handleUserPut(data.id)}
                     />
                 </div>
             </div>

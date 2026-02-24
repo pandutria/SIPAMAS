@@ -239,7 +239,7 @@ export default function AdminDireksiRencanaAnggaranAdd() {
             </div>
             <TableHeader
               title="Data Tender"
-              type='pokja'
+              type='admin'
               showHapus={false}
               showTambah={false}
               showTahunQuery={false}
@@ -381,13 +381,6 @@ export default function AdminDireksiRencanaAnggaranAdd() {
                   value={program}
                   onChange={handleChangeRAB}
                   name='program'
-                  type='textarea'
-                />
-
-                <FormInput
-                  title='Alasan'
-                  placeholder='Alasan'
-                  disabled={true}
                   type='textarea'
                 />
               </div>

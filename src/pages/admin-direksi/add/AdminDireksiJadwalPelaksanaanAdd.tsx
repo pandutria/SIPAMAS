@@ -292,7 +292,7 @@ export default function AdminDireksiJadwalPelaksanaanAdd() {
             </div>
             <TableHeader
               title="Data Identitas Proyek Dari RAB"
-              type='pokja'
+              type='admin'
               showHapus={false}
               showTambah={false}
               searchValue={search}
@@ -451,13 +451,6 @@ export default function AdminDireksiJadwalPelaksanaanAdd() {
                   title='Program'
                   placeholder='Masukkan program'
                   value={selectedRab?.program}
-                  disabled={true}
-                  type='textarea'
-                />
-
-                <FormInput
-                  title='Alasan'
-                  placeholder='Alasan'
                   disabled={true}
                   type='textarea'
                 />

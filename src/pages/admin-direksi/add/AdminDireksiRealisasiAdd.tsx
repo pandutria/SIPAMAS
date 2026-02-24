@@ -153,7 +153,7 @@ export default function AdminDireksiRealisasiAdd() {
                         </div>
                         <TableHeader
                             title="Data Tender Dari Jadwal"
-                            type='pokja'
+                            type='admin'
                             showHapus={false}
                             showTambah={false}
                             searchValue={search}

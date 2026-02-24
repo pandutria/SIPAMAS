@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Plus, MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen } from "lucide-react";
 import Navbar from "../../../components/Navbar";
@@ -6,66 +5,101 @@ import BackButton from "../../../ui/BackButton";
 import FormInput from "../../../ui/FormInput";
 import FormSelect from "../../../ui/FormSelect";
 import FormUploadFile from "../../../ui/FormUploadFile";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AdminDireksiTambahDokumentasiModal from "../modal/AdminDireksiTambahDokumentasiModal";
 import AdminDireksiTambahDokumenModal from "../modal/AdminDireksiTambahDokumenModal";
 import TableContent from "../../../ui/TableContent";
 import TableHeader from "../../../ui/TableHeader";
 import SubmitButton from "../../../ui/SubmitButton";
-import L from "leaflet";
-import maps from "/icon/maps.png";
-import "leaflet/dist/leaflet.css";
 import useProjectIdentity from "../../../hooks/ProjectIdentity";
 import LocationData from "../../../data/LocationData";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
 import { Navigate } from "react-router-dom";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import maps from "/icon/maps.png";
 
 type PhotoType = "start" | "end";
 
-const customIcon = L.icon({
-    iconUrl: maps,
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -36],
-});
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 
-function MapPicker({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const mapInstanceRef = useRef<L.Map | null>(null);
-    const markerRef = useRef<L.Marker | null>(null);
+const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
+const DEFAULT_CENTER = { lat: -2.5489, lng: 118.0149 };
 
-    useEffect(() => {
-        if (!mapRef.current || mapInstanceRef.current) return;
+async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+    try {
+        const res = await fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_API_KEY}`
+        );
+        const data = await res.json();
+        if (data.status === "OK" && data.results.length > 0) {
+            const { lat, lng } = data.results[0].geometry.location;
+            return { lat, lng };
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
 
-        const map = L.map(mapRef.current, { attributionControl: false }).setView([-2.5489, 118.0149], 5);
+interface GoogleMapPickerProps {
+    coords: { lat: number; lng: number } | null;
+    label: string;
+}
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+function GoogleMapPicker({ coords, label }: GoogleMapPickerProps) {
+    const { isLoaded, loadError } = useJsApiLoader({
+        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    });
 
-        map.on("click", (e: L.LeafletMouseEvent) => {
-            const { lat, lng } = e.latlng;
-            if (markerRef.current) {
-                markerRef.current.setLatLng([lat, lng]);
-            } else {
-                markerRef.current = L.marker([lat, lng], { icon: customIcon }).addTo(map);
-            }
-            onLocationSelect(lat, lng);
-        });
+    const customMarkerIcon: google.maps.Icon | undefined = isLoaded
+        ? {
+              url: maps,
+              scaledSize: new window.google.maps.Size(36, 36),
+              anchor: new window.google.maps.Point(18, 36),
+          }
+        : undefined;
 
-        mapInstanceRef.current = map;
+    if (loadError) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
+                <p className="text-sm text-gray-400 font-poppins-regular">Gagal memuat Google Maps</p>
+            </div>
+        );
+    }
 
-        return () => {
-            map.remove();
-            mapInstanceRef.current = null;
-            markerRef.current = null;
-        };
-    }, []);
+    if (!isLoaded) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
+                <p className="text-sm text-gray-400 font-poppins-regular">Memuat peta...</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="relative w-full h-full">
-            <div ref={mapRef} className="w-full h-full rounded-xl z-0" />
-            <div className="absolute bottom-0 right-0 w-full h-6 bg-white z-1000" />
-        </div>
+        <GoogleMap
+            mapContainerStyle={MAP_CONTAINER_STYLE}
+            center={coords ?? DEFAULT_CENTER}
+            zoom={coords ? 15 : 5}
+            mapTypeId="hybrid"
+            options={{
+                mapTypeId: "hybrid",
+                disableDefaultUI: false,
+                zoomControl: true,
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: false,
+                scrollwheel: true,
+            }}
+        >
+            {coords && (
+                <Marker
+                    position={coords}
+                    title={label}
+                    icon={customMarkerIcon}
+                />
+            )}
+        </GoogleMap>
     );
 }
 
@@ -92,10 +126,11 @@ export default function AdminDireksiIdentitasProyekAdd() {
     const [documentDataFilter, setDocumentDataFilter] = useState<any[]>([]);
     const [documentData, setDocumentData] = useState<any[]>([]);
     const [selectedRemove, setSelectedRemove] = useState<number[]>([]);
+    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+    const [geocoding, setGeocoding] = useState(false);
 
     const { handleChangeFile, handleChangeForm, handleProjectIdentityPost, projectIdentityForm, setProjectIdentityForm } = useProjectIdentity();
     const { kecamatanData, kelurahanData, setSelectedKecamatamCode } = LocationData();
-    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const { loading, user } = useAuth();
 
     const projectCategory = [
@@ -117,12 +152,38 @@ export default function AdminDireksiIdentitasProyekAdd() {
         { key: "created_at", label: "Tanggal Upload" },
     ];
 
+    const buildAddressQuery = useCallback(() => {
+        const parts = [
+            projectIdentityForm.kelurahan,
+            projectIdentityForm.kecamatan,
+            projectIdentityForm.kabupaten,
+            projectIdentityForm.provinsi,
+            "Indonesia",
+        ].filter(Boolean);
+        return parts.join(", ");
+    }, [
+        projectIdentityForm.kelurahan,
+        projectIdentityForm.kecamatan,
+        projectIdentityForm.kabupaten,
+        projectIdentityForm.provinsi,
+    ]);
+
     useEffect(() => {
-        if (showModalPhoto) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "auto";
-        }
+        const address = buildAddressQuery();
+        if (!address || address === "Indonesia") return;
+
+        const timeout = setTimeout(async () => {
+            setGeocoding(true);
+            const result = await geocodeAddress(address);
+            if (result) setCoords(result);
+            setGeocoding(false);
+        }, 600);
+
+        return () => clearTimeout(timeout);
+    }, [buildAddressQuery]);
+
+    useEffect(() => {
+        document.body.style.overflow = showModalPhoto ? "hidden" : "auto";
 
         const dataFiltering = documentData.filter((item) =>
             item.name.toLowerCase().includes(search.toLowerCase())
@@ -135,8 +196,14 @@ export default function AdminDireksiIdentitasProyekAdd() {
         setSelectedRemove([]);
     };
 
+    const mapLabel = [
+        projectIdentityForm.kelurahan,
+        projectIdentityForm.kecamatan,
+        projectIdentityForm.kabupaten,
+    ].filter(Boolean).join(", ") || "Lokasi Proyek";
+
     if (loading) return <LoadingSpinner />;
-    if (!user || user.role != "admin-direksi") return <Navigate to="/" replace />;
+    if (!user || user.role !== "admin-direksi") return <Navigate to="/" replace />;
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -195,15 +262,21 @@ export default function AdminDireksiIdentitasProyekAdd() {
                                     setProjectIdentityForm(prev => ({
                                         ...prev,
                                         kelurahan: "",
-                                        kecamatan_kode: String(selected?.code)
+                                        kecamatan_kode: String(selected?.code),
                                     }));
+                                    setCoords(null);
                                 }}
                             >
                                 {kecamatanData.map((item, index) => (
                                     <option key={index} value={item.name}>{item.name}</option>
                                 ))}
                             </FormSelect>
-                            <FormSelect value={projectIdentityForm.kelurahan} name="kelurahan" onChange={handleChangeForm} title="Desa / Kelurahan">
+                            <FormSelect
+                                value={projectIdentityForm.kelurahan}
+                                name="kelurahan"
+                                onChange={handleChangeForm}
+                                title="Desa / Kelurahan"
+                            >
                                 {kelurahanData.map((item, index) => (
                                     <option key={index} value={item.name}>{item.name}</option>
                                 ))}
@@ -212,11 +285,16 @@ export default function AdminDireksiIdentitasProyekAdd() {
 
                         <div className="flex flex-col gap-2">
                             <p className="font-poppins-semibold text-[14px]">
-                                Peta Interaktif (GPS) <span className="text-primary">*</span>
+                                Peta Lokasi (Google Maps) <span className="text-primary">*</span>
                             </p>
                             <div className="border border-gray-200 rounded-xl overflow-hidden">
                                 <div className="relative w-full h-64 bg-gray-100">
-                                    <MapPicker onLocationSelect={(lat, lng) => setCoords({ lat, lng })} />
+                                    {geocoding && (
+                                        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 rounded-xl">
+                                            <p className="text-sm text-gray-500 font-poppins-regular">Mencari lokasi...</p>
+                                        </div>
+                                    )}
+                                    <GoogleMapPicker coords={coords} label={mapLabel} />
                                 </div>
                                 <div className="grid grid-cols-2 border-t border-gray-200">
                                     <div className="flex flex-col p-4 border-r border-gray-200">
@@ -233,10 +311,16 @@ export default function AdminDireksiIdentitasProyekAdd() {
                                     </div>
                                 </div>
                             </div>
-                            {!coords && (
+                            {!coords && !geocoding && (
                                 <p className="text-xs font-poppins-regular text-gray-400 flex items-center gap-1">
                                     <MapPinIcon size={11} />
-                                    Klik pada peta untuk menentukan koordinat lokasi proyek
+                                    Pilih Kecamatan dan Desa/Kelurahan untuk menampilkan lokasi di peta
+                                </p>
+                            )}
+                            {coords && !geocoding && (
+                                <p className="text-xs font-poppins-regular text-green-500 flex items-center gap-1">
+                                    <MapPinIcon size={11} />
+                                    Koordinat otomatis terdeteksi dari wilayah yang dipilih
                                 </p>
                             )}
                         </div>

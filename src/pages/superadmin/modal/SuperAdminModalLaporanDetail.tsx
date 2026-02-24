@@ -122,7 +122,7 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
     const reviewer = data.created_by;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+        <div className="fixed inset-0 z-100000 flex items-center justify-center overflow-hidden">
             <div
                 className={`absolute inset-0 bg-black/40 transition-opacity ${visible ? "opacity-100" : "opacity-0"}`}
                 onClick={onClose}
@@ -173,6 +173,7 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
                             }
                         />
                         <InfoField label="Judul Laporan" value={data.judul ?? "-"} />
+                        <InfoField label="Kategori Laporan" value={data.kategori ?? "-"} />
                         <InfoField
                             label="Tanggal Pelaporan"
                             value={new Date(data.created_at).toLocaleDateString("id-ID", {

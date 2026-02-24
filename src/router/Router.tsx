@@ -42,6 +42,7 @@ import MasyarakatRiwayatLaporan from "../pages/masyarakat/MasyarakatRiwayatLapor
 import SuperAdminManajemenLaporan from "../pages/superadmin/SuperAdminManajemenLaporan"
 import LokasiProyek from "../pages/LokasiProyek"
 import Register from "../pages/auth/Register"
+import SuperAdminVerifikasiPengguna from "../pages/superadmin/SuperAdminVerifikasiPengguna"
 
 export default function Router() {
   return (
@@ -67,6 +68,7 @@ export default function Router() {
         {/* Super Admin */}
         <Route path="/superadmin/manajemen-pengguna" element={<SuperAdminManajemenPengguna/>}/> 
         <Route path="/superadmin/manajemen-laporan" element={<SuperAdminManajemenLaporan/>}/> 
+        <Route path="/superadmin/verifikasi-pengguna" element={<SuperAdminVerifikasiPengguna/>}/> 
 
         {/* Admin Direksi */}
         <Route path="/admin-direksi/identitas-proyek" element={<AdminDireksiIndentitasProyek/>}/>

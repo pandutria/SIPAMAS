@@ -13,7 +13,9 @@ const navConfig: Record<string, { dashboardPath: string; dropdownLabel: string; 
     dropdownLabel: 'Manajemen',
     dropdownItems: [
       { label: 'Pengguna', path: '/superadmin/manajemen-pengguna' },
+      { label: 'Verifikasi Pengguna', path: '/superadmin/verifikasi-pengguna' },
       { label: 'Laporan', path: '/superadmin/manajemen-laporan' },
+      { label: 'Verifikasi Laporan', path: '/superadmin/verifikasi-laporan' },
     ],
   },
   'masyarakat': {

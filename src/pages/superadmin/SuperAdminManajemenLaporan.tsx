@@ -106,7 +106,7 @@ export default function SuperAdminManajemenLaporan() {
 
             <div className="pt-28" data-aos="fade-up" data-aos-duration="1000">
                 <TableHeader
-                    title="Manajemen Laporan"
+                    title="Manajemen Laporan Pengaduan Masyarakat"
                     showTambah={false}
                     type="admin"
                     showTahunQuery={false}

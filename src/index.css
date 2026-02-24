@@ -40,8 +40,8 @@
 }
 
 .swal-z-top {
-  z-index: 999999 !important;
-  font-family: "poppins-regular";
+    z-index: 99999999 !important;
+    font-family: "poppins-regular";
 }
 
 .scrollbar-hidden::-webkit-scrollbar {
@@ -59,6 +59,50 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes infoPanelIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes listItemIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes statsIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.list-item-anim {
+    animation: listItemIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.stats-card {
+    animation: statsIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .animate-fade-in {

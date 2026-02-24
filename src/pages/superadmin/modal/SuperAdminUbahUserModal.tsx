@@ -58,11 +58,11 @@ export default function SuperAdminUbahUserModal({ isOpen, onClose, data }: UbahU
       name: "Admin PPK",
       value: "admin-ppk"
     },
-    {
-      id: 4,
-      name: "Masyarakat",
-      value: "masyarakat"
-    },
+    // {
+    //   id: 4,
+    //   name: "Masyarakat",
+    //   value: "masyarakat"
+    // },
   ];
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function SuperAdminUbahUserModal({ isOpen, onClose, data }: UbahU
   };
 
   return (
-    <div className="fixed inset-0 z-1000 overflow-hidden flex items-center justify-center">
+    <div className="fixed inset-0 z-10000 overflow-hidden flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black/20"
         onClick={onClose}
