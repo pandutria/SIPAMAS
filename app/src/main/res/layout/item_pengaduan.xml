@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="5dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="5dp"
+    android:background="@drawable/bg_input"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="15dp"
+    android:paddingVertical="10dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="95dp"
+        android:layout_height="95dp"
+        app:cardCornerRadius="7dp">
+
+        <RelativeLayout
+            android:layout_width="95dp"
+            android:layout_height="95dp">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Diproses"
+                android:elevation="2dp"
+                android:background="@drawable/bg_status_item_process"
+                android:textSize="6.5sp"
+                android:paddingHorizontal="8dp"
+                android:fontFamily="@font/poppins_bold"
+                android:textColor="#FF8400"
+                android:paddingVertical="2.5dp"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/example_home" />
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jalan Berlubang di Jl. Cililitan"
+            android:textColor="@color/textPrimary"
+            android:maxLines="1"
+            android:fontFamily="@font/poppins_semibold"
+            android:textSize="15sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginVertical="2dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_calendar"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textColor="#929292"
+                android:fontFamily="@font/poppins_regular"
+                android:layout_marginLeft="5dp"
+                android:text="17 December 2025"/>
+
+            <ImageView
+                android:layout_width="3dp"
+                android:layout_height="3dp"
+                android:layout_marginHorizontal="7dp"
+                android:src="@drawable/circle"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:fontFamily="@font/poppins_regular"
+                android:textColor="#929292"
+                android:text="AZA-1011"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lubang cukup dalam dilajur kiri dekat sebelah danau, membahayakan pengguna jalan karena takut tercebur kedalam danau."
+            android:textSize="10sp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:fontFamily="@font/poppins_medium"
+            android:justificationMode="inter_word"
+            android:lineSpacingExtra="2dp"
+            android:textColor="#6E6E6E"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/onboard_nav_graph"
+    app:startDestination="@id/onboard1Screen">
+
+    <fragment
+        android:id="@+id/onboard1Screen"
+        android:name="com.example.sipamas_android.presentation.onboarding.fragment.OnBoardingOneFragment"
+        tools:layout="@layout/fragment_on_boarding_one">
+        <action
+            android:id="@+id/action_onboard1Screen_to_onboard2Screen"
+            app:destination="@id/onboard2Screen"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_onboard1Screen_to_onboard3Screen"
+            app:destination="@id/onboard3Screen"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/onboard2Screen"
+        android:name="com.example.sipamas_android.presentation.onboarding.fragment.OnBoardingTwoFragment"
+        tools:layout="@layout/fragment_on_boarding_two">
+        <action
+            android:id="@+id/action_onboard2Screen_to_onboard3Screen"
+            app:destination="@id/onboard3Screen"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/onboard3Screen"
+        android:name="com.example.sipamas_android.presentation.onboarding.fragment.OnBoardingThreeFragment"
+        tools:layout="@layout/fragment_on_boarding_three"/>
+
+</navigation>

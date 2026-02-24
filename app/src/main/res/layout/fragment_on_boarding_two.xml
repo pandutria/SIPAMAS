@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    tools:context=".presentation.onboarding.fragment.OnBoardingOneFragment">
+
+    <TextView
+        android:id="@+id/tvSkip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Skip"
+        android:layout_alignParentEnd="true"
+        android:fontFamily="@font/poppins_regular"
+        android:textColor="@color/primary"
+        android:textSize="15sp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:paddingHorizontal="20dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kirim Pengaduan "
+                android:textColor="@color/textPrimary"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="23sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Secara"
+                android:textColor="@color/primary"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="23sp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lengkap"
+            android:textColor="@color/primary"
+            android:layout_marginTop="-5dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:textSize="23sp"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/img_onboard2"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sampaikan laporan Anda dengan teks, foto atau video, lokasi otomatis (GPS), serta kategori masalah seperti jalan rusak, keterlambatan proyek, atau polusi lingkungan."
+            android:textAlignment="center"
+            android:fontFamily="@font/poppins_medium"
+            android:textSize="11sp"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/textSecondary"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/btn_arrow_left"
+                android:background="@null"/>
+
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="6dp"
+                android:src="@drawable/ic_slider2"
+                android:layout_centerInParent="true"/>
+
+            <ImageButton
+                android:id="@+id/btnNext"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/btn_arrow_right"
+                android:layout_alignParentEnd="true"
+                android:background="@null"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

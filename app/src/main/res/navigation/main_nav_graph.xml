@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/homeScreen">
+
+    <fragment
+        android:id="@+id/homeScreen"
+        tools:layout="@layout/fragment_home"
+        android:name="com.example.sipamas_android.presentation.home.HomeFragment"/>
+
+    <fragment
+        android:id="@+id/activityScreen"
+        tools:layout="@layout/fragment_activity"
+        android:name="com.example.sipamas_android.presentation.activity.ActivityFragment"/>
+
+    <fragment
+        android:id="@+id/profileScreen"
+        tools:layout="@layout/fragment_profile"
+        android:name="com.example.sipamas_android.presentation.profile.ProfileFragment"/>
+
+</navigation>

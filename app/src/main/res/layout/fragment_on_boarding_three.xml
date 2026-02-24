@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/bg"
+    tools:context=".presentation.onboarding.fragment.OnBoardingOneFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Pantau Selalu "
+                android:textColor="@color/textPrimary"
+                android:textSize="23sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Proses"
+                android:textColor="@color/primary"
+                android:textSize="23sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Laporan "
+                android:textColor="@color/primary"
+                android:textSize="23sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Anda"
+                android:textColor="@color/textPrimary"
+                android:textSize="23sp" />
+
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/img_onboard3" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/poppins_medium"
+            android:text="Setiap laporan dapat dipantau secara real-time dengan status yang jelas: Diterima, Diproses, hingga Selesai. Jadi Pengguna dapat fleksibel untuk melihat laporan yang dikirim."
+            android:textAlignment="center"
+            android:textColor="@color/textSecondary"
+            android:textSize="11sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal">
+            
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                android:layout_width="125dp"
+                android:layout_height="50dp"
+                android:text="Login"
+                android:textColor="@color/primary"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="13sp"
+                android:backgroundTint="#EBEBEB"
+                app:strokeColor="#C4C4C4"
+                app:strokeWidth="1dp"/>
+
+
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="6dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_slider3" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRegister"
+                android:layout_width="125dp"
+                android:layout_height="50dp"
+                android:text="Daftar"
+                android:textColor="@color/white"
+                android:layout_alignParentEnd="true"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="13sp"
+                android:backgroundTint="@color/primary"/>
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
