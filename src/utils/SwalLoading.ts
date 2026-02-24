@@ -12,6 +12,9 @@ const SwalLoading = (options?: SwalLoadingOptions) => {
     didOpen: () => {
       Swal.showLoading();
     },
+    customClass: {
+      popup: 'swal-z-top',
+    },
   });
 };
 

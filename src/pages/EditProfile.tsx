@@ -20,6 +20,7 @@ export default function EditProfile() {
     nik,
     nip,
     address,
+    ktpFile,
     phoneNumber,
     jabatan,
     skNumber,
@@ -28,7 +29,7 @@ export default function EditProfile() {
     handleChangeUser,
     handleFileChangeUser,
     handleShowUser,
-    handleUserPut,
+    handleUserUpdateProfile,
   } = useUserHooks();
 
   useEffect(() => {
@@ -126,11 +127,14 @@ export default function EditProfile() {
             <FormInput type='number' title="NIK" name="nik" value={nik} onChange={handleChangeUser} placeholder="Masukkan NIK" />
             <FormInput type='number' title="NIP" name="nip" value={nip} onChange={handleChangeUser} placeholder="Masukkan NIP" />
             <FormInput title="No. SK" name="skNumber" value={skNumber} onChange={handleChangeUser} placeholder="Masukkan No. SK" />
+            {user.role == "masyarakat" && (
+              <FormUploadFile title="Unggah KTP" name="ktp_file" value={ktpFile as any} onChange={handleFileChangeUser} />
+            )}
             <FormUploadFile title="Unggah SK" name="sk_file" value={skFile as any} onChange={handleFileChangeUser} />
           </div>
 
           <div className="flex justify-end gap-4 mt-8 pt-8 border-t border-gray-100">            
-            <SubmitButton text='Simpan Perubahan' onClick={() => handleUserPut(user.id)}/>
+            <SubmitButton text='Simpan Perubahan' onClick={() => handleUserUpdateProfile()}/>
           </div>
         </div>
       </div>

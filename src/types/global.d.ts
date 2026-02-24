@@ -13,6 +13,7 @@ declare global {
     nip: string;
     sk_number: string;
     sk_file: string;
+    ktp_file: string;
     role: string;
     is_active: string;
     jabatan: string;

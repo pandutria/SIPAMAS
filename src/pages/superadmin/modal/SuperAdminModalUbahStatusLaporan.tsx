@@ -18,7 +18,7 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
 
     const statusOptions = [
         {
-            id: 2,
+            id: 1,
             text: "Menunggu"
         },
         {
@@ -31,6 +31,10 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
         },
         {
             id: 4,
+            text: "Selesai"
+        },
+        {
+            id: 5,
             text: "Ditolak"
         },
     ];

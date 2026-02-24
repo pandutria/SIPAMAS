@@ -166,7 +166,7 @@ export default function usePengaduanHooks() {
             formData.append("rating", pengaduanReviewForm.rating);
             formData.append("catatan", pengaduanReviewForm.catatan);
 
-            const response = await API.post("/pengaduan/review", formData, {
+            const response = await API.post("/pengaduan/review/create", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -187,7 +187,7 @@ export default function usePengaduanHooks() {
                 type: "error",
                 title: "Gagal!",
                 text: error.response?.data.message
-            })
+            });
         }
     }
 

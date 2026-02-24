@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ArrowLeft, Upload, RefreshCw } from 'lucide-react'
+import { ArrowLeft, RefreshCw } from 'lucide-react'
 import useUserHooks from '../../hooks/UserHooks'
 import logo from "/image/logo/logo-sipamas.png"
 import background from "/image/auth/background.jpg"
@@ -13,23 +13,17 @@ export default function Register() {
     const {
         email,
         password,
+        ktpFile,
         fullname,
-        nik,
-        nip,
         address,
-        jabatan,
-        phoneNumber,
-        skNumber,
-        skFile,
         handleChangeUser,
         handleFileChangeUser,
-        handleUserPost,
+        handleUserRegister,
     } = useUserHooks()
 
     const navigate = useNavigate()
     const [captchaCode, setCaptchaCode] = useState(generateCaptcha())
     const [captchaInput, setCaptchaInput] = useState('')
-    const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null)
 
     function generateCaptcha() {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -41,28 +35,17 @@ export default function Register() {
         setCaptchaInput('')
     }
 
-    function handleProfilePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-        handleFileChangeUser(e)
-        const file = e.target.files?.[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onloadend = () => setProfilePhotoPreview(reader.result as string)
-            reader.readAsDataURL(file)
-        }
-    }
-
     function handleSubmit() {
         if (captchaInput !== captchaCode) {
             SwalMessage({
                 type: "error",
                 title: "Gagal!",
                 text: "Kode captcha salah, silahkan coba lagi!"
-            });
-
+            })
             refreshCaptcha()
             return
         }
-        handleUserPost()
+        handleUserRegister()
     }
 
     return (
@@ -98,31 +81,6 @@ export default function Register() {
                     <p className="text-gray-600 text-sm">Daftarkan diri Anda sebagai masyarakat</p>
                 </div>
 
-                <div className="flex flex-col items-center mb-6">
-                    <div
-                        className="w-24 h-24 rounded-full border-4 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary transition-colors duration-200 bg-gray-50"
-                        onClick={() => document.getElementById('profilePhoto')?.click()}
-                    >
-                        {profilePhotoPreview ? (
-                            <img src={profilePhotoPreview} alt="Preview" className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="flex flex-col items-center text-gray-400">
-                                <Upload className="w-6 h-6 mb-1" />
-                                <span className="text-[10px] text-center px-1">Foto Profil</span>
-                            </div>
-                        )}
-                    </div>
-                    <input
-                        type="file"
-                        id="profilePhoto"
-                        name="profilePhoto"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleProfilePhotoChange}
-                    />
-                    <p className="text-xs text-gray-500 mt-2">Klik untuk unggah foto profil *</p>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="md:col-span-2">
                         <FormInput
@@ -131,77 +89,6 @@ export default function Register() {
                             value={fullname}
                             onChange={handleChangeUser}
                             placeholder="Masukkan nama lengkap"
-                        />
-                    </div>
-
-                    <div className="hidden">
-                        <FormInput
-                            title="Role"
-                            name="role"
-                            value={"masyarakat"}
-                            onChange={handleChangeUser}
-                            placeholder="Role"
-                        />
-                    </div>
-
-                    <FormInput
-                        title="NIK"
-                        name="nik"
-                        type='number'
-                        value={nik}
-                        onChange={handleChangeUser}
-                        placeholder="16 digit NIK"
-                    />
-
-                    <FormInput
-                        title="NIP"
-                        name="nip"
-                        type='number'
-                        value={nip}
-                        onChange={handleChangeUser}
-                        placeholder="Masukkan NIP"
-                    />
-
-                    <FormInput
-                        title="Jabatan"
-                        name="jabatan"
-                        value={jabatan}
-                        onChange={handleChangeUser}
-                        placeholder="Masukkan jabatan"
-                    />
-
-                    <FormInput
-                        title="Nomor Telepon"
-                        name="phoneNumber"
-                        type='number'
-                        value={phoneNumber}
-                        onChange={handleChangeUser}
-                        placeholder="Contoh: 08123456789"
-                    />
-
-                    <FormInput
-                        title="Nomor SK"
-                        name="skNumber"
-                        value={skNumber}
-                        onChange={handleChangeUser}
-                        placeholder="Masukkan nomor SK"
-                    />
-
-                    <FormUploadFile 
-                        title="Unggah SK" 
-                        name="sk_file" 
-                        value={skFile} 
-                        onChange={handleFileChangeUser} 
-                    />
-
-                    <div className="md:col-span-2">
-                        <FormInput
-                            title="Alamat"
-                            name="address"
-                            value={address}
-                            onChange={handleChangeUser}
-                            placeholder="Masukkan alamat lengkap"
-                            type='textarea'
                         />
                     </div>
 
@@ -220,8 +107,28 @@ export default function Register() {
                         type="password"
                         value={password}
                         onChange={handleChangeUser}
-                        placeholder="Masukkan Kata Sandi"
+                        placeholder="Minimal 8 karakter"
                     />
+
+                    <div className="md:col-span-2">
+                        <FormInput
+                            title="Alamat"
+                            name="address"
+                            value={address}
+                            onChange={handleChangeUser}
+                            placeholder="Masukkan alamat lengkap"
+                            type='textarea'
+                        />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <FormUploadFile
+                            title="Unggah KTP"
+                            name="ktp_file"
+                            value={ktpFile}
+                            onChange={handleFileChangeUser}
+                        />
+                    </div>
 
                     <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Kode Verifikasi (CAPTCHA) *</label>
@@ -266,7 +173,7 @@ export default function Register() {
                     <SubmitButton
                         width='full'
                         text='Daftar Sekarang'
-                        onClick={() => handleSubmit()}
+                        onClick={handleSubmit}
                     />
                     <p className="text-center text-sm text-gray-600">
                         Sudah punya akun?{' '}

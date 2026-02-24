@@ -17,6 +17,7 @@ export default function useUserHooks() {
     const [jabatan, setJabatan] = useState("");
     const [skNumber, setSkNumber] = useState('');
     const [skFile, setSkFile] = useState<File | null>(null);
+    const [ktpFile, setKtpFile] = useState<File | null>(null);
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
     const [isActive, setIsActive] = useState<any>("true");
     const [listUser, setListUser] = useState<UserProps[]>([]);
@@ -80,7 +81,7 @@ export default function useUserHooks() {
             if (phoneNumber) formData.append("phone_number", phoneNumber);
             if (skNumber) formData.append("sk_number", skNumber);
             if (skFile) formData.append("sk_file", skFile);
-            if (profilePhoto) formData.append("profile_photo", profilePhoto);
+            if (profilePhoto) formData.append("profile_file", profilePhoto);
 
             SwalLoading()
             const response = await API.post("/user/create", formData, {
@@ -88,6 +89,56 @@ export default function useUserHooks() {
                     Authorization: `Bearer ${token}`
                 }
             });
+            const message = response.data.message;
+
+            SwalMessage({
+                title: "Berhasil!",
+                text: message,
+                type: "success"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (error: any) {
+            SwalMessage({
+                title: "Gagal!",
+                text: error.response.data.message,
+                type: "error"
+            });
+        }
+    }
+
+    const handleUserRegister = async () => {
+        try {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                SwalMessage({
+                    title: "Gagal!",
+                    text: "Format email tidak valid!",
+                    type: "error"
+                })
+                return;
+            }
+
+            if (password && password.length < 8) {
+                SwalMessage({
+                    title: "Gagal!",
+                    text: "Kata sandi tidak boleh kurang dari 8 karakter",
+                    type: "error"
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("email", email);
+            if (fullname) formData.append("fullname", fullname);
+            if (password) formData.append("password", password);
+            if (address) formData.append("address", address);
+            if (ktpFile ) formData.append("ktp_file", ktpFile);
+
+            SwalLoading()
+            const response = await API.post("/auth/register", formData);
             const message = response.data.message;
 
             SwalMessage({
@@ -142,7 +193,7 @@ export default function useUserHooks() {
             if (phoneNumber) formData.append("phone_number", phoneNumber);
             if (skNumber) formData.append("sk_number", skNumber);
             if (skFile) formData.append("sk_file", skFile);
-            if (profilePhoto) formData.append("profile_photo", profilePhoto);
+            if (profilePhoto) formData.append("profile_file", profilePhoto);
 
             SwalLoading();
             const response = await API.put(`/user/update/${id}`, formData, {
@@ -152,6 +203,69 @@ export default function useUserHooks() {
             });
             const message = response.data.message;
 
+            SwalMessage({
+                title: "Berhasil!",
+                text: message,
+                type: "success"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (error: any) {
+            SwalMessage({
+                title: "Gagal!",
+                text: error.response?.data?.message,
+                type: "error"
+            });
+        }
+    }
+
+    const handleUserUpdateProfile = async () => {
+        try {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                SwalMessage({
+                    title: "Gagal!",
+                    text: "Format email tidak valid!",
+                    type: "error"
+                })
+                return;
+            }
+
+            if (password && password.length < 8) {
+                SwalMessage({
+                    title: "Gagal!",
+                    text: "Kata sandi tidak boleh kurang dari 8 karakter",
+                    type: "error"
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("email", email);
+            formData.append("role", role);
+            formData.append("is_active", `${isActive}`);
+            if (fullname) formData.append("fullname", fullname);
+            if (password) formData.append("password", password);
+            if (nik) formData.append("nik", nik);
+            if (nip) formData.append("nip", nip);
+            if (address) formData.append("address", address);
+            if (jabatan) formData.append("jabatan", jabatan);
+            if (phoneNumber) formData.append("phone_number", phoneNumber);
+            if (skNumber) formData.append("sk_number", skNumber);
+            if (skFile) formData.append("sk_file", skFile);
+            if (ktpFile) formData.append("ktp_file", ktpFile);
+            if (profilePhoto) formData.append("profile_file", profilePhoto);
+
+            SwalLoading();
+            const response = await API.put("/auth/profile/update", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const message = response.data.message;
             SwalMessage({
                 title: "Berhasil!",
                 text: message,
@@ -196,6 +310,7 @@ export default function useUserHooks() {
         if (!files?.[0]) return;
 
         if (name === "sk_file") setSkFile(files[0]);
+        if (name === "ktp_file") setKtpFile(files[0]);
         if (name === "profilePhoto") setProfilePhoto(files[0]);
     };
 
@@ -227,6 +342,7 @@ export default function useUserHooks() {
         phoneNumber,
         skNumber,
         skFile,
+        ktpFile,
         profilePhoto,
         handleUserPost,
         handleChangeUser,
@@ -235,7 +351,8 @@ export default function useUserHooks() {
         handleShowUser,
         handleUserPut,
         isActive,
-        setIsActive
+        setIsActive,
+        handleUserRegister,
+        handleUserUpdateProfile
     };
-
 }

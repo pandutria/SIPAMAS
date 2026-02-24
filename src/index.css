@@ -39,6 +39,11 @@
     --color-hover: #FEE2E2; */
 }
 
+.swal-z-top {
+  z-index: 999999 !important;
+  font-family: "poppins-regular";
+}
+
 .scrollbar-hidden::-webkit-scrollbar {
     height: 0;
     display: none;

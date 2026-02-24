@@ -83,7 +83,7 @@ export default function SuperAdminLihatUserModal({ isOpen, onClose, data }: Ubah
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center">
+    <div className="fixed inset-0 z-10000 overflow-hidden flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black/20"
         onClick={onClose}
