@@ -5,16 +5,26 @@ import { useEffect, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import maps from "/icon/maps.png";
 import { BASE_URL_FILE } from "../../../server/API";
+import FormSelect from "../../../ui/FormSelect";
+import SubmitButton from "../../../ui/SubmitButton";
+import usePengaduanHooks from "../../../hooks/PengaduanHooks";
+import FormInput from '../../../ui/FormInput';
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
 
 const statusConfig: Record<string, { label: string; badge: string }> = {
     menunggu: { label: "Menunggu", badge: "bg-blue-100 text-blue-600 border border-blue-200" },
+    diterima: { label: "Diterima", badge: "bg-green-100 text-green-600 border border-green-200" },
     diproses: { label: "Diproses", badge: "bg-orange-100 text-orange-600 border border-orange-200" },
-    selesai:  { label: "Selesai",  badge: "bg-green-100 text-green-600 border border-green-200" },
-    ditolak:  { label: "Ditolak",  badge: "bg-red-100 text-red-600 border border-red-200" },
+    selesai: { label: "Selesai", badge: "bg-green-100 text-green-600 border border-green-200" },
+    ditolak: { label: "Ditolak", badge: "bg-red-100 text-red-600 border border-red-200" },
 };
+
+const statusOptions = [
+    { id: 2, text: "Diproses" },
+    { id: 4, text: "Selesai" },
+];
 
 function resolveStatusKey(raw: string): string {
     const s = raw.toLowerCase().trim().replace(/[_ ]/g, "");
@@ -48,7 +58,6 @@ function MapModal({ lat, lng, alamat }: { lat: string | null; lng: string | null
     useEffect(() => {
         const parsedLat = lat ? parseFloat(lat) : NaN;
         const parsedLng = lng ? parseFloat(lng) : NaN;
-
         if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
             setCoords({ lat: parsedLat, lng: parsedLng });
         } else if (alamat) {
@@ -61,11 +70,7 @@ function MapModal({ lat, lng, alamat }: { lat: string | null; lng: string | null
     }, [lat, lng, alamat]);
 
     const customMarkerIcon: google.maps.Icon | undefined = isLoaded
-        ? {
-              url: maps,
-              scaledSize: new window.google.maps.Size(36, 36),
-              anchor: new window.google.maps.Point(18, 36),
-          }
+        ? { url: maps, scaledSize: new window.google.maps.Size(36, 36), anchor: new window.google.maps.Point(18, 36) }
         : undefined;
 
     if (loadError) {
@@ -97,7 +102,7 @@ function MapModal({ lat, lng, alamat }: { lat: string | null; lng: string | null
                     streetViewControl: false,
                     mapTypeControl: false,
                     fullscreenControl: false,
-                    scrollwheel: false,
+                    scrollwheel: false
                 }}
             >
                 <Marker position={coords} icon={customMarkerIcon} />
@@ -127,6 +132,15 @@ function InfoField({ label, value }: { label: string; value: React.ReactNode }) 
     );
 }
 
+function SectionHeader({ title }: { title: string }) {
+    return (
+        <div className="flex items-center gap-3">
+            <div className="w-1 h-5 bg-primary rounded-full shrink-0" />
+            <p className="font-poppins-bold text-[15px] text-gray-800">{title}</p>
+        </div>
+    );
+}
+
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -134,9 +148,12 @@ interface ModalProps {
     data: PengaduanProps;
 }
 
-export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: ModalProps) {
+export default function AdminDireksiUbahStatusPengaduan({ isOpen, onClose, data }: ModalProps) {
     const [lightbox, setLightbox] = useState<string | null>(null);
     const [visible, setVisible] = useState(false);
+    const [status, setStatus] = useState("");
+    const [catatan, setCatatan] = useState("");
+    const { handlePengaduanStatusPut } = usePengaduanHooks();
 
     useEffect(() => {
         if (isOpen) {
@@ -172,37 +189,27 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
                 </div>
             )}
 
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full mx-4 max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transition-all">
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full mx-4 max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
                 <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
                     <div>
-                        <h2 className="font-poppins-bold text-xl text-gray-800">Detail Pelaporan</h2>
+                        <h2 className="font-poppins-bold text-xl text-gray-800">Ubah Status Laporan</h2>
                         <p className="font-poppins-regular text-[13px] text-gray-400 mt-0.5">
-                            Lihat detail laporan dari masyarakat
+                            Lihat detail dan ubah status laporan dari masyarakat
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200 ml-4 shrink-0"
+                        className="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200 hover:rotate-90 ml-4 shrink-0"
                     >
                         <X className="h-5 w-5 text-gray-500" />
                     </button>
                 </div>
 
                 <div className="overflow-y-auto px-6 py-5 flex flex-col gap-5">
-                    {data.judul && (
-                        <div style={{ animationDelay: "0ms" }}>
-                            <InfoField label="Nama Proyek" value={data.judul} />
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-2 gap-4" style={{ animationDelay: "60ms" }}>
+                    <div className="grid grid-cols-2 gap-4">
                         <InfoField
                             label="Nomor Tiket Pengaduan"
-                            value={
-                                <span className="text-primary">
-                                    #{data?.id.toString().padStart(4, "0")}
-                                </span>
-                            }
+                            value={<span className="text-primary">#{data?.id.toString().padStart(4, "0")}</span>}
                         />
                         <InfoField label="Judul Laporan" value={data.judul ?? "-"} />
                         <InfoField label="Kategori Laporan" value={data.kategori ?? "-"} />
@@ -214,7 +221,7 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
                             }).replace(/\//g, "-")}
                         />
                         <InfoField
-                            label="Status Pelaporan"
+                            label="Status Saat Ini"
                             value={
                                 <span className={`inline-flex items-center text-[12px] font-poppins-semibold px-3 py-1 rounded-full ${statusCfg.badge}`}>
                                     {statusCfg.label}
@@ -248,21 +255,12 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
                     </div>
 
                     <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent" />
+
                     <div className="flex flex-col gap-2">
-                        <p className="font-poppins-semibold text-[15px] text-gray-800">Deskripsi Pengaduan</p>
+                        <SectionHeader title="Deskripsi Pengaduan" />
                         <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
                             <p className="font-poppins-regular text-[13px] text-gray-600 leading-relaxed">
                                 {data.deskripsi ?? "Tidak ada deskripsi."}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent" />
-                    <div className="flex flex-col gap-2">
-                        <p className="font-poppins-semibold text-[15px] text-gray-800">Catatan Tindak Lanjut</p>
-                        <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
-                            <p className="font-poppins-regular text-[13px] text-gray-600 leading-relaxed">
-                                {data.catatan ?? "Tidak ada catatan."}
                             </p>
                         </div>
                     </div>
@@ -271,7 +269,7 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
                         <>
                             <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent" />
                             <div className="flex flex-col gap-3">
-                                <p className="font-poppins-semibold text-[15px] text-gray-800">Lampiran Pengaduan</p>
+                                <SectionHeader title="Lampiran Pengaduan" />
                                 <div className="grid grid-cols-3 gap-3">
                                     {data.medias.map((media, index) => {
                                         const src = typeof media.media_file === "string"
@@ -303,11 +301,38 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
                         </>
                     )}
 
+                    <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent" />
+
+                    <div className="flex flex-col gap-4">
+                        <SectionHeader title="Ubah Status Laporan" />
+
+                        <FormSelect
+                            title="Status"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            {statusOptions.map((item) => (
+                                <option key={item.id} value={item.text}>{item.text}</option>
+                            ))}
+                        </FormSelect>
+
+                        {status == "Selesai" && (
+                            <FormInput
+                                title='Catatan Tindak Lanjut'
+                                placeholder='Masukkan catatan'
+                                value={catatan}
+                                onChange={(e) => setCatatan(e.target.value)}
+                                type='textarea'
+                            />
+                        )}
+
+                    </div>
+
                     {review && (
                         <>
                             <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent" />
                             <div className="flex flex-col gap-3">
-                                <p className="font-poppins-semibold text-[15px] text-gray-800">Penilaian Masyarakat</p>
+                                <SectionHeader title="Penilaian Masyarakat" />
                                 <div className="border border-gray-100 rounded-xl p-4 flex flex-col gap-3">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
@@ -316,25 +341,25 @@ export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: 
                                             </svg>
                                         </div>
                                         <div>
-                                            <p className="font-poppins-semibold text-[13px] text-gray-800">
-                                                {reviewer?.fullname ?? "Masyarakat"}
-                                            </p>
+                                            <p className="font-poppins-semibold text-[13px] text-gray-800">{reviewer?.fullname ?? "Masyarakat"}</p>
                                             <p className="font-poppins-regular text-[11px] text-gray-400">Masyarakat</p>
                                         </div>
                                     </div>
-
                                     <div className="bg-green-50 border border-green-100 rounded-xl px-4 py-3 flex flex-col gap-2">
                                         <StarDisplay value={review.rating ?? 0} />
                                         {review.catatan && (
-                                            <p className="font-poppins-regular text-[13px] text-gray-600 italic">
-                                                "{review.catatan}"
-                                            </p>
+                                            <p className="font-poppins-regular text-[13px] text-gray-600 italic">"{review.catatan}"</p>
                                         )}
                                     </div>
                                 </div>
                             </div>
                         </>
                     )}
+
+                    <SubmitButton
+                        text="Simpan Perubahan"
+                        onClick={() => handlePengaduanStatusPut(status, catatan, data.id)}
+                    />
 
                     <div className="h-2" />
                 </div>

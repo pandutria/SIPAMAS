@@ -9,6 +9,7 @@ import FormSelect from '../../ui/FormSelect';
 import { useRef, useState } from 'react';
 import SubmitButton from '../../ui/SubmitButton';
 import { Plus, Trash2, FileVideo, ImageIcon, Upload } from 'lucide-react';
+import useProjectIdentity from '../../hooks/ProjectIdentity';
 
 export default function MasyarakatLaporanBaru() {
     const {
@@ -16,6 +17,7 @@ export default function MasyarakatLaporanBaru() {
         handlePegaduanChangeForm,
         handlePengaduanPost
     } = usePengaduanHooks();
+    const { projectIdentityData } = useProjectIdentity();
     const [mediaFilesData, setMediaFilesData] = useState<PengaduanMediaProps[]>([]);
     const [previews, setPreviews] = useState<{ url: string; tipe: string; name: string }[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +125,17 @@ export default function MasyarakatLaporanBaru() {
                                 >
                                     {kategoriLaporanOptions.map((item, index) => (
                                         <option key={index} value={item.text}>{item.text}</option>
+                                    ))}
+                                </FormSelect>
+
+                                <FormSelect
+                                    title='Proyek'
+                                    name='identitas_proyek_id'
+                                    value={pengaduanForm.identitas_proyek_id}
+                                    onChange={handlePegaduanChangeForm}
+                                >
+                                    {projectIdentityData.map((item, index) => (
+                                        <option key={index} value={item.id}>{`${item.nama} - ${item.kecamatan}, ${item.kelurahan}`}</option>
                                     ))}
                                 </FormSelect>
 

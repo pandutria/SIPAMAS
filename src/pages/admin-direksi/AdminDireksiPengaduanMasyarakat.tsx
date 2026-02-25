@@ -5,11 +5,11 @@ import TableHeader from '../../ui/TableHeader'
 import TableContent from '../../ui/TableContent'
 import { useEffect, useState } from 'react';
 import usePengaduanHooks from '../../hooks/PengaduanHooks';
-import SuperAdminModalLaporanDetail from './modal/SuperAdminModalLaporanDetail';
-import SuperAdminModalUbahStatusLaporan from './modal/SuperAdminModalUbahStatusLaporan';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../ui/LoadingSpinner';
 import { Navigate } from 'react-router-dom';
+import AdminDireksiUbahStatusPengaduan from './modal/AdminDireksiUbahStatusPengaduan';
+import AdminDireksiLihatStatusPengaduan from './modal/AdminDireksiLihatStatusPengaduan';
 
 function resolveStatus(raw: string): string {
     const s = raw.toLowerCase().trim().replace(/[_ ]/g, "");
@@ -101,10 +101,8 @@ const statCards = [
     },
 ];
 
-export default function SuperAdminManajemenLaporan() {
+export default function AdminDireksiPengaduanMasyarakat() {
     const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("");
-
     const { pengaduanData } = usePengaduanHooks();
     const [showModalEdit, setShowModalEdit] = useState(false);
     const [showModalPreview, setShowModalPreview] = useState(false);
@@ -119,12 +117,12 @@ export default function SuperAdminManajemenLaporan() {
 
         const filtered = pengaduanData.filter((item) => {
             const matcheTitle = item.judul?.toLowerCase()?.includes(search.toLowerCase());
-            const statusFilter = status ? item.status == status : true;
+            const statusFilter = item.status != "Menunggu" && item.status !== "Ditolak";;
             return matcheTitle && statusFilter;
         });
 
         setPengaduanDataFIlter(filtered);
-    }, [pengaduanData, search, status, selectedEdit, selectedPreview]);
+    }, [pengaduanData, search, selectedEdit, selectedPreview]);
 
     const stats = {
         total: pengaduanDataFilter.length,
@@ -144,19 +142,19 @@ export default function SuperAdminManajemenLaporan() {
     ];
 
     if (loading) return <LoadingSpinner />;
-    if (!user || user.role != "super-admin") return <Navigate to="/" replace />;
+    if (!user || user.role != "admin-direksi") return <Navigate to="/" replace />;
 
     return (
         <div>
             <Navbar />
 
-            <SuperAdminModalLaporanDetail
+            <AdminDireksiLihatStatusPengaduan
                 isOpen={showModalPreview}
                 onClose={() => { setShowModalPreview(false); setSelectedPreview(null); }}
                 data={selectedPreview as any}
             />
 
-            <SuperAdminModalUbahStatusLaporan
+            <AdminDireksiUbahStatusPengaduan
                 isOpen={showModalEdit}
                 onClose={() => { setShowModalEdit(false); setSelectedEdit(null); }}
                 data={selectedEdit as any}
@@ -169,9 +167,6 @@ export default function SuperAdminManajemenLaporan() {
                     type="admin"
                     showTahunQuery={false}
                     searchValue={search}
-                    showStatus={true}
-                    selectedStatus={status}
-                    onStatusChange={setStatus}
                     onSearchChange={(item) => setSearch(item)}
                 />
 

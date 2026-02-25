@@ -81,9 +81,9 @@ function GoogleMapPicker({ coords, label }: GoogleMapPickerProps) {
             mapContainerStyle={MAP_CONTAINER_STYLE}
             center={coords ?? DEFAULT_CENTER}
             zoom={coords ? 15 : 5}
-            mapTypeId="hybrid"
+            mapTypeId="roadmap"
             options={{
-                mapTypeId: "hybrid",
+                mapTypeId: "roadmap",
                 disableDefaultUI: false,
                 zoomControl: true,
                 streetViewControl: false,

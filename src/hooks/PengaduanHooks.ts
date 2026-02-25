@@ -16,7 +16,8 @@ export default function usePengaduanHooks() {
         kategori: "",
         judul: "",
         deskripsi: "",
-        alamat: ""
+        alamat: "",
+        identitas_proyek_id: "",
     });
     const [pengaduanReviewForm, setPengaduanReviewForm] = useState({
         catatan: "",
@@ -35,7 +36,7 @@ export default function usePengaduanHooks() {
                 const data = response.data.data;
                 const mappingData = data.map((item: PengaduanProps) => ({
                     ...item,
-                    kontak: item?.created_by!.phone_number
+                    kontak: item?.created_by!.phone_number,
                 }))
 
                 setPengaduanData(SortDescById(mappingData))
@@ -76,6 +77,7 @@ export default function usePengaduanHooks() {
             formData.append("judul", pengaduanForm.judul);
             formData.append("deskripsi", pengaduanForm.deskripsi);
             formData.append("alamat", pengaduanForm.alamat);
+            formData.append("identitas_proyek_id", pengaduanForm.identitas_proyek_id);
             formData.append("longitude", "");
             formData.append("latitude", "");
             
@@ -127,11 +129,14 @@ export default function usePengaduanHooks() {
         }));
     }
 
-    const handlePengaduanStatusPut = async(status: string, id: number) => {
+    const handlePengaduanStatusPut = async(status: string, catatan: string | null, id: number) => {
         try {
             SwalLoading();
             const formData = new FormData();
             formData.append("status", status);
+            if (catatan) {
+                formData.append("catatan", catatan);
+            }
 
             const response = await API.put(`/pengaduan/status/update/${id}`, formData, {
                 headers: {

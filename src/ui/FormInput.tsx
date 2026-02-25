@@ -22,7 +22,7 @@ export default function FormInput({ value, onChange, title, placeholder, disable
                     name={name}
                     value={value}
                     onChange={onChange}
-                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200`}
+                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins-medium focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200`}
                     placeholder={placeholder}
                     disabled={disabled}
                 />
@@ -32,7 +32,7 @@ export default function FormInput({ value, onChange, title, placeholder, disable
                     disabled={disabled}
                     name={name}
                     rows={3}
-                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins resize-none`}
+                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins-medium resize-none`}
                     onChange={onChange}
                     placeholder={placeholder}
                 />
@@ -42,7 +42,7 @@ export default function FormInput({ value, onChange, title, placeholder, disable
                     value={value}
                     name={name}
                     onChange={onChange}
-                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200`}
+                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins-medium focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200`}
                     placeholder={placeholder}
                     disabled={disabled}
                 />
@@ -52,7 +52,7 @@ export default function FormInput({ value, onChange, title, placeholder, disable
                     name={name}
                     value={value}
                     onChange={onChange}
-                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200`}
+                    className={`w-full ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''} text-[14px] px-4 py-2.5 border border-gray-300 rounded-lg font-poppins-medium focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200`}
                     placeholder={placeholder}
                     disabled={disabled}
                 />

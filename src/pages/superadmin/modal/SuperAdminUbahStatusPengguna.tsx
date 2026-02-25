@@ -12,7 +12,7 @@ interface ModalProps {
 }
 
 export default function SuperAdminUbahStatusPengguna({ isOpen, onClose, data }: ModalProps) {
-    const { isActive, handleChangeUser, handleUserPut } = useUserHooks();
+    const { isActive, handleChangeUser, handleVerificationUserPut } = useUserHooks();
 
     const statusOptions = [
         {
@@ -64,7 +64,7 @@ export default function SuperAdminUbahStatusPengguna({ isOpen, onClose, data }: 
                     </FormSelect>
                     <SubmitButton
                         text="Ubah"
-                        onClick={() => handleUserPut(data.id)}
+                        onClick={() => handleVerificationUserPut(data.id)}
                     />
                 </div>
             </div>

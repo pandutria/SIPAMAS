@@ -11,6 +11,7 @@ const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
 
 const statusConfig: Record<string, { label: string; badge: string }> = {
     menunggu: { label: "Menunggu", badge: "bg-blue-100 text-blue-600 border border-blue-200" },
+    diterima: { label: "Diterima", badge: "bg-green-100 text-green-600 border border-green-200" },
     diproses: { label: "Diproses", badge: "bg-orange-100 text-orange-600 border border-orange-200" },
     selesai:  { label: "Selesai",  badge: "bg-green-100 text-green-600 border border-green-200" },
     ditolak:  { label: "Ditolak",  badge: "bg-red-100 text-red-600 border border-red-200" },
@@ -134,7 +135,7 @@ interface ModalProps {
     data: PengaduanProps;
 }
 
-export default function SuperAdminModalLaporanDetail({ isOpen, onClose, data }: ModalProps) {
+export default function AdminDireksiLihatStatusPengaduan({ isOpen, onClose, data }: ModalProps) {
     const [lightbox, setLightbox] = useState<string | null>(null);
     const [visible, setVisible] = useState(false);
 

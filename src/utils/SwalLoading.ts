@@ -13,7 +13,7 @@ const SwalLoading = (options?: SwalLoadingOptions) => {
       Swal.showLoading();
     },
     customClass: {
-      popup: 'swal-z-top',
+      container: 'swal-z-top',
     },
   });
 };

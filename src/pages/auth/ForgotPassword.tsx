@@ -1,7 +1,7 @@
 import { Mail, ArrowLeft, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from "/image/logo/logo-monalisa.png";
+import logo from "/image/logo/logo-sipamas.png";
 import background from "/image/auth/background.jpg";
 import emailjs from "@emailjs/browser"
 import { SwalMessage } from '../../utils/SwalMessage';
@@ -81,7 +81,7 @@ export default function ForgotPassword() {
       }}
     >
       <div
-        className="rounded-2xl p-8 w-full max-w-lg"
+        className="rounded-2xl p-8 w-full font-poppins-medium max-w-lg"
         data-aos="fade-up"
         data-aos-duration="1000"
         style={{
@@ -97,9 +97,10 @@ export default function ForgotPassword() {
               onClick={() => navigate("/masuk")}
             />
             <img src={logo} className='w-auto h-4 mx-auto'/>
+            <div className="w-6"></div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Lupa Kata Sandi?</h1>
-          <p className="text-gray-600">Masukkan email Anda untuk menerima link reset password</p>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Lupa Kata Sandi?</h1>
+          <p className="text-gray-600 text-sm">Masukkan email Anda untuk menerima link reset password</p>
         </div>
 
         <div className="space-y-5">
@@ -131,10 +132,7 @@ export default function ForgotPassword() {
             type="button"
             onClick={handleSendResetLink}
             disabled={loading}
-            className="w-full text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#f60' }}
-            onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#ff7a1a')}
-            onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#f60')}
+            className="w-full text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-primary"
           >
             {loading ? (
               <>
@@ -153,8 +151,7 @@ export default function ForgotPassword() {
             <button
               type="button"
               onClick={() => navigate('/masuk')}
-              className="text-sm font-medium hover:underline"
-              style={{ color: '#f60' }}
+              className="text-sm font-medium hover:underline text-primary"
             >
               Kembali ke halaman login
             </button>

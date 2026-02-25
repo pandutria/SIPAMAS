@@ -12,24 +12,24 @@ const navConfig: Record<string, { dashboardPath: string; dropdownLabel: string; 
     dashboardPath: '/',
     dropdownLabel: 'Manajemen',
     dropdownItems: [
-      { label: 'Pengguna', path: '/superadmin/manajemen-pengguna' },
       { label: 'Verifikasi Pengguna', path: '/superadmin/verifikasi-pengguna' },
+      { label: 'Pengguna', path: '/superadmin/manajemen-pengguna' },
       { label: 'Laporan', path: '/superadmin/manajemen-laporan' },
-      { label: 'Verifikasi Laporan', path: '/superadmin/verifikasi-laporan' },
     ],
   },
   'masyarakat': {
     dashboardPath: '/',
     dropdownLabel: 'Laporan',
     dropdownItems: [
-      { label: 'Buat Laporan Baru', path: '/masyarakat/laporan-baru' },
       { label: 'Riwayat Laporan', path: '/masyarakat/riwayat-laporan' },
+      { label: 'Buat Laporan Baru', path: '/masyarakat/laporan-baru' },
     ],
   },
   'admin-direksi': {
     dashboardPath: '/',
     dropdownLabel: 'Laporan Saya',
     dropdownItems: [
+      { label: 'Pengaduan Masyarakat', path: '/admin-direksi/pengaduan-masyarakat' },
       { label: 'Identitas Proyek', path: '/admin-direksi/identitas-proyek' },
       { label: 'Rencana Anggaran', path: '/admin-direksi/rencana-anggaran' },
       { label: 'Jadwal Pelaksanaan', path: '/admin-direksi/jadwal-pelaksanaan' },

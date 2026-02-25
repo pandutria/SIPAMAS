@@ -64,7 +64,7 @@ export default function useProjectIdentity() {
             "documents": data.documents.map((item: ProjectIdentityDocumentProps) => ({
                 ...item,
                 "created_at": FormatDate(item.created_at!.toString())
-            }))
+            })),
         }
 
         setProjectIdentityByIdData(mappingData);
@@ -102,7 +102,8 @@ export default function useProjectIdentity() {
                 const mappingData = data.map((item: ProjectIdentityProps) => ({
                     ...item,
                     project_id: `TND-0${item.id}`,
-                    status: item.photos.filter(data => data.type == "end").length == 0 || item.photos.filter(data => data.type == "end").length == 0 ? "Belum Lengkap" : "Sudah Lengkap"
+                    status: item.photos.filter(data => data.type == "end").length == 0 || item.photos.filter(data => data.type == "end").length == 0 ? "Belum Lengkap" : "Sudah Lengkap",
+                    pengaduan: item.pengaduan.length + " Pengaduan",
                 }));
 
                 const tahunOpts = buildTahunOptions(data);

@@ -47,7 +47,7 @@ export const SwalMessage = ({
             popup: 'swal2-hide',
         },
         customClass: {
-            popup: 'swal-z-top',
+            container: 'swal-z-top',
         },
     });
 };

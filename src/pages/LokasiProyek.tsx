@@ -289,7 +289,7 @@ export default function LokasiProyek() {
         setSelectedId(project.id);
         if (mapRef.current) {
             mapRef.current.panTo({ lat: project.resolvedLat, lng: project.resolvedLng });
-            mapRef.current.setZoom(15);
+            mapRef.current.setZoom(11);
         }
     }, []);
 
@@ -450,10 +450,10 @@ export default function LokasiProyek() {
                             mapContainerStyle={MAP_CONTAINER_STYLE}
                             center={DEFAULT_CENTER}
                             zoom={5}
-                            mapTypeId="hybrid"
+                            mapTypeId="roadmap"
                             onLoad={onMapLoad}
                             options={{
-                                mapTypeId: "hybrid",
+                                mapTypeId: "roadmap",
                                 zoomControl: true,
                                 streetViewControl: false,
                                 mapTypeControl: false,

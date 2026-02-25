@@ -63,6 +63,10 @@ export default function AdminDireksiIndentitasProyek() {
             key: 'nama',
             label: 'Nama Proyek'
         },
+        {
+            key: 'pengaduan',
+            label: 'Jumlah Pengaduan'
+        },
     ];
 
     if (loading) {

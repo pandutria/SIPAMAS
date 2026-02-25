@@ -221,6 +221,37 @@ export default function useUserHooks() {
         }
     }
 
+    const handleVerificationUserPut = async (id: number) => {
+        try {
+            const formData = new FormData();
+            formData.append("is_active", isActive);
+
+            SwalLoading();
+            await API.put(`/user/update/${id}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const message = "Akun pengguna berhasil diverifikasi!";
+            SwalMessage({
+                title: "Berhasil!",
+                text: message,
+                type: "success"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (error: any) {
+            SwalMessage({
+                title: "Gagal!",
+                text: error.response?.data?.message,
+                type: "error"
+            });
+        }
+    }
+
     const handleUserUpdateProfile = async () => {
         try {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -279,7 +310,7 @@ export default function useUserHooks() {
             SwalMessage({
                 title: "Gagal!",
                 text: error.response?.data?.message,
-                type: "error"
+                type: "error",
             });
         }
     }
@@ -355,6 +386,7 @@ export default function useUserHooks() {
         isActive,
         setIsActive,
         handleUserRegister,
-        handleUserUpdateProfile
+        handleUserUpdateProfile,
+        handleVerificationUserPut
     };
 }

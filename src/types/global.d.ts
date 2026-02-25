@@ -52,6 +52,7 @@ declare global {
 
     photos: ProjectIdentityPhotoProps[];
     documents: ProjectIdentityDocumentProps[];
+    pengaduan: PengaduanProps[];
   }
 
   export interface ProjectIdentityPhotoProps {
@@ -190,16 +191,19 @@ declare global {
   export interface PengaduanProps {
     id: number;
     created_by_id: number;
+    identitas_proyek_id: number;
     kategori: string | null;
     judul: string | null;
     deskripsi: string | null;
     alamat: string | null;
     latitude: string | null;
     longitude: string | null;
+    catatan: string;
     status: string;
     created_at: string;
     updated_at: string;
 
+    proyek: ProjectIdentityProps;
     created_by?: UserProps | null;
     medias?: PengaduanMediaProps[];
     timelines?: PengaduanTimelineProps[];
