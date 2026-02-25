@@ -2,6 +2,7 @@ package com.example.sipamas_android.presentation.auth.login
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.UserManager
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -10,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.sipamas_android.MainActivity
 import com.example.sipamas_android.R
+import com.example.sipamas_android.data.local.AuthManager
 import com.example.sipamas_android.data.local.TokenManager
 import com.example.sipamas_android.data.repository.AuthRepository
 import com.example.sipamas_android.data.state.State
@@ -44,61 +46,63 @@ class LoginActivity : AppCompatActivity() {
             IntenHelper.navigate(this, RegisterActivity::class.java)
         }
 
-        viewModel.loginState.observe(this){state ->
-            when(state) {
+        binding.etEmail.setText("masyarakat@gmail.com")
+        binding.etPassword.setText("masyarakat123")
 
-                is State.Loading -> {
-                    binding.btnLogin.visibility = View.GONE
-                    binding.pbLoading.visibility = View.VISIBLE
-                }
-                is State.Success -> {
-                    if (state.data.role != "masyarakat") {
-                        Toasthelper.show(this, "Role kamu bukan masyarakat!")
-                        return@observe
-                    }
-                    TokenManager(this).saveToken(state.data.token!!)
-                    viewModel.me(this)
-                }
-                is State.Error -> {
-                    Toasthelper.show(this, state.message ?: "Error")
-                    binding.btnLogin.visibility = View.VISIBLE
-                    binding.pbLoading.visibility = View.GONE
-                }
-                else -> {
-                    Toasthelper.show(this, "Error")
-                    binding.btnLogin.visibility = View.VISIBLE
-                    binding.pbLoading.visibility = View.GONE
-                }
-            }
+        binding.btnLogin.setOnClickListener {
+            val email = binding.etEmail.text.toString()
+            val password = binding.etPassword.text.toString()
 
-            viewModel.meState.observe(this){ state ->
-                when(state) {
+            viewModel.loginState.observe(this) { state ->
+                when (state) {
                     is State.Loading -> {
                         binding.btnLogin.visibility = View.GONE
                         binding.pbLoading.visibility = View.VISIBLE
                     }
+
                     is State.Success -> {
-                        Toasthelper.show(this, state.message)
-                        IntenHelper.navigate(this, MainActivity::class.java)
+                        if (state.data.role != "masyarakat") {
+                            Toasthelper.show(this, "Role kamu bukan masyarakat!")
+                            binding.btnLogin.visibility = View.VISIBLE
+                            binding.pbLoading.visibility = View.GONE
+                            return@observe
+                        }
+                        TokenManager(this).saveToken(state.data.token!!)
+                        viewModel.me(this)
                     }
+
                     is State.Error -> {
                         Toasthelper.show(this, state.message ?: "Error")
                         binding.btnLogin.visibility = View.VISIBLE
                         binding.pbLoading.visibility = View.GONE
                     }
-                    else -> {
-                        Toasthelper.show(this, "Error")
-                        binding.btnLogin.visibility = View.VISIBLE
-                        binding.pbLoading.visibility = View.GONE
-                    }
+
+                    else -> {}
                 }
             }
 
-        }
+            viewModel.meState.observe(this) { state ->
+                when (state) {
+                    is State.Loading -> {
+                        binding.btnLogin.visibility = View.GONE
+                        binding.pbLoading.visibility = View.VISIBLE
+                    }
 
-        binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString()
-            val password = binding.etPassword.text.toString()
+                    is State.Success -> {
+                        AuthManager(this).save(state.data)
+                        IntenHelper.navigate(this, MainActivity::class.java)
+                        finish()
+                    }
+
+                    is State.Error -> {
+                        Toasthelper.show(this, state.message ?: "Error")
+                        binding.btnLogin.visibility = View.VISIBLE
+                        binding.pbLoading.visibility = View.GONE
+                    }
+
+                    else -> {}
+                }
+            }
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toasthelper.show(this, "Semua input wajib di isi")

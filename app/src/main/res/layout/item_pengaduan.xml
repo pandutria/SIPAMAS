@@ -22,6 +22,7 @@
             android:layout_height="95dp">
             
             <TextView
+                android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Diproses"
@@ -34,6 +35,7 @@
                 android:paddingVertical="2.5dp"/>
 
             <ImageView
+                android:id="@+id/imgImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
@@ -50,6 +52,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tvJudul"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Jalan Berlubang di Jl. Cililitan"
@@ -71,6 +74,7 @@
                 android:src="@drawable/ic_calendar"/>
 
             <TextView
+                android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="9sp"
@@ -86,6 +90,7 @@
                 android:src="@drawable/circle"/>
 
             <TextView
+                android:id="@+id/tvId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="9sp"
@@ -96,11 +101,13 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tvDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Lubang cukup dalam dilajur kiri dekat sebelah danau, membahayakan pengguna jalan karena takut tercebur kedalam danau."
             android:textSize="10sp"
             android:maxLines="3"
+            android:minLines="3"
             android:ellipsize="end"
             android:fontFamily="@font/poppins_medium"
             android:justificationMode="inter_word"

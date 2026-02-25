@@ -68,7 +68,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         binding.tvLogin.setOnClickListener {
-            IntenHelper.finish(this)
+            IntenHelper.navigate(this, LoginActivity::class.java)
         }
 
         binding.layoutRegister.setOnClickListener {

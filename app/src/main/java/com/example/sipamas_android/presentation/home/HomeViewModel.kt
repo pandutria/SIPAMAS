@@ -1,0 +1,58 @@
+package com.example.sipamas_android.presentation.home
+
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.sipamas_android.data.model.Pengaduan
+import com.example.sipamas_android.data.repository.AuthRepository
+import com.example.sipamas_android.data.repository.PengaduanRepository
+import com.example.sipamas_android.data.state.State
+import com.example.sipamas_android.presentation.auth.login.LoginViewModel
+import kotlinx.coroutines.launch
+
+class HomeViewModel(private val repo: PengaduanRepository): ViewModel() {
+    private val _getState = MutableLiveData<State<List<Pengaduan>>>()
+    val getState: LiveData<State<List<Pengaduan>>> = _getState
+
+    fun getPengaduan(context: Context) {
+        viewModelScope.launch {
+            _getState.postValue(State.Loading)
+            try {
+                val res = repo.getPengaduan(context)
+                val body = res.body()
+
+                if (res.isSuccessful && body?.data != null) {
+                    _getState.postValue(
+                        State.Success(
+                            data = body.data,
+                            message = body.message ?: "Gagal"
+                        )
+                    )
+                } else {
+
+                }
+            } catch (e: Exception) {
+                _getState.postValue(
+                    State.Error(
+                        message = "Gagal",
+                        error = e.message ?: "Error"
+                    )
+                )
+            }
+        }
+    }
+}
+
+class HomeViewModelFactory(private val repo: PengaduanRepository) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return HomeViewModel(repo) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

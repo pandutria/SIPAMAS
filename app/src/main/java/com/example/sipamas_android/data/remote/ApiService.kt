@@ -1,5 +1,6 @@
 package com.example.sipamas_android.data.remote
 
+import com.example.sipamas_android.data.model.Pengaduan
 import com.example.sipamas_android.data.model.User
 import com.example.sipamas_android.data.response.BaseResponse
 import com.example.sipamas_android.data.response.LoginResponse
@@ -13,6 +14,7 @@ import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface ApiService {
     @Multipart
@@ -36,4 +38,15 @@ interface ApiService {
     suspend fun me(
         @Header("Authorization") token: String
     ): Response<BaseResponse<User>>
+
+    @GET("pengaduan")
+    suspend fun getPengaduan(
+        @Header("Authorization") token: String
+    ): Response<BaseResponse<List<Pengaduan>>>
+
+    @GET("pengaduan/{id}")
+    suspend fun getPengaduanById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Response<BaseResponse<Pengaduan>>
 }
