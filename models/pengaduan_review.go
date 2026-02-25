@@ -1,7 +1,6 @@
 package models
 
 import "time"
-
 type PengaduanReview struct {
 	ID          uint      `gorm:"primaryKey" json:"id"`
 	PengaduanId uint      `json:"pengaduan_id"`

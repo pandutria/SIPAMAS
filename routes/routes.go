@@ -15,14 +15,15 @@ func SetupRoutes(r *gin.Engine) {
 		public.POST("/auth/register", controllers.Register)
 		public.GET("/identitas-proyek", controllers.GetAllIdentitas)
 		public.GET("/realisasi", controllers.GetAllRealisasiHeader)
+		public.POST("/auth/password/request", controllers.RequestResetPassword)
+		public.PUT("/auth/password/reset", controllers.ResetPassword)
 	}
 
 	private := r.Group("/api")
 	private.Use(middlewares.BearerAuth())
 	{
 		private.GET("/auth/me", controllers.Me)
-		private.PUT("/auth/update", controllers.UpdateProfile)
-		private.PUT("/auth/password/update", controllers.UpdatePassword)
+		private.PUT("/auth/profile/update", controllers.UpdateProfile)
 
 		private.GET("/user", controllers.GetAllUser)
 		private.PUT("/user/update/:id", controllers.UpdateUser)

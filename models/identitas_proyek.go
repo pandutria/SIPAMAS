@@ -31,4 +31,5 @@ type IdentitasProyek struct {
 	CreatedBy *User                      `gorm:"foreignKey:CreatedById" json:"created_by"`
 	Photos    []*IdentitasProyekPhoto    `gorm:"foreignKey:identitas_proyek_id" json:"photos"`
 	Documents []*IdentitasProyekDocument `gorm:"foreignKey:identitas_proyek_id" json:"documents"`
+	Pengaduan []*Pengaduan               `gorm:"foreignKey:IdentitasPronyekId" json:"pengaduan"`
 }

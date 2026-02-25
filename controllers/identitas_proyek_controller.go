@@ -18,6 +18,11 @@ func GetAllIdentitas(c *gin.Context) {
 		Preload("CreatedBy").
 		Preload("Photos").
 		Preload("Documents").
+		Preload("Pengaduan").
+		Preload("Pengaduan.CreatedBy").
+		Preload("Pengaduan.Medias").
+		Preload("Pengaduan.Timelines").
+		Preload("Pengaduan.Review").
 		Find(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
@@ -39,6 +44,10 @@ func GetIdentitasById(c *gin.Context) {
 		Preload("CreatedBy").
 		Preload("Photos").
 		Preload("Documents").
+		Preload("Pengaduan.CreatedBy").
+		Preload("Pengaduan.Medias").
+		Preload("Pengaduan.Timelines").
+		Preload("Pengaduan.Review").
 		First(&data, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",

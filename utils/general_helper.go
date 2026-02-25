@@ -49,6 +49,15 @@ func NilIfEmpty(s string) *string {
 	return &s
 }
 
+func ZeroIfEmpty(s string) *uint {
+	if strings.TrimSpace(s) == "" {
+		return nil
+	}
+
+	value := uint(0)
+	return &value
+}
+
 func SetIfNotEmpty(dest **string, val string) {
 	if strings.TrimSpace(val) == "" {
 		return
@@ -68,4 +77,8 @@ func UploadIfExists(c *gin.Context, field string) (*string, error) {
 	}
 
 	return path, nil
+}
+
+func GenerateResetToken(userID uint) (string, error) {
+	return GenerateJWT(userID) 
 }
