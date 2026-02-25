@@ -1,5 +1,7 @@
 package com.example.sipamas_android.data.repository
 
+import android.content.Context
+import com.example.sipamas_android.data.local.TokenManager
 import com.example.sipamas_android.data.model.User
 import com.example.sipamas_android.data.remote.RetrofitInstance
 import com.example.sipamas_android.data.response.BaseResponse
@@ -49,6 +51,12 @@ class AuthRepository {
         password: String
     ): Response<LoginResponse> {
         val res = RetrofitInstance.api.login(email, password)
+        return res
+    }
+
+    suspend fun me(context: Context): Response<BaseResponse<User>> {
+        val token = TokenManager(context).getToken()
+        val res = RetrofitInstance.api.me(token)
         return res
     }
 }

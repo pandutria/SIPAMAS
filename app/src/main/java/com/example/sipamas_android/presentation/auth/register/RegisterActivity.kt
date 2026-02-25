@@ -1,6 +1,7 @@
 package com.example.sipamas_android.presentation.auth.register
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -17,7 +18,9 @@ import com.example.sipamas_android.R
 import com.example.sipamas_android.data.repository.AuthRepository
 import com.example.sipamas_android.data.state.State
 import com.example.sipamas_android.databinding.ActivityRegisterBinding
+import com.example.sipamas_android.presentation.auth.login.LoginActivity
 import com.example.sipamas_android.utils.IntenHelper
+import com.example.sipamas_android.utils.Toasthelper
 import java.io.File
 import java.io.FileOutputStream
 
@@ -41,9 +44,14 @@ class RegisterActivity : AppCompatActivity() {
         }
 
     private val filePickerLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
             uri?.let {
                 selectedKtpFile = uriToFile(it)
+                val fileName = getFileName(it)
+
+                binding.layoutRegister.visibility = View.GONE
+                binding.layoutFilePreview.visibility = View.VISIBLE
+                binding.tvFileName.text = fileName
                 Toast.makeText(this, "File dipilih", Toast.LENGTH_SHORT).show()
             }
         }
@@ -57,6 +65,10 @@ class RegisterActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        binding.tvLogin.setOnClickListener {
+            IntenHelper.finish(this)
         }
 
         binding.layoutRegister.setOnClickListener {
@@ -88,13 +100,19 @@ class RegisterActivity : AppCompatActivity() {
                     binding.pbLoading.visibility = View.VISIBLE
                 }
                 is State.Success -> {
-//                    if (state.data.role != "masyarakat") {
-//
-//                    }
-                    Toast.makeText(this, "berhasil", Toast.LENGTH_LONG).show()
+
+                    Toasthelper.show(this, state.message)
+                    IntenHelper.navigate(this, LoginActivity::class.java)
                 }
                 is State.Error -> {
-                    Toast.makeText(this, state.error.toString(), Toast.LENGTH_LONG).show()
+                    Toasthelper.show(this, state.message ?: "Error")
+                    binding.btnRegister.visibility = View.VISIBLE
+                    binding.pbLoading.visibility = View.GONE
+                }
+                else -> {
+                    Toasthelper.show(this, "Error")
+                    binding.btnRegister.visibility = View.VISIBLE
+                    binding.pbLoading.visibility = View.GONE
                 }
             }
         }
@@ -106,17 +124,43 @@ class RegisterActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString()
 
             val file = selectedKtpFile
-            if (file == null) {
-                Toast.makeText(this, "Silakan pilih file KTP terlebih dahulu", Toast.LENGTH_SHORT).show()
+            if (file == null || fullname.isEmpty() || email.isEmpty() || address.isEmpty() || password.isEmpty()) {
+                Toasthelper.show(this, "Semua input wajib di isi")
                 return@setOnClickListener
             }
 
             viewModel.register(fullname, email, address, password, file)
         }
+
+        binding.btnRetakeFile.setOnClickListener {
+            selectedKtpFile = null
+            binding.layoutFilePreview.visibility = View.GONE
+            binding.layoutRegister.visibility = View.VISIBLE
+            binding.tvFileName.text = "-"
+        }
+    }
+
+    private fun getFileName(uri: Uri): String {
+        var name = "file_tidak_diketahui"
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val index = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                if (index != -1) name = it.getString(index)
+            }
+        }
+        return name
     }
 
     private fun openFilePicker() {
-        filePickerLauncher.launch("*")
+        filePickerLauncher.launch(
+            arrayOf(
+                "image/*",
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+        )
     }
 
     private fun uriToFile(uri: Uri): File {
@@ -130,5 +174,16 @@ class RegisterActivity : AppCompatActivity() {
         outputStream.close()
 
         return file
+    }
+
+    @SuppressLint("GestureBackNavigation")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        IntenHelper.finish(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

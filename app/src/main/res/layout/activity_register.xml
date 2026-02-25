@@ -142,8 +142,7 @@
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
                 android:layout_marginTop="5dp"
-                android:drawableEnd="@drawable/ic_eye_close"
-                android:inputType="textPassword"
+                android:inputType="text"
                 android:singleLine="true" />
 
             <TextView
@@ -203,6 +202,47 @@
                 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/layoutFilePreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_cloud"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvFileName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/poppins_medium"
+                    android:maxLines="1"
+                    android:text="-"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btnRetakeFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="Ambil Ulang"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
@@ -224,7 +264,7 @@
                     android:id="@+id/pbLoading"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
                     android:indeterminateTint="@color/primary"
                     android:visibility="gone" />
 
@@ -254,6 +294,7 @@
                 android:textColor="@color/textSecondary"/>
 
             <TextView
+                android:id="@+id/tvLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Masuk Sekarang"

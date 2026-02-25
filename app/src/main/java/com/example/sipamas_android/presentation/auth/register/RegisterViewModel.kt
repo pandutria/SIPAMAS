@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.sipamas_android.data.model.User
 import com.example.sipamas_android.data.repository.AuthRepository
+import com.example.sipamas_android.data.response.BaseResponse
+import com.example.sipamas_android.data.response.LoginResponse
 import com.example.sipamas_android.data.state.State
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -36,10 +39,12 @@ class RegisterViewModel(private val repo: AuthRepository) : ViewModel() {
                         )
                     )
                 } else {
+                    val errorBody = res.errorBody()?.string()
+                    val errorResponse = Gson().fromJson(errorBody, BaseResponse::class.java)
                     _registerState.postValue(
                         State.Error(
-                            message = body?.message ?: "Gagal",
-                            error = body?.error ?: "Error"
+                            message = errorResponse.message ?: "Gagal",
+                            error = errorResponse.error ?: "Error"
                         )
                     )
                 }
