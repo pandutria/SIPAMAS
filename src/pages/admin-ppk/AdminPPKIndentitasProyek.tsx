@@ -58,6 +58,10 @@ export default function AdminPPKIndentitasProyek() {
             key: 'nama',
             label: 'Nama Proyek'
         },
+        {
+            key: 'pengaduan',
+            label: 'Jumlah Pengaduan'
+        },
     ];
 
     if (loading) {

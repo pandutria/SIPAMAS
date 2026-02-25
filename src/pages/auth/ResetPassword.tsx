@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Lock, ArrowLeft, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import logo from "/image/logo/logo-monalisa.png";
+import logo from "/image/logo/logo-sipamas.png";
 import background from "/image/auth/background.jpg";
 import useAuthHooks from '../../hooks/AuthHooks';
 
@@ -32,7 +32,7 @@ export default function ResetPassword() {
 
   return (
     <div
-      className="h-screen flex items-center justify-center p-4 overflow-hidden"
+      className="h-screen font-poppins-medium flex items-center justify-center p-4 overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${background})`,
         backgroundSize: 'cover',
@@ -52,13 +52,9 @@ export default function ResetPassword() {
       >
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-4 mb-4">
-            <ArrowLeft
-              className="w-6 h-6 cursor-pointer hover:scale-90 transition-all text-gray-700"
-              onClick={() => navigate("/login")}
-            />
-            <img src={logo} className='w-auto h-4 mx-auto' />
+            <img src={logo} className='w-auto h-6 mx-auto' />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Reset Kata Sandi</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Reset Kata Sandi</h1>
           <p className="text-gray-600">Masukkan kata sandi baru Anda</p>
         </div>
 
@@ -111,7 +107,7 @@ export default function ResetPassword() {
                 placeholder="Ulangi kata sandi baru"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    handleChangePassword(email as any)
+                    handleChangePassword(email as any, token as any)
                   }
                 }}
               />
@@ -138,9 +134,8 @@ export default function ResetPassword() {
 
           <button
             type="button"
-            onClick={() => handleChangePassword(email as any)}
-            className="w-full text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#f60' }}
+            onClick={() => handleChangePassword(email as any, token as any)}
+            className="w-full text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-primary"
           >
             Reset Kata Sandi
           </button>

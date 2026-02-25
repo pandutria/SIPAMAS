@@ -107,7 +107,7 @@ export default function useAuthHooks() {
         if (name === "password") return setPassword(value);
     }
 
-    const handleChangePassword = async (email: string) => {
+    const handleChangePassword = async (email: string, tokenEmail: string) => {
         try {
             if (!email) {
                 SwalMessage({
@@ -139,9 +139,10 @@ export default function useAuthHooks() {
                 return;
             }
 
-            const response = await API.put('/auth/password/update', {
+            const response = await API.put('/auth/password/reset', {
                 email,
-                password
+                password,
+                token: tokenEmail
             });
 
             SwalMessage({
