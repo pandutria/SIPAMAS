@@ -8,8 +8,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.sipamas_android.MainActivity
 import com.example.sipamas_android.R
+import com.example.sipamas_android.data.local.AuthManager
 import com.example.sipamas_android.presentation.onboarding.OnBoardingActivity
+import com.example.sipamas_android.utils.IntenHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -29,9 +32,12 @@ class SplashActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             delay(3000)
-            val intent = Intent(this@SplashActivity, OnBoardingActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.zoom_fade_in, R.anim.zoom_fade_out)
+            val auth = AuthManager(this@SplashActivity).get()
+            if (auth != null) {
+                IntenHelper.navigate(this@SplashActivity, MainActivity::class.java)
+            } else {
+                IntenHelper.navigate(this@SplashActivity, OnBoardingActivity::class.java)
+            }
             finish()
         }
     }

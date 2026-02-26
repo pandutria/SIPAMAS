@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SIPAMASAndroid"
         android:usesCleartextTraffic="true">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAraSMgBUhKTJS4Ck8RXa5dGM7lgL3OWDI" />
         <activity
             android:name=".presentation.detail.PengaduanDetailActivity"
             android:exported="false" />

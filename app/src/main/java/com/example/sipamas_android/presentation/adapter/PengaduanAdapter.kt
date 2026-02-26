@@ -12,6 +12,7 @@ import com.example.sipamas_android.data.remote.RetrofitInstance
 import com.example.sipamas_android.databinding.ItemPengaduanBinding
 import com.example.sipamas_android.utils.DateHelper
 import com.example.sipamas_android.utils.IdHelper
+import com.example.sipamas_android.utils.LogHelper
 
 class PengaduanAdapter(
     private val list: MutableList<Pengaduan> = mutableListOf(),
@@ -25,25 +26,41 @@ class PengaduanAdapter(
             binding.tvDate.text = DateHelper.format(pengaduan.created_at)
             binding.tvId.text = IdHelper.formatId(pengaduan.id)
 
-            if (pengaduan.medias?.firstOrNull() != null) {
-                val url = RetrofitInstance.baseUrl
-                val imageUrl = url + pengaduan.medias[0].file
+            val media = pengaduan.medias?.firstOrNull()
+            if (media != null && !media.media_file.isNullOrEmpty()) {
+                val baseUrl = RetrofitInstance.baseUrl.replace("api/", "")
+                val filePath = media.media_file!!.replace("\\", "/")
+                val imageUrl = baseUrl + filePath
 
                 Glide.with(binding.root.context)
                     .load(imageUrl)
+                    .placeholder(R.drawable.example_home)
+                    .error(R.drawable.example_home)
                     .into(binding.imgImage)
+
+                LogHelper.log("Loading Image: $imageUrl")
+            } else {
+                binding.imgImage.setImageResource(R.drawable.example_home)
             }
 
-            when (pengaduan.status?.lowercase()) {
-                "menunggu", "pending" -> {
+            when (pengaduan.status) {
+                "Ditolak" -> {
+                    binding.tvStatus.setTextColor(Color.parseColor("#FF0000"))
+                    binding.tvStatus.background = ContextCompat.getDrawable(binding.root.context, R.drawable.bg_status_item_cancel)
+                }
+                "Menunggu" -> {
                     binding.tvStatus.setTextColor(Color.parseColor("#0022FF"))
                     binding.tvStatus.background = ContextCompat.getDrawable(binding.root.context, R.drawable.bg_status_item_pending)
                 }
-                "diproses", "proses" -> {
+                "Diterima" -> {
+                    binding.tvStatus.setTextColor(Color.parseColor("#009EB0"))
+                    binding.tvStatus.background = ContextCompat.getDrawable(binding.root.context, R.drawable.bg_status_item_accept)
+                }
+                "Diproses" -> {
                     binding.tvStatus.setTextColor(Color.parseColor("#FF8400"))
                     binding.tvStatus.background = ContextCompat.getDrawable(binding.root.context, R.drawable.bg_status_item_process)
                 }
-                "selesai", "done" -> {
+                "Selesai" -> {
                     binding.tvStatus.setTextColor(Color.parseColor("#00B112"))
                     binding.tvStatus.background = ContextCompat.getDrawable(binding.root.context, R.drawable.bg_status_item_done)
                 }
@@ -53,7 +70,9 @@ class PengaduanAdapter(
                 }
             }
 
-            onClick(pengaduan)
+            binding.root.setOnClickListener {
+                onClick(pengaduan)
+            }
         }
     }
 
