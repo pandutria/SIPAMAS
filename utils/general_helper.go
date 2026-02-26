@@ -54,8 +54,7 @@ func ZeroIfEmpty(s string) *uint {
 		return nil
 	}
 
-	value := uint(0)
-	return &value
+	return nil
 }
 
 func SetIfNotEmpty(dest **string, val string) {

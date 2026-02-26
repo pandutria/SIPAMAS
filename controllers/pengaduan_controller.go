@@ -96,16 +96,16 @@ func CreatePengaduan(c *gin.Context) {
 	}
 
 	data := models.Pengaduan{
-		Kategori:           utils.NilIfEmpty(req.Kategori),
-		Judul:              utils.NilIfEmpty(req.Judul),
-		Deskripsi:          utils.NilIfEmpty(req.Deskripsi),
-		Alamat:             utils.NilIfEmpty(req.Alamat),
-		Latitude:           utils.NilIfEmpty(req.Latitude),
-		Longitude:          utils.NilIfEmpty(req.Longitude),
-		IdentitasPronyekId: &req.IdentitasProyekId,
-		Catatan:            utils.NilIfEmpty(req.Catatan),
-		Status:             "Menunggu",
-		CreatedById:        user.ID,
+		Kategori:          utils.NilIfEmpty(req.Kategori),
+		Judul:             utils.NilIfEmpty(req.Judul),
+		Deskripsi:         utils.NilIfEmpty(req.Deskripsi),
+		Alamat:            utils.NilIfEmpty(req.Alamat),
+		Latitude:          utils.NilIfEmpty(req.Latitude),
+		Longitude:         utils.NilIfEmpty(req.Longitude),
+		IdentitasProyekId: utils.ZeroIfEmpty(utils.ToString(req.IdentitasProyekId)),
+		Catatan:           utils.NilIfEmpty(req.Catatan),
+		Status:            "Menunggu",
+		CreatedById:       user.ID,
 	}
 
 	if err := query.Create(&data).Error; err != nil {
@@ -116,8 +116,58 @@ func CreatePengaduan(c *gin.Context) {
 		return
 	}
 
+	judul := "Laporan Menunggu Verifikasi"
+	keterangan := "Laporan Anda telah berhasil dikirim dan saat ini sedang menunggu proses verifikasi oleh tim terkait."
+
+	timeline := models.PengaduanTimeline{
+		PengaduanId: data.ID,
+		Judul:       &judul,
+		Keterangan:  &keterangan,
+		CreatedById: data.CreatedById,
+	}
+
+	if err := query.Create(&timeline).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Membuat data gagal",
+			"error": err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
+		"data":    data,
+	})
+}
+
+func UpdatePengaduan(c *gin.Context) {
+	query := config.DB
+	id := c.Param("id")
+	var req dtos.UpdatePengaduan
+	if components.BindRequest(c, &req) == false {
+		return
+	}
+
+	var data models.Pengaduan
+
+	if err := query.First(&data, id).Error; err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Mengubah data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Model(&data).Update("identitas_proyek_id", req.IdentitasProyekId).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Mengubah data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Mengubah data berhasil",
 		"data":    data,
 	})
 }

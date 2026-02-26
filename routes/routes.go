@@ -77,6 +77,7 @@ func SetupRoutes(r *gin.Engine) {
 		private.GET("/pengaduan", controllers.GetAllPengaduan)
 		private.GET("/pengaduan/:id", controllers.GetPengaduanById)
 		private.POST("/pengaduan/create", controllers.CreatePengaduan)
+		private.PUT("/pengaduan/update/identitas/:id", controllers.UpdatePengaduan)
 		private.PUT("/pengaduan/status/update/:id", controllers.UpdateStatusPengaduan)
 		private.DELETE("/pengaduan/delete/:id", controllers.DeletePengaduan)
 

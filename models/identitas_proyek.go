@@ -29,7 +29,7 @@ type IdentitasProyek struct {
 	UpdatedAt           time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 
 	CreatedBy *User                      `gorm:"foreignKey:CreatedById" json:"created_by"`
-	Photos    []*IdentitasProyekPhoto    `gorm:"foreignKey:identitas_proyek_id" json:"photos"`
-	Documents []*IdentitasProyekDocument `gorm:"foreignKey:identitas_proyek_id" json:"documents"`
-	Pengaduan []*Pengaduan               `gorm:"foreignKey:IdentitasPronyekId" json:"pengaduan"`
+	Photos    []*IdentitasProyekPhoto    `gorm:"foreignKey:IdentitasProyekId " json:"photos"`
+	Documents []*IdentitasProyekDocument `gorm:"foreignKey:IdentitasProyekId " json:"documents"`
+	Pengaduan []*Pengaduan               `gorm:"foreignKey:IdentitasProyekId" json:"pengaduan"`
 }
