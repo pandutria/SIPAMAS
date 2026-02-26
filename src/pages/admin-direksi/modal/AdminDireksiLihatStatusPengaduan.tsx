@@ -207,6 +207,7 @@ export default function AdminDireksiLihatStatusPengaduan({ isOpen, onClose, data
                         />
                         <InfoField label="Judul Laporan" value={data.judul ?? "-"} />
                         <InfoField label="Kategori Laporan" value={data.kategori ?? "-"} />
+                        <InfoField label="Nama Pelapor" value={data.created_by?.fullname ?? "-"} />
                         <InfoField
                             label="Tanggal Pelaporan"
                             value={new Date(data.created_at).toLocaleDateString("id-ID", {

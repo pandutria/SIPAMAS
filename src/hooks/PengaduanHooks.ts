@@ -12,12 +12,12 @@ export default function usePengaduanHooks() {
     const [selectedPengaduanId, setSelectedPengaduanId] = useState<number | null>(null);
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
+    const [projectIdentityForm, setProjectIdentityForm] = useState("");
     const [pengaduanForm, setPengaduanForm] = useState({
         kategori: "",
         judul: "",
         deskripsi: "",
         alamat: "",
-        identitas_proyek_id: "",
     });
     const [pengaduanReviewForm, setPengaduanReviewForm] = useState({
         catatan: "",
@@ -36,6 +36,7 @@ export default function usePengaduanHooks() {
                 const data = response.data.data;
                 const mappingData = data.map((item: PengaduanProps) => ({
                     ...item,
+                    nama: item.created_by!.fullname,
                     kontak: item?.created_by!.phone_number,
                 }))
 
@@ -77,7 +78,6 @@ export default function usePengaduanHooks() {
             formData.append("judul", pengaduanForm.judul);
             formData.append("deskripsi", pengaduanForm.deskripsi);
             formData.append("alamat", pengaduanForm.alamat);
-            formData.append("identitas_proyek_id", pengaduanForm.identitas_proyek_id);
             formData.append("longitude", "");
             formData.append("latitude", "");
             
@@ -163,6 +163,35 @@ export default function usePengaduanHooks() {
         }
     }
 
+    const handlePengaduanSetProjectIdentity = async() => {
+        try {
+            SwalLoading();
+            const formData = new FormData();
+            formData.append("identitas_proyek_id", String(projectIdentityForm));
+
+            const response = await API.put(`/pengaduan/update/identitas/${projectIdentityForm}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const message = response.data.message;
+            SwalMessage({
+                type: "success",
+                title: "Berhasil!",
+                text: message
+            });
+        } catch (error) {
+            if (error) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Terjadi Kesalahan!"
+                })
+            }
+        }
+    }
+
     const handlePengaduanReviewPost = async(id: number) => {
         try {
             SwalLoading();
@@ -214,6 +243,9 @@ export default function usePengaduanHooks() {
         handlePengaduanStatusPut,
         pengaduanReviewForm,
         handleChangePengaduanReviewForm,
-        handlePengaduanReviewPost
+        handlePengaduanReviewPost,
+        handlePengaduanSetProjectIdentity,
+        projectIdentityForm,
+        setProjectIdentityForm
     }
 }

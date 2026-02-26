@@ -44,6 +44,7 @@ import LokasiProyek from "../pages/LokasiProyek"
 import Register from "../pages/auth/Register"
 import SuperAdminVerifikasiPengguna from "../pages/superadmin/SuperAdminVerifikasiPengguna"
 import AdminDireksiPengaduanMasyarakat from "../pages/admin-direksi/AdminDireksiPengaduanMasyarakat"
+import AdminPPKPengaduanMasyarakat from "../pages/admin-ppk/AdminPPKPengaduanMasyarakat"
 
 export default function Router() {
   return (
@@ -102,6 +103,8 @@ export default function Router() {
         <Route path="/admin-direksi/evaluasi/lihat/:id" element={<AdminDireksiEvaluasiUpdateView/>}/>
 
         {/* Admin PPK */}
+        <Route path="/admin-ppk/pengaduan-masyarakat" element={<AdminPPKPengaduanMasyarakat/>}/>
+
         <Route path="/admin-ppk/identitas-proyek" element={<AdminPPKIndentitasProyek/>}/>
         <Route path="/admin-ppk/identitas-proyek/lihat/:id" element={<AdminPPKIdentitasProyekUpdateView/>}/>
 

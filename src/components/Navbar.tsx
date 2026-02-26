@@ -43,6 +43,7 @@ const navConfig: Record<string, { dashboardPath: string; dropdownLabel: string; 
     dashboardPath: '/',
     dropdownLabel: 'Laporan Saya',
     dropdownItems: [
+      { label: 'Pengaduan Masyarakat', path: '/admin-ppk/pengaduan-masyarakat' },
       { label: 'Identitas Proyek', path: '/admin-ppk/identitas-proyek' },
       { label: 'Rencana Anggaran', path: '/admin-ppk/rencana-anggaran' },
       { label: 'Jadwal Pelaksanaan', path: '/admin-ppk/jadwal-pelaksanaan' },

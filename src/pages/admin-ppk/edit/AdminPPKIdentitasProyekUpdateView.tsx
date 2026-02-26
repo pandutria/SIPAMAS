@@ -107,7 +107,7 @@ function PengaduanCard({ item }: { item: any }) {
             <div className="p-5">
                 <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0 mt-0.5">
                             <MessageSquareWarning size={15} className="text-orange-500" />
                         </div>
                         <div className="min-w-0">
@@ -119,7 +119,7 @@ function PengaduanCard({ item }: { item: any }) {
                             </p>
                         </div>
                     </div>
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-poppins-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${statusCfg.badge}`}>
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-poppins-semibold px-2.5 py-1 rounded-full shrink-0 ${statusCfg.badge}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
                         {statusCfg.label}
                     </span>

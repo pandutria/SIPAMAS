@@ -8,8 +8,7 @@ import usePengaduanHooks from '../../hooks/PengaduanHooks';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../ui/LoadingSpinner';
 import { Navigate } from 'react-router-dom';
-import AdminDireksiUbahStatusPengaduan from './modal/AdminDireksiUbahStatusPengaduan';
-import AdminDireksiLihatStatusPengaduan from './modal/AdminDireksiLihatStatusPengaduan';
+import AdminPPKLihatStatusPengaduan from './edit/AdminPPKLihatStatusPengaduan';
 
 function resolveStatus(raw: string): string {
     const s = raw.toLowerCase().trim().replace(/[_ ]/g, "");
@@ -101,19 +100,16 @@ const statCards = [
     },
 ];
 
-export default function AdminDireksiPengaduanMasyarakat() {
+export default function AdminPPKPengaduanMasyarakat() {
     const [search, setSearch] = useState("");
     const { pengaduanData } = usePengaduanHooks();
-    const [showModalEdit, setShowModalEdit] = useState(false);
-    const [showModalPreview, setShowModalPreview] = useState(false);
-    const [selectedEdit, setSelectedEdit] = useState<PengaduanProps | null>(null);
+    const [showModal, setShowModal] = useState(false);
     const [selectedPreview, setSelectedPreview] = useState<PengaduanProps | null>(null);
     const [pengaduanDataFilter, setPengaduanDataFIlter] = useState<PengaduanProps[]>([]);
     const { user, loading } = useAuth();
 
     useEffect(() => {
-        if (selectedEdit) setShowModalEdit(true);
-        if (selectedPreview) setShowModalPreview(true);
+        if (selectedPreview) setShowModal(true);
 
         const filtered = pengaduanData.filter((item) => {
             const matcheTitle = item.judul?.toLowerCase()?.includes(search.toLowerCase());
@@ -122,7 +118,7 @@ export default function AdminDireksiPengaduanMasyarakat() {
         });
 
         setPengaduanDataFIlter(filtered);
-    }, [pengaduanData, search, selectedEdit, selectedPreview]);
+    }, [pengaduanData, search, selectedPreview]);
 
     const stats = {
         total: pengaduanDataFilter.length,
@@ -143,22 +139,16 @@ export default function AdminDireksiPengaduanMasyarakat() {
     ];
 
     if (loading) return <LoadingSpinner />;
-    if (!user || user.role != "admin-direksi") return <Navigate to="/" replace />;
+    if (!user || user.role != "admin-ppk") return <Navigate to="/" replace />;
 
     return (
         <div>
             <Navbar />
 
-            <AdminDireksiLihatStatusPengaduan
-                isOpen={showModalPreview}
-                onClose={() => { setShowModalPreview(false); setSelectedPreview(null); }}
+            <AdminPPKLihatStatusPengaduan
+                isOpen={showModal}
+                onClose={() => { setShowModal(false); setSelectedPreview(null); }}
                 data={selectedPreview as any}
-            />
-
-            <AdminDireksiUbahStatusPengaduan
-                isOpen={showModalEdit}
-                onClose={() => { setShowModalEdit(false); setSelectedEdit(null); }}
-                data={selectedEdit as any}
             />
 
             <div className="pt-28" data-aos="fade-up" data-aos-duration="1000">
@@ -202,9 +192,8 @@ export default function AdminDireksiPengaduanMasyarakat() {
                         columns={columns}
                         data={pengaduanDataFilter}
                         isSelect={false}
-                        showEdit={true}
+                        showEdit={false}
                         showPreview={true}
-                        onEdit={setSelectedEdit}
                         onPreview={setSelectedPreview}
                     />
                 </div>

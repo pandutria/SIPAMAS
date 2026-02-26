@@ -8,6 +8,8 @@ import { BASE_URL_FILE } from "../../../server/API";
 import FormSelect from "../../../ui/FormSelect";
 import SubmitButton from "../../../ui/SubmitButton";
 import usePengaduanHooks from "../../../hooks/PengaduanHooks";
+import useProjectIdentity from "../../../hooks/ProjectIdentity";
+import { SwalMessage } from "../../../utils/SwalMessage";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
@@ -151,7 +153,13 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
     const [lightbox, setLightbox] = useState<string | null>(null);
     const [visible, setVisible] = useState(false);
     const [status, setStatus] = useState("");
-    const { handlePengaduanStatusPut } = usePengaduanHooks();
+    const { projectIdentityData } = useProjectIdentity();
+    const {
+        handlePengaduanStatusPut,
+        handlePengaduanSetProjectIdentity,
+        projectIdentityForm,
+        setProjectIdentityForm
+    } = usePengaduanHooks();
 
     useEffect(() => {
         if (isOpen) {
@@ -161,8 +169,11 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
             setVisible(false);
             document.body.style.overflow = "auto";
         }
+        
+        setProjectIdentityForm(String(data?.identitas_proyek_id));
+        setStatus(String(data?.status));
         return () => { document.body.style.overflow = "auto"; };
-    }, [isOpen]);
+    }, [isOpen, data, setProjectIdentityForm, setStatus]);
 
     if (!isOpen) return null;
 
@@ -211,6 +222,7 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
                         />
                         <InfoField label="Judul Laporan" value={data.judul ?? "-"} />
                         <InfoField label="Kategori Laporan" value={data.kategori ?? "-"} />
+                        <InfoField label="Nama Pelapor" value={data.created_by?.fullname ?? "-"} />
                         <InfoField
                             label="Tanggal Pelaporan"
                             value={new Date(data.created_at).toLocaleDateString("id-ID", {
@@ -301,7 +313,7 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
 
                     <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent" />
 
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-6">
                         <SectionHeader title="Ubah Status Laporan" />
 
                         <FormSelect
@@ -311,6 +323,16 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
                         >
                             {statusOptions.map((item) => (
                                 <option key={item.id} value={item.text}>{item.text}</option>
+                            ))}
+                        </FormSelect>
+
+                        <FormSelect
+                            title="Proyek Terkait"
+                            value={projectIdentityForm}
+                            onChange={(e) => setProjectIdentityForm(e.target.value)}
+                        >
+                            {projectIdentityData.map((item) => (
+                                <option key={item.id} value={item.id}>{`${item.nama} - ${item.kecamatan}, ${item.kelurahan} Tahun ${item.tahun_anggaran}`}</option>
                             ))}
                         </FormSelect>
 
@@ -346,7 +368,18 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
 
                     <SubmitButton
                         text="Simpan Perubahan"
-                        onClick={() => handlePengaduanStatusPut(status, null, data.id)}
+                        onClick={() => {
+                            if (status && projectIdentityForm) {
+                                handlePengaduanSetProjectIdentity()
+                                handlePengaduanStatusPut(status, null, data.id)
+                            } else {
+                                SwalMessage({
+                                    type: "error",
+                                    title: "Gagal!",
+                                    text: "Seluruh field wajib diisi!"
+                                })
+                            }
+                        }}
                     />
 
                     <div className="h-2" />

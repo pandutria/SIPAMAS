@@ -139,6 +139,7 @@ export default function SuperAdminManajemenLaporan() {
         { key: "id", label: "No" },
         { key: "judul", label: "Judul Pengaduan" },
         { key: "kategori", label: "Kategori" },
+        { key: "nama", label: "Nama Pelapor" },
         { key: "kontak", label: "Kontak" },
         { key: "status", label: "Status" },
     ];
