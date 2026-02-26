@@ -1,0 +1,95 @@
+package routes
+
+import (
+	"gin-gorm/controllers"
+	"gin-gorm/middlewares"
+
+	"github.com/gin-gonic/gin"
+)
+
+func SetupRoutes(r *gin.Engine) {
+	public := r.Group("/api")
+	{
+		public.POST("/user/create", controllers.CreateUser)
+		public.POST("/auth/login", controllers.Login)
+		public.POST("/auth/register", controllers.Register)
+		public.GET("/identitas-proyek", controllers.GetAllIdentitas)
+		public.GET("/realisasi", controllers.GetAllRealisasiHeader)
+		public.POST("/auth/password/request", controllers.RequestResetPassword)
+		public.PUT("/auth/password/reset", controllers.ResetPassword)
+	}
+
+	private := r.Group("/api")
+	private.Use(middlewares.BearerAuth())
+	{
+		private.GET("/auth/me", controllers.Me)
+		private.PUT("/auth/profile/update", controllers.UpdateProfile)
+
+		private.GET("/user", controllers.GetAllUser)
+		private.PUT("/user/update/:id", controllers.UpdateUser)
+
+		private.GET("/identitas-proyek/:id", controllers.GetIdentitasById)
+		private.POST("/identitas-proyek/create", controllers.CreateIdentitas)
+		private.PUT("/identitas-proyek/update/:id", controllers.UpdateIdentitas)
+		private.DELETE("/identitas-proyek/delete/:id", controllers.DeleteIdentitas)
+
+		private.GET("/identitas-proyek/photo", controllers.GetAllIdentitasProyekPhoto)
+		private.GET("/identitas-proyek/photo/:id", controllers.GetIdentitasProyekPhotoById)
+		private.POST("/identitas-proyek/photo/create", controllers.CreateIdentitasProyekPhoto)
+		private.DELETE("/identitas-proyek/photo/delete/:id", controllers.DeleteIdentitasProyekPhoto)
+
+		private.GET("/identitas-proyek/document", controllers.GetAllIdentitasProyekDocument)
+		private.GET("/identitas-proyek/document/:id", controllers.GetIdentitasProyekDocumentById)
+		private.POST("/identitas-proyek/document/create", controllers.CreateIdentitasProyekDocument)
+		private.DELETE("/identitas-proyek/document/delete/:id", controllers.DeleteIdentitasProyekDocument)
+
+		private.GET("/rab", controllers.GetAllRabHader)
+		private.GET("/rab/:id", controllers.GetRabHaderById)
+		private.POST("/rab/create", controllers.CreateRabHeader)
+		private.DELETE("/rab/delete/:id", controllers.DeleteRab)
+
+		private.GET("/rab/detail", controllers.GetAllRabDetail)
+		private.POST("/rab/detail/create", controllers.CreateRabDetail)
+
+		private.GET("/schedule", controllers.GetAllScheduleHeader)
+		private.GET("/schedule/:id", controllers.GetScheduleHeaderById)
+		private.POST("/schedule/create", controllers.CreateScheduleHeader)
+		private.DELETE("/schedule/delete/:id", controllers.DeleteSchedule)
+
+		private.GET("/schedule/item", controllers.GetAllScheduleItem)
+		private.POST("/schedule/item/create", controllers.CreateScheduleItem)
+
+		private.GET("/schedule/week", controllers.GetAllScheduleWeek)
+		private.POST("/schedule/week/create", controllers.CreateScheduleWeek)
+
+		private.GET("/realisasi/:id", controllers.GetRealisasiById)
+		private.POST("/realisasi/create", controllers.CreateRealisasiHeader)
+		private.DELETE("/realisasi/delete/:id", controllers.DeleteRealisasi)
+
+		private.GET("/realisasi/detail", controllers.GetAllRealisasiDetail)
+		private.POST("/realisasi/detail/create", controllers.CreateRealisasiDetail)
+
+		private.GET("/evaluasi", controllers.GetAllEvaluasi)
+		private.GET("/evaluasi/:id", controllers.GetEvaluasiById)
+		private.POST("/evaluasi/create", controllers.CreateEvaluasi)
+		private.DELETE("/evaluasi/delete/:id", controllers.DeleteEvaluasi)
+
+		private.GET("/pengaduan", controllers.GetAllPengaduan)
+		private.GET("/pengaduan/:id", controllers.GetPengaduanById)
+		private.POST("/pengaduan/create", controllers.CreatePengaduan)
+		private.PUT("/pengaduan/update/identitas/:id", controllers.UpdatePengaduan)
+		private.PUT("/pengaduan/status/update/:id", controllers.UpdateStatusPengaduan)
+		private.DELETE("/pengaduan/delete/:id", controllers.DeletePengaduan)
+
+		private.GET("/pengaduan/media", controllers.GetAllPengaduanMedia)
+		private.POST("/pengaduan/media/create", controllers.CreatePengaduanMedia)
+		private.DELETE("/pengaduan/media/delete/:id", controllers.DeletePengaduanMedia)
+
+		private.GET("/pengaduan/timeline", controllers.GetAllPengaduanTimeLine)
+		private.DELETE("/pengaduan/timeline/delete/:id", controllers.DeletePengaduanTimeline)
+
+		private.GET("/pengaduan/review", controllers.GetAllPengaduanReview)
+		private.POST("/pengaduan/review/create", controllers.CreatePengaduanReview)
+		private.DELETE("/pengaduan/review/delete/:id", controllers.DeletePengaduanReview)
+	}
+}
