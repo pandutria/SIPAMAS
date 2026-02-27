@@ -3,6 +3,7 @@ package main
 import (
 	"gin-gorm/config"
 	"gin-gorm/models"
+	"gin-gorm/utils"
 )
 
 func main() {
@@ -26,4 +27,30 @@ func main() {
 		&models.PengaduanTimeline{},
 		&models.PengaduanReview{},
 	)
+
+	SeedSuperAdmin()
+}
+
+func SeedSuperAdmin() {
+	var user models.User
+
+	email := "superadmin"
+
+	err := config.DB.Where("email = ?", email).First(&user).Error
+	if err == nil {
+		return
+	}
+
+	password := "SuperAdminss7617&"
+	role := "superadmin"
+	isActive := "true"
+
+	superAdmin := models.User{
+		Email:    &email,
+		Password: utils.HashSHA512(password),
+		Role:     &role,
+		IsActive: &isActive,
+	}
+
+	config.DB.Create(&superAdmin)
 }

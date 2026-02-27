@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,19 @@ func GetAllUser(c *gin.Context) {
 	})
 }
 
+func isValidPassword(password string) bool {
+	if len(password) < 8 {
+		return false
+	}
+
+	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
+	hasLower := regexp.MustCompile(`[a-z]`).MatchString(password)
+	hasNumber := regexp.MustCompile(`[0-9]`).MatchString(password)
+	hasSymbol := regexp.MustCompile(`[^a-zA-Z0-9]`).MatchString(password)
+
+	return hasUpper && hasLower && hasNumber && hasSymbol
+}
+
 func CreateUser(c *gin.Context) {
 	query := config.DB
 
@@ -43,6 +57,13 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Membuat data gagal",
 			"error":   err.Error(),
+		})
+		return
+	}
+
+	if !isValidPassword(req.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Password minimal 8 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan simbol.",
 		})
 		return
 	}
@@ -135,6 +156,13 @@ func UpdateProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Membuat data gagal",
 			"error":   err.Error(),
+		})
+		return
+	}
+
+	if !isValidPassword(req.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Password minimal 8 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan simbol.",
 		})
 		return
 	}
@@ -317,6 +345,13 @@ func Register(c *gin.Context) {
 
 	var req dtos.Register
 	if components.BindRequest(c, &req) == false {
+		return
+	}
+
+	if !isValidPassword(req.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Password minimal 8 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan simbol.",
+		})
 		return
 	}
 
