@@ -1,0 +1,363 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "poppins-regular";
+    src: url('../public/fonts/Poppins-Regular.ttf');
+}
+
+@font-face {
+    font-family: "poppins-medium";
+    src: url('../public/fonts/Poppins-Medium.ttf');
+}
+
+@font-face {
+    font-family: "poppins-semibold";
+    src: url('../public/fonts/Poppins-SemiBold.ttf');
+}
+
+@font-face {
+    font-family: "poppins-bold";
+    src: url('../public/fonts/Poppins-Bold.ttf');
+}
+
+@theme {
+    --font-poppins-regular: "poppins-regular";
+    --font-poppins-medium: "poppins-medium";
+    --font-poppins-semibold: "poppins-semibold";
+    --font-poppins-bold: "poppins-bold";
+    --color-primary: #00BF50;
+    --color-secondary: #005925;
+    --color-third: #00692C;
+    --color-hover: #00BF50;
+    /* --color-primary: #1E40AF;
+    --color-secondary: #1E3A8A;
+    --color-third: #3B82F6;
+    --color-hover: #DBEAFE; */
+    /* --color-primary: #991B1B;
+    --color-secondary: #7F1D1D;
+    --color-third: #DC2626;
+    --color-hover: #FEE2E2; */
+}
+
+.swal-z-top {
+    z-index: 99999999 !important;
+    font-family: "poppins-regular";
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+    height: 0;
+    display: none;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes infoPanelIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes listItemIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes statsIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.list-item-anim {
+    animation: listItemIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.stats-card {
+    animation: statsIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #fff7ed;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff6600 0%, #ff8533 100%);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ff8533 0%, #ff6600 100%);
+}
+
+.bounce {
+    animation: smoothBounce 8s infinite ease-out;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes logoPop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes borderExpand {
+    from {
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    to {
+        width: 7rem;
+        height: 7rem;
+        opacity: 1;
+    }
+}
+
+@keyframes smoothBounce {
+    0% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-12px);
+    }
+
+    65% {
+        transform: translateY(0);
+    }
+
+    80% {
+        transform: translateY(-6px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: 0.7;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.row-animate {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.row-animate.visible {
+    animation: fadeSlideIn 0.35s ease forwards;
+}
+
+.btn-action {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.btn-action::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.btn-action:hover::after {
+    transform: translateX(100%);
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-action:active {
+    transform: translateY(0px) scale(0.97);
+}
+
+.page-btn {
+    transition: all 0.2s ease;
+}
+
+.page-btn:not(:disabled):hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.page-btn:not(:disabled):active {
+    transform: scale(0.97);
+}
+
+.header-th {
+    position: relative;
+    overflow: hidden;
+}
+
+.header-th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--color-primary, #3b82f6);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.header-th:hover::after {
+    width: 80%;
+}
+
+.checkbox-custom {
+    transition: all 0.2s ease;
+}
+
+.checkbox-custom:checked {
+    animation: pulse-dot 0.3s ease;
+}
+
+.float-icon {
+    animation: float 3s ease-in-out infinite;
+}
+
+.select-animated {
+    transition: all 0.2s ease;
+}
+
+.select-animated:focus {
+    transform: scale(1.02);
+}
