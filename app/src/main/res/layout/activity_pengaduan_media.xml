@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".presentation.pengaduan.PengaduanActivity">
+    tools:context=".presentation.pengaduan.media.PengaduanMediaActivity">
 
     <RelativeLayout
         android:id="@+id/header"
@@ -55,13 +55,14 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="7dp"
-                android:background="@drawable/bg_line_green_no_rounded"/>
+                android:background="@drawable/bg_line_green"/>
 
             <View
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="7dp"
-                android:background="@drawable/bg_line_green_no_rounded"/>
+                android:visibility="invisible"
+                android:background="@drawable/bg_line_green"/>
 
         </LinearLayout>
 
@@ -76,33 +77,117 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
             android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sertakan Bukti Visual"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="20sp"
+                android:textColor="@color/textPrimary"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="15dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:text="Mohon lampirkan foto atau video yang jelas untuk mempercepat proses verifikas laporan anda."
+                android:fontFamily="@font/poppins_medium"
+                android:textSize="13sp"
+                android:textColor="@color/textSecondary"/>
+
+            <LinearLayout
+                android:id="@+id/layoutTakePhoto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_input"
+                android:layout_marginHorizontal="15dp"
+                android:paddingHorizontal="17dp"
+                android:paddingVertical="15dp"
+                android:gravity="center_vertical"
+                android:layout_marginTop="15dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@drawable/ic_camera_green"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ambil Foto/Video"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="17sp"
+                        android:textColor="@color/textPrimary"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gunakan kamera langsung"
+                        android:fontFamily="@font/poppins_medium"
+                        android:textSize="12sp"
+                        android:layout_marginTop="-5dp"
+                        android:textColor="@color/textSecondary"/>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_arror_right_grey"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="15dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginTop="15dp">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lampiran Media"
+                    android:text="Media Terpilih"
                     android:fontFamily="@font/poppins_semibold"
                     android:textSize="17sp"
                     android:textColor="@color/textPrimary"/>
 
                 <TextView
+                    android:id="@+id/tvCountMedia"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="(0/3)"
+                    android:textColor="#929292"
+                    android:textSize="13sp"
+                    android:layout_marginLeft="5dp"
+                    android:fontFamily="@font/poppins_medium"/>
+
+                <TextView
+                    android:id="@+id/tvDeleteAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Edit"
+                    android:text="Hapus Semua"
                     android:fontFamily="@font/poppins_medium"
                     android:textSize="14sp"
-                    android:textColor="@color/primary"/>
+                    android:textColor="#FF0000"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
             </LinearLayout>
 
@@ -240,99 +325,101 @@
 
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Kategori Masalah"
-                android:fontFamily="@font/poppins_semibold"
-                android:textSize="17sp"
-                android:layout_marginHorizontal="15dp"
-                android:layout_marginTop="15dp"
-                android:textColor="@color/textPrimary"/>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginHorizontal="15dp"
+                android:background="@drawable/bg_tips"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="15dp"
                 android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_category_unselected"
-                    android:paddingVertical="15dp"
-                    android:orientation="vertical">
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_lamp"/>
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_jalan_rusak_unselected"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Jalan Rusak"
-                        android:fontFamily="@font/poppins_medium"
-                        android:textSize="13sp"
-                        android:layout_marginTop="5dp"
-                        android:textColor="#6C7278"/>
+                        android:text="Tips Foto Pelaporan"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:textSize="15sp"
+                        android:textColor="@color/textPrimary"/>
 
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:background="@drawable/bg_category_unselected"
-                    android:paddingVertical="15dp"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_jalan_rusak_unselected"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Sampah"
-                        android:fontFamily="@font/poppins_medium"
-                        android:textSize="13sp"
                         android:layout_marginTop="5dp"
-                        android:textColor="#6C7278"/>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="5dp"
+                            android:layout_height="5dp"
+                            android:src="@drawable/ic_circle_grey"/>
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pastikan objek masalah terlihat jelas."
+                            android:fontFamily="@font/poppins_medium"
+                            android:layout_marginLeft="7dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/textSecondary"/>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_category_unselected"
-                    android:paddingVertical="15dp"
-                    android:orientation="vertical">
+                    </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_jalan_rusak_unselected"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Banjir"
-                        android:fontFamily="@font/poppins_medium"
-                        android:textSize="13sp"
-                        android:layout_marginTop="5dp"
-                        android:textColor="#6C7278"/>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="5dp"
+                            android:layout_height="5dp"
+                            android:src="@drawable/ic_circle_grey"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ambil foto dari beberapa sudut jika perlu."
+                            android:fontFamily="@font/poppins_medium"
+                            android:layout_marginLeft="7dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/textSecondary"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="5dp"
+                            android:layout_height="5dp"
+                            android:src="@drawable/ic_circle_grey"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hindari foto yang buram atau terlalu gelap"
+                            android:fontFamily="@font/poppins_medium"
+                            android:layout_marginLeft="7dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/textSecondary"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

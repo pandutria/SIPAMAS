@@ -9,11 +9,13 @@ import androidx.fragment.app.viewModels
 import com.example.sipamas_android.R
 import com.example.sipamas_android.data.local.AuthManager
 import com.example.sipamas_android.data.model.Pengaduan
+import com.example.sipamas_android.data.model.PengaduanMedia
 import com.example.sipamas_android.data.repository.PengaduanRepository
 import com.example.sipamas_android.data.state.State
 import com.example.sipamas_android.databinding.FragmentHomeBinding
 import com.example.sipamas_android.presentation.adapter.PengaduanAdapter
 import com.example.sipamas_android.presentation.detail.PengaduanDetailActivity
+import com.example.sipamas_android.presentation.pengaduan.media.PengaduanMediaActivity
 import com.example.sipamas_android.utils.IntenHelper
 import com.example.sipamas_android.utils.Toasthelper
 
@@ -50,6 +52,10 @@ class HomeFragment : Fragment() {
 
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.getPengaduan(requireContext())
+        }
+
+        binding.btnBuatLaporan.setOnClickListener {
+            IntenHelper.navigate(requireActivity(), PengaduanMediaActivity::class.java)
         }
 
         viewModel.getPengaduan(requireContext())
@@ -109,5 +115,10 @@ class HomeFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
