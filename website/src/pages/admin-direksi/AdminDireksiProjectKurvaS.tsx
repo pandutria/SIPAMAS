@@ -309,7 +309,7 @@ export default function AdminDireksiProjectKurvaS() {
             </div>
             <TableHeader
               title="Data Tender Dari Realisasi"
-              type='pokja'
+              type="user"
               showHapus={false}
               showTambah={false}
               searchValue={search}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
 import useUserHooks from '../../hooks/UserHooks'
 import logo from "/image/logo/logo-sipamas.png"
