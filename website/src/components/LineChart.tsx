@@ -43,7 +43,7 @@ export default function LineChart({ selectedRealization }: LineChartProps) {
     const plannedValue = PlannedProgressUntilWeek(scheduleAggreateWeeks, String(latestRealization?.schedule?.tanggal_mulai));
     const totalPlanned = RemainingProgress(scheduleAggreateWeeks);
     const scheduleProgress = ConvertToPercent(plannedValue, totalPlanned);
-    const actualProgress = ConvertToPercent(RemainingProgress(latestRealization?.detail), RemainingProgress(scheduleAggreateWeeks)) ?? 0;
+    const actualProgress = ConvertToPercent(RemainingProgress(latestRealization?.details), RemainingProgress(scheduleAggreateWeeks)) ?? 0;
     const kurvaData = buildKurvaData(latestRealization?.schedule, latestRealization as any);
     const deviation = actualProgress - scheduleProgress;
     const isAhead = deviation >= 0;

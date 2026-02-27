@@ -6,7 +6,6 @@ import FormInput from "../../../ui/FormInput";
 import ShowTableForm from "../../../ui/ShowTableForm";
 import { useEffect, useState } from "react";
 import useEvaluasiHooks from "../../../hooks/EvaluasiHooks";
-import type { EvaluasiProps } from "../../../types/global";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
 import { SortDescById } from "../../../utils/SortDescById";

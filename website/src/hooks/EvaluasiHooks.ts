@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { SwalMessage } from "../utils/SwalMessage";
 import API from "../server/API";
 import { useNavigate } from "react-router-dom";
-import type { EvaluasiProps } from "../types/global";
 import SwalLoading from "../utils/SwalLoading";
 
 export default function useEvaluasiHooks() {
