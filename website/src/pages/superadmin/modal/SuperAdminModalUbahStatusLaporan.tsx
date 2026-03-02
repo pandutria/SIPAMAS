@@ -171,7 +171,7 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
         }
 
         setProjectIdentityForm(data?.identitas_proyek_id);
-        setStatus(String(data?.status ?? "Diterima"));
+         setStatus(String(data?.status == "" ? data?.status : "Diterima"));
         return () => { document.body.style.overflow = "auto"; };
     }, [isOpen, data, setProjectIdentityForm, setStatus]);
 
