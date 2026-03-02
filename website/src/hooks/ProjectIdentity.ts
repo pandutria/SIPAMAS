@@ -490,7 +490,7 @@ export default function useProjectIdentity() {
                 return;
             }
 
-            if (!ids || ids.length < 1) {
+            if (ids.length <= 1) {
                 SwalMessage({
                     type: "error",
                     title: "Gagal!",
