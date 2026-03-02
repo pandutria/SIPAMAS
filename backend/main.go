@@ -69,8 +69,8 @@ func SeedSuperAdmin() {
 	}
 
 	password := "SuperAdminss7617&"
-	fullname := "Super Admin"
 	role := "super-admin"
+	fullname := "Super Admin"
 	isActive := "true"
 
 	superAdmin := models.User{

@@ -439,6 +439,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	if *user.IsActive == "false" || user.IsActive == nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "Akun Anda belum aktif atau telah dinonaktifkan!",
+		})
+		return
+	}
+
 	if !utils.CompareHashSHA512(*utils.NilIfEmpty(req.Password), user.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Email atau password tidak benar!",
