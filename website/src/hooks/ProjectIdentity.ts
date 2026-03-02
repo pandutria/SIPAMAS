@@ -340,7 +340,9 @@ export default function useProjectIdentity() {
                     text: message
                 });
 
-                fetchIdentityProjectById();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error: any) {
             SwalMessage({
@@ -416,7 +418,9 @@ export default function useProjectIdentity() {
                     text: message
                 });
 
-                fetchIdentityProjectById();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error: any) {
             if (error) {
@@ -511,7 +515,9 @@ export default function useProjectIdentity() {
                     text: message
                 });
 
-                fetchIdentityProjectById();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error) {
             if (error) {
