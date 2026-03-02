@@ -67,10 +67,10 @@ func SetIfNotEmpty(dest **string, val string) {
 func UploadIfExists(c *gin.Context, field string) (*string, error) {
 	file, err := c.FormFile(field)
 	if err != nil {
-		return nil, nil 
+		return nil, nil
 	}
 
-	path, err := SaveUploadedFile(c, file, "assets/file")
+	path, err := SaveUploadedFile(c, file, "uploads/file")
 	if err != nil {
 		return nil, err
 	}
@@ -79,5 +79,5 @@ func UploadIfExists(c *gin.Context, field string) (*string, error) {
 }
 
 func GenerateResetToken(userID uint) (string, error) {
-	return GenerateJWT(userID) 
+	return GenerateJWT(userID)
 }

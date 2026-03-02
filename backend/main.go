@@ -14,18 +14,17 @@ import (
 
 func main() {
 	r := gin.Default()
-	
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	r.SetTrustedProxies(nil)
-	r.Static("/assets", "./assets")
+	r.Static("/uploads", "./uploads")
 
 	config.ConnectDB()
 
-	
 	config.DB.AutoMigrate(
 		&models.User{},
 		&models.IdentitasProyek{},
@@ -62,7 +61,7 @@ func main() {
 func SeedSuperAdmin() {
 	var user models.User
 
-	email := "superadmin"
+	email := "superadmin@gmail.com"
 
 	err := config.DB.Where("email = ?", email).First(&user).Error
 	if err == nil {
@@ -71,10 +70,12 @@ func SeedSuperAdmin() {
 
 	password := "SuperAdminss7617&"
 	role := "superadmin"
+	fullname := "Super Admin"
 	isActive := "true"
 
 	superAdmin := models.User{
 		Email:    &email,
+		FullName: &fullname,
 		Password: utils.HashSHA512(password),
 		Role:     &role,
 		IsActive: &isActive,
@@ -82,4 +83,3 @@ func SeedSuperAdmin() {
 
 	config.DB.Create(&superAdmin)
 }
-
