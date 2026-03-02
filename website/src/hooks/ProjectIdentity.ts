@@ -141,7 +141,7 @@ export default function useProjectIdentity() {
 
     const handleProjectIdentityPost = async (photosData: any, documentsData: ProjectIdentityDocumentProps[], coords: any) => {
         try {
-            if (photosData.start.length == 0 || !coords) {
+            if (photosData.start.length == 0 || !coords || documentsData.length == 0) {
                 SwalMessage({
                     type: "error",
                     title: "Gagal!",
@@ -312,7 +312,7 @@ export default function useProjectIdentity() {
                 cancelText: "Tidak",
                 showCancelButton: true,
             });
-            
+
             let response;
             if (result.isConfirmed) {
                 SwalLoading();
@@ -395,6 +395,16 @@ export default function useProjectIdentity() {
 
     const handleProjectIdentityPhotoDelete = async (id: number) => {
         try {
+            if (projectIdentityByIdData!.photos.length <= 1) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Setidaknya harus ada satu foto. Tidak bisa menghapus foto!."
+                });
+
+                return;
+            }
+
             const result = await SwalMessage({
                 title: "Peringatan!",
                 text: "Apakah anda yakin untuk menghapus data ini?",
@@ -405,6 +415,7 @@ export default function useProjectIdentity() {
             });
 
             if (result.isConfirmed) {
+                SwalLoading();
                 const response = await API.delete(`/identitas-proyek/photo/delete/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -479,6 +490,15 @@ export default function useProjectIdentity() {
                 return;
             }
 
+            if (!ids || ids.length < 1) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Setidaknya harus ada satu dokumen yang diupload."
+                });
+                return;
+            }
+
             const result = await SwalMessage({
                 title: "Peringatan!",
                 text: "Apakah anda yakin untuk menghapus data ini?",
@@ -487,7 +507,7 @@ export default function useProjectIdentity() {
                 cancelText: "Tidak",
                 showCancelButton: true,
             });
-            
+
             if (result.isConfirmed) {
                 SwalLoading();
                 let response;
