@@ -160,12 +160,14 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	if !isValidPassword(req.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Password minimal 8 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan simbol.",
-		})
-		return
-	}
+	// if req.Password != "" {
+	// 	if !isValidPassword(req.Password) {
+	// 		c.JSON(http.StatusBadRequest, gin.H{
+	// 			"message": "Password minimal 8 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan simbol.",
+	// 		})
+	// 		return
+	// 	}
+	// }
 
 	user, err := components.GetCurrentUser(c, query)
 	if err != nil {
