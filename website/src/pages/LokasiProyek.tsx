@@ -29,7 +29,7 @@ function getAlamat(project: ProjectIdentityProps): string {
 }
 
 function getStatus(project: ProjectIdentityProps) {
-    const selesai = !!project.updated_at && project.updated_at !== project.created_at;
+    const selesai = project.status === 'Sudah Lengkap';
     return selesai
         ? { label: 'Selesai', color: '#16a34a', bg: 'bg-green-500', dot: 'bg-green-400' }
         : { label: 'Berproses', color: '#f97316', bg: 'bg-orange-400', dot: 'bg-orange-400' };
@@ -261,6 +261,7 @@ export default function LokasiProyek() {
         [filtered, selectedId]
     );
 
+    console.log(filtered)
     const countSelesai = useMemo(() => filtered.filter(p => getStatus(p).label === 'Selesai').length, [filtered]);
     const countBerproses = useMemo(() => filtered.filter(p => getStatus(p).label === 'Berproses').length, [filtered]);
 

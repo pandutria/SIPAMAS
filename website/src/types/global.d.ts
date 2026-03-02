@@ -20,6 +20,7 @@ declare global {
   }
 
   export interface ProjectIdentityProps {
+    status: string;
     id: number;
 
     nama: string;
