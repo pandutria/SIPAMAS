@@ -36,7 +36,7 @@ export default function useProjectIdentity() {
     });
 
     const buildTahunOptions = (data: any) => {
-        const uniqueYears = Array.from(
+        const uniqueYears = Array?.from(
             new Set(
                 data
                     .map((item: any) => Number(item?.tahun_anggaran))
@@ -44,7 +44,7 @@ export default function useProjectIdentity() {
             )
         ).sort((a: any, b: any) => b - a);
 
-        return uniqueYears.map((tahun: any) => ({
+        return uniqueYears?.map((tahun: any) => ({
             id: tahun.toString(),
             text: tahun.toString()
         }));
@@ -99,11 +99,11 @@ export default function useProjectIdentity() {
                 });
 
                 const data = response.data.data;
-                const mappingData = data.map((item: ProjectIdentityProps) => ({
+                const mappingData = data?.map((item: ProjectIdentityProps) => ({
                     ...item,
                     project_id: `TND-0${item.id}`,
                     status: item.photos.filter(data => data.type == "end").length == 0 || item.photos.filter(data => data.type == "end").length == 0 ? "Belum Lengkap" : "Sudah Lengkap",
-                    pengaduan: item.pengaduan.length + " Pengaduan",
+                    pengaduan: item.pengaduan?.length + " Pengaduan",
                 }));
 
                 const tahunOpts = buildTahunOptions(data);
@@ -113,6 +113,7 @@ export default function useProjectIdentity() {
             } catch (error) {
                 if (error) {
                     console.error("Terjadi Kesalahan!")
+                    console.error(error)
                 }
             }
         }

@@ -14,6 +14,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: path => path.replace(/^\/wilayah/, ''),
       },
+      '/api': {
+        target: 'https://dev-perkim.lpse.info/api',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
     },
   }
 })

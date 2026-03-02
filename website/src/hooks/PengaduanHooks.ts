@@ -34,13 +34,13 @@ export default function usePengaduanHooks() {
                 });
 
                 const data = response.data.data;
-                const mappingData = data.map((item: PengaduanProps) => ({
+                const mappingData = data?.map((item: PengaduanProps) => ({
                     ...item,
                     nama: item.created_by!.fullname,
                     kontak: item?.created_by!.phone_number,
                 }))
 
-                setPengaduanData(SortDescById(mappingData))
+                setPengaduanData(SortDescById(mappingData || []))
             } catch (error) {
                 if (error) {
                     console.error("Terjadi Kesalahan");

@@ -17,7 +17,7 @@ export default function useRABHooks() {
     const [revisionCount, setRevisionCount] = useState<any[]>([]);
 
     const buildTahunOptions = (data: any) => {
-        const uniqueYears = Array.from(
+        const uniqueYears = Array?.from(
             new Set(
                 data
                     .map((item: any) => Number(item?.data_entry?.tahun_anggaran))
@@ -25,7 +25,7 @@ export default function useRABHooks() {
             )
         ).sort((a: any, b: any) => b - a);
 
-        return uniqueYears.map((tahun: any) => ({
+        return uniqueYears?.map((tahun: any) => ({
             id: tahun.toString(),
             text: tahun.toString()
         }));
@@ -52,7 +52,7 @@ export default function useRABHooks() {
                     }
                 });
 
-                const mappingData = Array.from(latestRabMap.values()).map(item => ({
+                const mappingData = Array?.from(latestRabMap.values()).map(item => ({
                     ...item,
                     proyek_id: `TND-0${item.proyek.id}`,
                     tahun_anggaran: item.proyek.tahun_anggaran,
