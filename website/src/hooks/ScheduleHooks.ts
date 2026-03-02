@@ -29,7 +29,7 @@ export default function useScheduleHooks() {
                 const data = response.data.data;
                 const latestScheduleMap = new Map<number, ScheduleProps>();
 
-                data.forEach((item: ScheduleProps) => {
+                data?.forEach((item: ScheduleProps) => {
                     if (!item.schedule_group_id) return;
 
                     const existing = latestScheduleMap.get(item.schedule_group_id);
@@ -38,7 +38,7 @@ export default function useScheduleHooks() {
                     }
                 });
 
-                const mappingData = Array.from(latestScheduleMap.values()).map((item: ScheduleProps) => ({
+                const mappingData = Array?.from(latestScheduleMap.values()).map((item: ScheduleProps) => ({
                     ...item,
                     tahun_anggaran: item.rab?.proyek.tahun_anggaran,
                     proyek_id: `TND-0${item.rab?.proyek?.id}`,
@@ -46,7 +46,7 @@ export default function useScheduleHooks() {
                     program: item.rab?.program,
                 }));
 
-                const tahunUnique = Array.from(
+                const tahunUnique = Array?.from(
                     new Set(
                         mappingData
                             ?.map((item: { tahun_anggaran: any; }) => item.tahun_anggaran)
@@ -54,7 +54,7 @@ export default function useScheduleHooks() {
                     )
                 ).sort((a, b) => Number(b) - Number(a));
 
-                const tahunOptions = tahunUnique.map((tahun, index) => ({
+                const tahunOptions = tahunUnique?.map((tahun, index) => ({
                     id: index + 1,
                     text: tahun?.toString()
                 }));
