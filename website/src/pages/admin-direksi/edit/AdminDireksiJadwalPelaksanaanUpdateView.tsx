@@ -407,7 +407,7 @@ export default function AdminDireksiJadwalPelaksanaanUpdateView() {
 
           {showDetail && (
             <FormGenerateExcel
-              handleSave={() => handleSchedulePut(scheduleDataById, scheduleDataById.schedule_group_id, dataFile.length > 0 ? dataFile : scheduleDataById.items as any, reason as any, totalMinggu ? totalMinggu : Math.max(...(scheduleDataById?.items?.map((item: any) => item.schedule_weeks?.length || 0) ?? [0])))}
+              handleSave={() => handleSchedulePut(scheduleDataById, scheduleDataById.schedule_group_id, dataFile.length > 0 ? dataFile : scheduleDataById.items as any, reason as any, totalMinggu ? totalMinggu : Math.max(...(scheduleDataById?.items?.map((item: any) => item.weeks?.length || 0) ?? [0])))}
               title='jadwal Pelaksanaan'
               handleFileChange={handleFileChange}
               handleDownloadTemplate={handleDownloadTemplate}

@@ -134,6 +134,7 @@ export default function useScheduleHooks() {
             }
 
             const weeksFromDate = TotalWeek(startDate, endDate);
+            console.log(weeksFromDate, weeksTotal)
             if (weeksTotal != weeksFromDate) {
                 SwalMessage({
                     type: "error",
@@ -225,15 +226,17 @@ export default function useScheduleHooks() {
             }
 
             const weeksFromDate = TotalWeek(startDate, endDate);
+            console.log(weeksFromDate, weeksTotal)
             if (weeksTotal != weeksFromDate) {
                 SwalMessage({
                     type: "error",
                     title: "Gagal!",
                     text: "Tanggal pelaksanaan dengan minggu pelaksanaan tidak sesuai!"
                 });
-
+                
                 return;
             }
+            return;
 
             SwalLoading();
             const formData = new FormData();
