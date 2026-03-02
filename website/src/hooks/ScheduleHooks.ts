@@ -134,7 +134,6 @@ export default function useScheduleHooks() {
             }
 
             const weeksFromDate = TotalWeek(startDate, endDate);
-            console.log(weeksFromDate, weeksTotal)
             if (weeksTotal != weeksFromDate) {
                 SwalMessage({
                     type: "error",
@@ -226,7 +225,6 @@ export default function useScheduleHooks() {
             }
 
             const weeksFromDate = TotalWeek(startDate, endDate);
-            console.log(weeksFromDate, weeksTotal)
             if (weeksTotal != weeksFromDate) {
                 SwalMessage({
                     type: "error",
@@ -236,7 +234,6 @@ export default function useScheduleHooks() {
                 
                 return;
             }
-            return;
 
             SwalLoading();
             const formData = new FormData();
