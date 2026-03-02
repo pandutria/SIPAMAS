@@ -236,7 +236,7 @@ export default function AdminDireksiIdentitasProyekAdd() {
                         <FormInput value={projectIdentityForm.nama} name="nama" onChange={handleChangeForm} title="Nama Proyek" placeholder="Masukkan nama proyek" />
                         <FormInput value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran" placeholder="Masukkan tahun anggaran" />
                         <FormSelect value={projectIdentityForm.kategori} name="kategori" onChange={handleChangeForm} title="Kategori Proyek">
-                            {projectCategory.map((item, index) => (
+                            {projectCategory?.map((item, index) => (
                                 <option key={index} value={item.text}>{item.text}</option>
                             ))}
                         </FormSelect>
@@ -267,7 +267,7 @@ export default function AdminDireksiIdentitasProyekAdd() {
                                     setCoords(null);
                                 }}
                             >
-                                {kecamatanData.map((item, index) => (
+                                {kecamatanData?.map((item, index) => (
                                     <option key={index} value={item.name}>{item.name}</option>
                                 ))}
                             </FormSelect>
@@ -277,7 +277,7 @@ export default function AdminDireksiIdentitasProyekAdd() {
                                 onChange={handleChangeForm}
                                 title="Desa / Kelurahan"
                             >
-                                {kelurahanData.map((item, index) => (
+                                {kelurahanData?.map((item, index) => (
                                     <option key={index} value={item.name}>{item.name}</option>
                                 ))}
                             </FormSelect>
@@ -333,7 +333,7 @@ export default function AdminDireksiIdentitasProyekAdd() {
                     <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 flex flex-col gap-6">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                             <div className="flex bg-white rounded-xl p-1 gap-1 border border-gray-100 shadow-sm">
-                                {(["start", "end"] as PhotoType[]).map((tab) => (
+                                {(["start", "end"] as PhotoType[])?.map((tab) => (
                                     <button
                                         key={tab}
                                         onClick={() => setSelectedPhoto(tab)}
@@ -358,7 +358,7 @@ export default function AdminDireksiIdentitasProyekAdd() {
 
                         {photoData[selectedPhoto].length > 0 ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                {photoData[selectedPhoto].map((item: any, index: number) => (
+                                {photoData[selectedPhoto]?.map((item: any, index: number) => (
                                     <div
                                         key={index}
                                         data-aos="fade-up"
@@ -407,7 +407,7 @@ export default function AdminDireksiIdentitasProyekAdd() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
                         <FormInput value={projectIdentityForm.nilai_kontrak} name="nilai_kontrak" onChange={handleChangeForm} title="Nilai Proyek" placeholder="Masukkan nilai proyek" />
                         <FormSelect value={projectIdentityForm.sumber_dana} name="sumber_dana" onChange={handleChangeForm} title="Sumber Dana">
-                            {sumberDanaOptions.map((item, index) => (
+                            {sumberDanaOptions?.map((item, index) => (
                                 <option key={index} value={item.text}>{item.text}</option>
                             ))}
                         </FormSelect>
