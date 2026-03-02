@@ -261,8 +261,9 @@ export default function LokasiProyek() {
         [filtered, selectedId]
     );
 
-    const countSelesai = useMemo(() => filtered.filter(p => getStatus(p).label === 'Selesai').length, [filtered]);
-    const countBerproses = useMemo(() => filtered.filter(p => getStatus(p).label === 'Berproses').length, [filtered]);
+    console.log(filtered)
+    const countSelesai = useMemo(() => filtered.filter(p => getStatus(p).label === 'Sudah Lengkap').length, [filtered]);
+    const countBerproses = useMemo(() => filtered.filter(p => getStatus(p).label === 'Belum Lengkap').length, [filtered]);
 
     useEffect(() => {
         if (!projectIdentityData) return;
