@@ -33,6 +33,9 @@ export default function useUserHooks() {
                 });
                 const users = SortDescById(response.data.data).map((item: any) => ({
                     ...item,
+                    phone_number: item?.phone_number ?? "-",
+                    jabatan: item?.jabatan ?? "-",
+                    nik: item?.nik ?? "-",
                     status: item.is_active == "true" ? "Aktif" : "Tidak Aktif"
                 }));
 
@@ -347,7 +350,6 @@ export default function useUserHooks() {
     };
 
     const handleShowUser = (data: UserProps) => {
-        console.log(data)
         setEmail(data?.email ?? '');
         setPassword('');
         setRole(data?.role ?? '');
@@ -359,6 +361,7 @@ export default function useUserHooks() {
         setAddress(data?.address ?? '');
         setPhoneNumber(data?.phone_number ?? '');
         setSkNumber(data?.sk_number ?? '');
+        setKtpFile(data?.ktp_file as any);
         setSkFile(data?.sk_file as any);
         setProfilePhoto(data?.profile_photo as any);
     };
