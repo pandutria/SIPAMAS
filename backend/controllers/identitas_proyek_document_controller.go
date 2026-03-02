@@ -58,7 +58,7 @@ func CreateIdentitasProyekDocument(c *gin.Context) {
 	photoPath, err := utils.SaveUploadedFile(
 		c,
 		photoFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {

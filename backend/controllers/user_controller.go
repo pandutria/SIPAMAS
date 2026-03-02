@@ -91,7 +91,7 @@ func CreateUser(c *gin.Context) {
 	profilePath, err := utils.SaveUploadedFile(
 		c,
 		profileFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -106,7 +106,7 @@ func CreateUser(c *gin.Context) {
 	skPath, err := utils.SaveUploadedFile(
 		c,
 		skFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -176,7 +176,7 @@ func UpdateProfile(c *gin.Context) {
 	profilePath, err := utils.SaveUploadedFile(
 		c,
 		profileFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -191,14 +191,14 @@ func UpdateProfile(c *gin.Context) {
 	skPath, err := utils.SaveUploadedFile(
 		c,
 		skFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	ktpFile, _ := c.FormFile("ktp_file")
 	ktpPath, err := utils.SaveUploadedFile(
 		c,
 		ktpFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -270,14 +270,14 @@ func UpdateUser(c *gin.Context) {
 	profilePath, err := utils.SaveUploadedFile(
 		c,
 		profileFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	ktpFile, _ := c.FormFile("ktp_file")
 	ktpPath, err := utils.SaveUploadedFile(
 		c,
 		ktpFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -292,7 +292,7 @@ func UpdateUser(c *gin.Context) {
 	skPath, err := utils.SaveUploadedFile(
 		c,
 		skFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -367,7 +367,7 @@ func Register(c *gin.Context) {
 	ktpPath, err := utils.SaveUploadedFile(
 		c,
 		ktpFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {

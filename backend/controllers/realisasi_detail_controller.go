@@ -51,7 +51,7 @@ func CreateRealisasiDetail(c *gin.Context) {
 	buktiPath, err := utils.SaveUploadedFile(
 		c,
 		buktiFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
