@@ -12,7 +12,7 @@ export default function usePengaduanHooks() {
     const [selectedPengaduanId, setSelectedPengaduanId] = useState<number | null>(null);
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
-    const [projectIdentityForm, setProjectIdentityForm] = useState("");
+    const [projectIdentityForm, setProjectIdentityForm] = useState<string | null | number>("");
     const [pengaduanForm, setPengaduanForm] = useState({
         kategori: "",
         judul: "",
@@ -25,7 +25,7 @@ export default function usePengaduanHooks() {
     });
 
     useEffect(() => {
-        const fetchPengaduan = async() => {
+        const fetchPengaduan = async () => {
             try {
                 const response = await API.get("/pengaduan", {
                     headers: {
@@ -48,7 +48,7 @@ export default function usePengaduanHooks() {
             }
         }
 
-        const fetchPengaduanById = async() => {
+        const fetchPengaduanById = async () => {
             try {
                 if (!selectedPengaduanId) return;
                 const response = await API.get(`/pengaduan/${selectedPengaduanId}`, {
@@ -70,7 +70,7 @@ export default function usePengaduanHooks() {
         fetchPengaduanById();
     }, [token, selectedPengaduanId]);
 
-    const handlePengaduanPost = async(mediaForms: PengaduanMediaProps[]) => {
+    const handlePengaduanPost = async (mediaForms: PengaduanMediaProps[]) => {
         try {
             SwalLoading();
             const formData = new FormData();
@@ -80,13 +80,13 @@ export default function usePengaduanHooks() {
             formData.append("alamat", pengaduanForm.alamat);
             formData.append("longitude", "");
             formData.append("latitude", "");
-            
+
             const responseParent = await API.post("/pengaduan/create", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-            
+
             for (let index = 0; index < mediaForms.length; index++) {
                 const mediaForm = mediaForms[index];
                 const formMediaData = new FormData();
@@ -129,7 +129,7 @@ export default function usePengaduanHooks() {
         }));
     }
 
-    const handlePengaduanStatusPut = async(status: string, catatan: string | null, id: number) => {
+    const handlePengaduanStatusPut = async (status: string, catatan: string | null, id: number) => {
         try {
             SwalLoading();
             const formData = new FormData();
@@ -163,7 +163,7 @@ export default function usePengaduanHooks() {
         }
     }
 
-    const handlePengaduanSetProjectIdentity = async() => {
+    const handlePengaduanSetProjectIdentity = async () => {
         try {
             SwalLoading();
             const formData = new FormData();
@@ -181,18 +181,18 @@ export default function usePengaduanHooks() {
                 title: "Berhasil!",
                 text: message
             });
-        } catch (error) {
+        } catch (error: any) {
             if (error) {
                 SwalMessage({
                     type: "error",
                     title: "Gagal!",
-                    text: "Terjadi Kesalahan!"
+                    text: error?.response.data.message
                 })
             }
         }
     }
 
-    const handlePengaduanReviewPost = async(id: number) => {
+    const handlePengaduanReviewPost = async (id: number) => {
         try {
             SwalLoading();
             const formData = new FormData();

@@ -169,8 +169,8 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
             setVisible(false);
             document.body.style.overflow = "auto";
         }
-        
-        setProjectIdentityForm(String(data?.identitas_proyek_id));
+
+        setProjectIdentityForm(data?.identitas_proyek_id);
         setStatus(String(data?.status));
         return () => { document.body.style.overflow = "auto"; };
     }, [isOpen, data, setProjectIdentityForm, setStatus]);
@@ -326,15 +326,17 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
                             ))}
                         </FormSelect>
 
-                        <FormSelect
-                            title="Proyek Terkait"
-                            value={projectIdentityForm}
-                            onChange={(e) => setProjectIdentityForm(e.target.value)}
-                        >
-                            {projectIdentityData.map((item) => (
-                                <option key={item.id} value={item.id}>{`${item.nama} - ${item.kecamatan}, ${item.kelurahan} Tahun ${item.tahun_anggaran}`}</option>
-                            ))}
-                        </FormSelect>
+                        {status == "Diterima" && (
+                            <FormSelect
+                                title="Proyek Terkait"
+                                value={projectIdentityForm as any}
+                                onChange={(e) => setProjectIdentityForm(e.target.value)}
+                            >
+                                {projectIdentityData.map((item) => (
+                                    <option key={item.id} value={item.id}>{`${item.nama} - ${item.kecamatan}, ${item.kelurahan} Tahun ${item.tahun_anggaran}`}</option>
+                                ))}
+                            </FormSelect>
+                        )}
 
                     </div>
 
@@ -369,15 +371,19 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
                     <SubmitButton
                         text="Simpan Perubahan"
                         onClick={() => {
-                            if (status && projectIdentityForm) {
-                                handlePengaduanSetProjectIdentity()
+                            if (status == "Ditolak") {
                                 handlePengaduanStatusPut(status, null, data.id)
                             } else {
-                                SwalMessage({
-                                    type: "error",
-                                    title: "Gagal!",
-                                    text: "Seluruh field wajib diisi!"
-                                })
+                                if (status && projectIdentityForm) {
+                                    handlePengaduanSetProjectIdentity()
+                                    handlePengaduanStatusPut(status, null, data.id)
+                                } else {
+                                    SwalMessage({
+                                        type: "error",
+                                        title: "Gagal!",
+                                        text: "Seluruh field wajib diisi!"
+                                    })
+                                }
                             }
                         }}
                     />
