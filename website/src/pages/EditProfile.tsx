@@ -54,7 +54,7 @@ export default function EditProfile() {
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 pt-8 pb-12 font-poppins-medium">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
-        <BackButton/>
+        <BackButton />
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6 hover:shadow-md transition-shadow duration-300" data-aos="fade-up" data-aos-duration="1000">
           <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -122,19 +122,31 @@ export default function EditProfile() {
             <FormInput title="Nama lengkap" name="fullname" value={fullname} onChange={handleChangeUser} placeholder="Masukkan nama lengkap" />
             <FormInput title="Alamat" name="address" value={address} onChange={handleChangeUser} placeholder="Masukkan alamat" />
             <FormInput type='number' title="Telepon/HP" name="phoneNumber" value={phoneNumber} onChange={handleChangeUser} placeholder="Masukkan telepon" />
-            <FormInput title="Jabatan" name="jabatan" value={jabatan} onChange={handleChangeUser} placeholder="Masukkan jabatan" />
+            {user.role != "masyarakat" && (
+              <FormInput title="Jabatan" name="jabatan" value={jabatan} onChange={handleChangeUser} placeholder="Masukkan jabatan" />
+            )}
 
             <FormInput type='number' title="NIK" name="nik" value={nik} onChange={handleChangeUser} placeholder="Masukkan NIK" />
-            <FormInput type='number' title="NIP" name="nip" value={nip} onChange={handleChangeUser} placeholder="Masukkan NIP" />
-            <FormInput title="No. SK" name="skNumber" value={skNumber} onChange={handleChangeUser} placeholder="Masukkan No. SK" />
+
+            {user.role != "masyarakat" && (
+              <FormInput type='number' title="NIP" name="nip" value={nip} onChange={handleChangeUser} placeholder="Masukkan NIP" />
+            )}
+
+            {user.role != "masyarakat" && (
+              <FormInput title="No. SK" name="skNumber" value={skNumber} onChange={handleChangeUser} placeholder="Masukkan No. SK" />
+            )}
+
             {user.role == "masyarakat" && (
               <FormUploadFile title="Unggah KTP" name="ktp_file" value={ktpFile as any} onChange={handleFileChangeUser} />
             )}
-            <FormUploadFile title="Unggah SK" name="sk_file" value={skFile as any} onChange={handleFileChangeUser} />
+
+            {user.role != "masyarakat" && (
+              <FormUploadFile title="Unggah SK" name="sk_file" value={skFile as any} onChange={handleFileChangeUser} />
+            )}
           </div>
 
-          <div className="flex justify-end gap-4 mt-8 pt-8 border-t border-gray-100">            
-            <SubmitButton text='Simpan Perubahan' onClick={() => handleUserUpdateProfile()}/>
+          <div className="flex justify-end gap-4 mt-8 pt-8 border-t border-gray-100">
+            <SubmitButton text='Simpan Perubahan' onClick={() => handleUserUpdateProfile()} />
           </div>
         </div>
       </div>
