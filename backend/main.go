@@ -69,7 +69,7 @@ func SeedSuperAdmin() {
 	}
 
 	password := "SuperAdminss7617&"
-	role := "superadmin"
+	role := "super-admin"
 	fullname := "Super Admin"
 	isActive := "true"
 
