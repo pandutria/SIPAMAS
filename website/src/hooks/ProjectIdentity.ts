@@ -155,6 +155,8 @@ export default function useProjectIdentity() {
             formData.append("nama", projectIdentityForm.nama);
             formData.append("tahun_anggaran", projectIdentityForm.tahun_anggaran);
             formData.append("kategori", projectIdentityForm.kategori);
+            formData.append("provinsi", "Maluku Utara");
+            formData.append("kabupaten", "Halmahera Tengah");
             formData.append("kecamatan", projectIdentityForm.kecamatan);
             formData.append("kelurahan", projectIdentityForm.kelurahan);
             formData.append("longitude", coords.lng);
@@ -248,6 +250,8 @@ export default function useProjectIdentity() {
             const formData = new FormData();
             formData.append("nama", projectIdentityForm.nama);
             formData.append("tahun_anggaran", projectIdentityForm.tahun_anggaran);
+            formData.append("provinsi", "Maluku Utara");
+            formData.append("kabupaten", "Halmahera Tengah");
             formData.append("kategori", projectIdentityForm.kategori);
             formData.append("kecamatan", projectIdentityForm.kecamatan);
             formData.append("kelurahan", projectIdentityForm.kelurahan);
