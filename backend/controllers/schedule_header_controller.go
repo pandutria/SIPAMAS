@@ -156,7 +156,8 @@ func CreateScheduleHeader(c *gin.Context) {
 
 	if req.ScheduleGroupId != nil {
 		var oldScheduleIds []uint
-		err := query.
+
+		err := config.DB.
 			Model(&models.ScheduleHeader{}).
 			Where("schedule_group_id = ? AND id != ?", *req.ScheduleGroupId, data.ID).
 			Pluck("id", &oldScheduleIds).Error
@@ -170,7 +171,7 @@ func CreateScheduleHeader(c *gin.Context) {
 
 		if len(oldScheduleIds) > 0 {
 			var realisasiHeaderIds []uint
-			err := query.
+			err := config.DB.
 				Model(&models.RealisasiHeader{}).
 				Where("schedule_header_id IN ?", oldScheduleIds).
 				Pluck("id", &realisasiHeaderIds).Error
@@ -183,7 +184,7 @@ func CreateScheduleHeader(c *gin.Context) {
 			}
 
 			if len(realisasiHeaderIds) > 0 {
-				if err := query.
+				if err := config.DB.
 					Where("realisasi_header_id IN ?", realisasiHeaderIds).
 					Delete(&models.RealisasiDetail{}).Error; err != nil {
 
@@ -193,7 +194,7 @@ func CreateScheduleHeader(c *gin.Context) {
 					return
 				}
 
-				if err := query.
+				if err := config.DB.
 					Where("id IN ?", realisasiHeaderIds).
 					Delete(&models.RealisasiHeader{}).Error; err != nil {
 
@@ -205,6 +206,15 @@ func CreateScheduleHeader(c *gin.Context) {
 			}
 		}
 	}
+
+	config.DB.
+		Preload("CreatedBy.Role").
+		First(&data, data.ID)
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Membuat data berhasil",
+		"data":    data,
+	})
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
