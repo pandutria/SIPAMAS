@@ -75,7 +75,7 @@ func SeedSuperAdmin() {
 
 	superAdmin := models.User{
 		Email:    &email,
-		FullName: &fullname,
+		Fullname: &fullname,
 		Password: utils.HashSHA512(password),
 		Role:     &role,
 		IsActive: &isActive,
