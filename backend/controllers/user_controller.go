@@ -91,7 +91,7 @@ func CreateUser(c *gin.Context) {
 	profilePath, err := utils.SaveUploadedFile(
 		c,
 		profileFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -106,7 +106,7 @@ func CreateUser(c *gin.Context) {
 	skPath, err := utils.SaveUploadedFile(
 		c,
 		skFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -169,7 +169,7 @@ func UpdateProfile(c *gin.Context) {
 	profilePath, err := utils.SaveUploadedFile(
 		c,
 		profileFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -184,14 +184,14 @@ func UpdateProfile(c *gin.Context) {
 	skPath, err := utils.SaveUploadedFile(
 		c,
 		skFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	ktpFile, _ := c.FormFile("ktp_file")
 	ktpPath, err := utils.SaveUploadedFile(
 		c,
 		ktpFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -263,14 +263,14 @@ func UpdateUser(c *gin.Context) {
 	profilePath, err := utils.SaveUploadedFile(
 		c,
 		profileFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	ktpFile, _ := c.FormFile("ktp_file")
 	ktpPath, err := utils.SaveUploadedFile(
 		c,
 		ktpFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -285,7 +285,7 @@ func UpdateUser(c *gin.Context) {
 	skPath, err := utils.SaveUploadedFile(
 		c,
 		skFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -360,7 +360,7 @@ func Register(c *gin.Context) {
 	ktpPath, err := utils.SaveUploadedFile(
 		c,
 		ktpFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -374,6 +374,7 @@ func Register(c *gin.Context) {
 	if utils.NilIfEmpty(req.Fullname) == nil ||
 		utils.NilIfEmpty(req.Email) == nil ||
 		utils.NilIfEmpty(req.Address) == nil ||
+		utils.NilIfEmpty(req.Nik) == nil ||
 		utils.NilIfEmpty(req.Password) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Semua input wajib di isi",
@@ -389,6 +390,7 @@ func Register(c *gin.Context) {
 		Email:    utils.NilIfEmpty(req.Email),
 		Address:  utils.NilIfEmpty(req.Address),
 		Password: utils.HashSHA512(req.Password),
+		Nik: utils.NilIfEmpty(req.Nik),
 		IsActive: &active,
 		Role:     &role,
 		KtpFile:  ktpPath,

@@ -78,28 +78,28 @@ func CreateIdentitas(c *gin.Context) {
 	kontrakPath, err := utils.SaveUploadedFile(
 		c,
 		kontrakFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	suratPerintahFile, _ := c.FormFile("surat_perintah_file")
 	suratPerintahPath, err := utils.SaveUploadedFile(
 		c,
 		suratPerintahFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	suratPenunjukanFile, _ := c.FormFile("surat_penunjukan_file")
 	suratPenunjukanPath, err := utils.SaveUploadedFile(
 		c,
 		suratPenunjukanFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	beritaAcaraFile, _ := c.FormFile("berita_acara_file")
 	beritaAcaraPath, err := utils.SaveUploadedFile(
 		c,
 		beritaAcaraFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
@@ -177,28 +177,28 @@ func UpdateIdentitas(c *gin.Context) {
 	kontrakPath, err := utils.SaveUploadedFile(
 		c,
 		kontrakFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	suratPerintahFile, _ := c.FormFile("surat_perintah_file")
 	suratPerintahPath, err := utils.SaveUploadedFile(
 		c,
 		suratPerintahFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	suratPenunjukanFile, _ := c.FormFile("surat_penunjukan_file")
 	suratPenunjukanPath, err := utils.SaveUploadedFile(
 		c,
 		suratPenunjukanFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	beritaAcaraFile, _ := c.FormFile("berita_acara_file")
 	beritaAcaraPath, err := utils.SaveUploadedFile(
 		c,
 		beritaAcaraFile,
-		"assets/file",
+		"uploads/file",
 	)
 
 	if err != nil {
