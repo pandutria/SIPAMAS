@@ -307,15 +307,28 @@ export default function AdminDireksiUbahStatusPengaduan({ isOpen, onClose, data 
                     <div className="flex flex-col gap-4">
                         <SectionHeader title="Ubah Status Laporan" />
 
-                        <FormSelect
-                            title="Status"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                        >
-                            {statusOptions.map((item) => (
-                                <option key={item.id} value={item.text}>{item.text}</option>
-                            ))}
-                        </FormSelect>
+                        {data.status == "Diterima" ? (
+                            <FormSelect
+                                title="Status"
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                {statusOptions.filter((item) => item.text != "Selesai").map((item) => (
+                                    <option key={item.id} value={item.text}>{item.text}</option>
+                                ))}
+                            </FormSelect>
+                        ) : (
+                            <FormSelect
+                                title="Status"
+                                disabled={data.status == "Selesai"}
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                {statusOptions.filter((item) => item.text != data.status).map((item) => (
+                                    <option key={item.id} value={item.text}>{item.text}</option>
+                                ))}
+                            </FormSelect>
+                        )}
 
                         {status == "Selesai" && (
                             <FormInput
@@ -357,10 +370,12 @@ export default function AdminDireksiUbahStatusPengaduan({ isOpen, onClose, data 
                         </>
                     )}
 
-                    <SubmitButton
-                        text="Simpan Perubahan"
-                        onClick={() => handlePengaduanStatusPut(status, catatan, data.id)}
-                    />
+                    {data.status != "Selesai" && (
+                        <SubmitButton
+                            text="Simpan Perubahan"
+                            onClick={() => handlePengaduanStatusPut(status, catatan, data.id)}
+                        />
+                    )}
 
                     <div className="h-2" />
                 </div>
