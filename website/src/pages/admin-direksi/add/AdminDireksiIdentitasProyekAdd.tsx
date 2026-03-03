@@ -18,6 +18,7 @@ import LoadingSpinner from "../../../ui/LoadingSpinner";
 import { Navigate } from "react-router-dom";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import maps from "/icon/maps.png";
+import { TahunData } from "../../../data/TahunData";
 
 type PhotoType = "start" | "end";
 
@@ -234,7 +235,12 @@ export default function AdminDireksiIdentitasProyekAdd() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
                         <FormInput value={projectIdentityForm.nama} name="nama" onChange={handleChangeForm} title="Nama Proyek" placeholder="Masukkan nama proyek" />
-                        <FormInput value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran" placeholder="Masukkan tahun anggaran" />
+                        <FormSelect value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran">
+                            {TahunData?.map((item, index) => (
+                                <option key={index} value={item.text}>{item.text}</option>
+                            ))}
+                        </FormSelect>
+                        
                         <FormSelect value={projectIdentityForm.kategori} name="kategori" onChange={handleChangeForm} title="Kategori Proyek">
                             {projectCategory?.map((item, index) => (
                                 <option key={index} value={item.text}>{item.text}</option>
