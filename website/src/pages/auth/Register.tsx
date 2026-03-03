@@ -16,6 +16,7 @@ export default function Register() {
         ktpFile,
         fullname,
         address,
+        nik,
         handleChangeUser,
         handleFileChangeUser,
         handleUserRegister,
@@ -121,14 +122,20 @@ export default function Register() {
                         />
                     </div>
 
-                    <div className="md:col-span-2">
-                        <FormUploadFile
-                            title="Unggah KTP"
-                            name="ktp_file"
-                            value={ktpFile}
-                            onChange={handleFileChangeUser}
-                        />
-                    </div>
+                    <FormUploadFile
+                        title="Unggah KTP"
+                        name="ktp_file"
+                        value={ktpFile}
+                        onChange={handleFileChangeUser}
+                    />
+
+                    <FormInput
+                        title="NIK"
+                        name="nik"
+                        value={nik}
+                        onChange={handleChangeUser}
+                        placeholder="Masukkan NIK"
+                    />
 
                     <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Kode Verifikasi (CAPTCHA) *</label>
