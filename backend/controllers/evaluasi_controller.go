@@ -5,6 +5,7 @@ import (
 	"gin-gorm/config"
 	"gin-gorm/dtos"
 	"gin-gorm/models"
+	"gin-gorm/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -60,11 +61,19 @@ func CreateEvaluasi(c *gin.Context) {
 		return
 	}
 
+	if utils.NilIfEmpty(req.Skor) == nil ||
+	utils.NilIfEmpty(req.Catatan) == nil || utils.NilIfEmpty(req.Tindakan) == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Semua input wajib di isi",
+		})
+		return
+	}
+
 	data := models.Evaluasi{
 		RealisasiHeaderId: req.RealisasiHeaderId,
-		Catatan:           req.Catatan,
-		Tindakan:          req.Tindakan,
-		Skor:              req.Skor,
+		Catatan:           utils.NilIfEmpty(req.Catatan),
+		Tindakan:          utils.NilIfEmpty(req.Tindakan),
+		Skor:              utils.NilIfEmpty(req.Skor),
 		CreatedById:       user.ID,
 	}
 

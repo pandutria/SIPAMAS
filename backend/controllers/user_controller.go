@@ -118,7 +118,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	user := models.User{
-		FullName:     utils.NilIfEmpty(req.FullName),
+		Fullname:     utils.NilIfEmpty(req.FullName),
 		Email:        utils.NilIfEmpty(req.Email),
 		Password:     utils.HashSHA512(req.Password),
 		Role:         utils.NilIfEmpty(req.Role),
@@ -156,13 +156,6 @@ func UpdateProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Membuat data gagal",
 			"error":   err.Error(),
-		})
-		return
-	}
-
-	if !isValidPassword(req.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Password minimal 8 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan simbol.",
 		})
 		return
 	}
@@ -209,7 +202,7 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	utils.SetIfNotEmpty(&user.FullName, req.FullName)
+	utils.SetIfNotEmpty(&user.Fullname, req.FullName)
 	utils.SetIfNotEmpty(&user.Email, req.Email)
 	utils.SetIfNotEmpty(&user.Role, req.Role)
 	utils.SetIfNotEmpty(&user.Nik, req.Nik)
@@ -297,13 +290,13 @@ func UpdateUser(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Upload SK file gagal",
+			"message": "Upload file gagal",
 			"error":   err.Error(),
 		})
 		return
 	}
 
-	utils.SetIfNotEmpty(&user.FullName, req.FullName)
+	utils.SetIfNotEmpty(&user.Fullname, req.FullName)
 	utils.SetIfNotEmpty(&user.Email, req.Email)
 	utils.SetIfNotEmpty(&user.Role, req.Role)
 	utils.SetIfNotEmpty(&user.Nik, req.Nik)
@@ -392,7 +385,7 @@ func Register(c *gin.Context) {
 	active := "false"
 
 	data := models.User{
-		FullName: utils.NilIfEmpty(req.Fullname),
+		Fullname: utils.NilIfEmpty(req.Fullname),
 		Email:    utils.NilIfEmpty(req.Email),
 		Address:  utils.NilIfEmpty(req.Address),
 		Password: utils.HashSHA512(req.Password),

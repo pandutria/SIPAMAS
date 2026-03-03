@@ -154,6 +154,68 @@ func CreateScheduleHeader(c *gin.Context) {
 			Update("schedule_group_id", data.ID)
 	}
 
+	if req.ScheduleGroupId != nil {
+		var oldScheduleIds []uint
+
+		err := config.DB.
+			Model(&models.ScheduleHeader{}).
+			Where("schedule_group_id = ? AND id != ?", *req.ScheduleGroupId, data.ID).
+			Pluck("id", &oldScheduleIds).Error
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Gagal ambil schedule lama",
+			})
+			return
+		}
+
+		if len(oldScheduleIds) > 0 {
+			var realisasiHeaderIds []uint
+			err := config.DB.
+				Model(&models.RealisasiHeader{}).
+				Where("schedule_header_id IN ?", oldScheduleIds).
+				Pluck("id", &realisasiHeaderIds).Error
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"message": "Gagal ambil realisasi header",
+				})
+				return
+			}
+
+			if len(realisasiHeaderIds) > 0 {
+				if err := config.DB.
+					Where("realisasi_header_id IN ?", realisasiHeaderIds).
+					Delete(&models.RealisasiDetail{}).Error; err != nil {
+
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": "Gagal hapus realisasi detail",
+					})
+					return
+				}
+
+				if err := config.DB.
+					Where("id IN ?", realisasiHeaderIds).
+					Delete(&models.RealisasiHeader{}).Error; err != nil {
+
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": "Gagal hapus realisasi header",
+					})
+					return
+				}
+			}
+		}
+	}
+
+	config.DB.
+		Preload("CreatedBy.Role").
+		First(&data, data.ID)
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Membuat data berhasil",
+		"data":    data,
+	})
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",
 		"data":    data,
