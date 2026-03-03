@@ -19,6 +19,7 @@ type Register struct {
 	Email    string `form:"email"`
 	Address  string `form:"address"`
 	Password string `form:"password"`
+	Nik      string `form:"nik"`
 }
 
 type LoginRequest struct {

@@ -374,6 +374,7 @@ func Register(c *gin.Context) {
 	if utils.NilIfEmpty(req.Fullname) == nil ||
 		utils.NilIfEmpty(req.Email) == nil ||
 		utils.NilIfEmpty(req.Address) == nil ||
+		utils.NilIfEmpty(req.Nik) == nil ||
 		utils.NilIfEmpty(req.Password) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Semua input wajib di isi",
@@ -389,6 +390,7 @@ func Register(c *gin.Context) {
 		Email:    utils.NilIfEmpty(req.Email),
 		Address:  utils.NilIfEmpty(req.Address),
 		Password: utils.HashSHA512(req.Password),
+		Nik: utils.NilIfEmpty(req.Nik),
 		IsActive: &active,
 		Role:     &role,
 		KtpFile:  ktpPath,

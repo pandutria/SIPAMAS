@@ -16,7 +16,6 @@ func getJWTKey() []byte {
 func GenerateJWT(userID uint) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 		"iat":     time.Now().Unix(),
 		"jti":     uuid.NewString(),
 	}
