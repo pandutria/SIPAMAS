@@ -440,6 +440,7 @@
             android:background="#D0D0D0"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNext"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginHorizontal="15dp"

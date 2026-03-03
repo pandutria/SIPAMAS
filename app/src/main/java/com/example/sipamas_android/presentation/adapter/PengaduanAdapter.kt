@@ -34,11 +34,10 @@ class PengaduanAdapter(
 
                 Glide.with(binding.root.context)
                     .load(imageUrl)
-                    .placeholder(R.drawable.example_home)
-                    .error(R.drawable.example_home)
+                    .placeholder(R.drawable.img_black)
+                    .error(R.drawable.img_black)
                     .into(binding.imgImage)
 
-                LogHelper.log("Loading Image: $imageUrl")
             } else {
                 binding.imgImage.setImageResource(R.drawable.example_home)
             }

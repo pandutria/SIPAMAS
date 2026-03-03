@@ -2,6 +2,7 @@ package com.example.sipamas_android.presentation.pengaduan.media
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +20,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.bumptech.glide.Glide
 import com.example.sipamas_android.R
 import com.example.sipamas_android.databinding.ActivityPengaduanMediaBinding
+import com.example.sipamas_android.presentation.pengaduan.PengaduanActivity
 import com.example.sipamas_android.utils.IntenHelper
 import com.example.sipamas_android.utils.Toasthelper
 import java.io.File
@@ -61,9 +63,22 @@ class PengaduanMediaActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
-            showCameraOptions()
+            // Cek apakah dipicu dari onCreate (useCamera=true) atau klik manual
+            if (intent.getBooleanExtra("useCamera", false) && selectedMediaUris.isEmpty()) {
+                openCameraForPhoto()
+            } else {
+                showCameraOptions()
+            }
         } else {
             Toasthelper.show(this, "Izin kamera ditolak")
+            // Jika izin ditolak, selalu kembali ke halaman sebelumnya (finish)
+            IntenHelper.finish(this)
+        }
+    }
+
+    private val pengaduanLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            finish()
         }
     }
 
@@ -83,7 +98,24 @@ class PengaduanMediaActivity : AppCompatActivity() {
         insetsController.isAppearanceLightStatusBars = true
 
         setupAction()
+        isUseCamera()
         updateUI()
+    }
+
+    private fun isUseCamera() {
+        val useCamera = intent.getBooleanExtra("useCamera", false)
+        if (useCamera) {
+            checkPermissionAndOpenCameraDirectly()
+        }
+    }
+
+    private fun checkPermissionAndOpenCameraDirectly() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            openCameraForPhoto()
+        } else {
+            // Minta izin ke sistem (bukan buka pengaturan)
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
     }
 
     private fun setupAction() {
@@ -106,6 +138,18 @@ class PengaduanMediaActivity : AppCompatActivity() {
         binding.tvDeleteAll.setOnClickListener {
             selectedMediaUris.clear()
             updateUI()
+        }
+
+        binding.btnNext.setOnClickListener {
+            if (selectedMediaUris.isNotEmpty()) {
+                val intent = Intent(this, PengaduanActivity::class.java).apply {
+                    putParcelableArrayListExtra("EXTRA_MEDIA_URIS", ArrayList(selectedMediaUris))
+                }
+                pengaduanLauncher.launch(intent)
+                overridePendingTransition(R.anim.zoom_fade_in, R.anim.zoom_fade_out)
+            } else {
+                Toasthelper.show(this, "Silakan lampirkan minimal 1 media")
+            }
         }
     }
 

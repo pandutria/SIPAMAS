@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.sipamas_android.R
 import com.example.sipamas_android.data.local.AuthManager
+import com.example.sipamas_android.data.local.TokenManager
 import com.example.sipamas_android.data.model.Pengaduan
 import com.example.sipamas_android.data.model.PengaduanMedia
 import com.example.sipamas_android.data.repository.PengaduanRepository
@@ -16,6 +17,7 @@ import com.example.sipamas_android.databinding.FragmentHomeBinding
 import com.example.sipamas_android.presentation.adapter.PengaduanAdapter
 import com.example.sipamas_android.presentation.detail.PengaduanDetailActivity
 import com.example.sipamas_android.presentation.pengaduan.media.PengaduanMediaActivity
+import com.example.sipamas_android.presentation.search.SearchActivity
 import com.example.sipamas_android.utils.IntenHelper
 import com.example.sipamas_android.utils.Toasthelper
 
@@ -54,8 +56,28 @@ class HomeFragment : Fragment() {
             viewModel.getPengaduan(requireContext())
         }
 
+        binding.etSearch.setOnClickListener {
+            IntenHelper.navigate(requireActivity(), SearchActivity::class.java)
+        }
+
+        binding.etSearch.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                IntenHelper.navigate(requireActivity(), SearchActivity::class.java)
+            }
+        }
+
+        binding.layoutCamera.setOnClickListener {
+            val bundle = Bundle().apply {
+                putBoolean("useCamera", true)
+            }
+            IntenHelper.navigate(requireActivity(), PengaduanMediaActivity::class.java, bundle)
+        }
+
         binding.btnBuatLaporan.setOnClickListener {
-            IntenHelper.navigate(requireActivity(), PengaduanMediaActivity::class.java)
+            val bundle = Bundle().apply {
+                putBoolean("useCamera", false)
+            }
+            IntenHelper.navigate(requireActivity(), PengaduanMediaActivity::class.java, bundle)
         }
 
         viewModel.getPengaduan(requireContext())
@@ -99,10 +121,8 @@ class HomeFragment : Fragment() {
                 }
 
                 is State.Error -> {
-                    binding.swipeRefresh.isRefreshing = false
-                    binding.pbLoading.visibility = View.GONE
-                    binding.tvEmpty.visibility = View.VISIBLE
-                    Toasthelper.show(requireContext(), state.message ?: "Error")
+                    TokenManager(requireContext()).removeToken()
+                    requireActivity().finishAffinity()
                 }
 
                 else -> {
@@ -115,6 +135,11 @@ class HomeFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+//        viewModel.getPengaduan(requireContext())
     }
 
     override fun onDestroyView() {

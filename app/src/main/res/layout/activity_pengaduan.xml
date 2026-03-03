@@ -71,12 +71,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/progress"
+        android:layout_above="@id/layoutBtnn"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginVertical="15dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -97,6 +98,7 @@
                     android:textColor="@color/textPrimary"/>
 
                 <TextView
+                    android:id="@+id/tvEdit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Edit"
@@ -258,33 +260,37 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/layoutJalanRusak"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_category_unselected"
+                    android:background="@drawable/bg_category_selected"
                     android:paddingVertical="15dp"
                     android:orientation="vertical">
 
                     <ImageView
+                        android:id="@+id/icJalanRusak"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_jalan_rusak_unselected"/>
+                        android:src="@drawable/ic_jalan_rusak_selected"/>
 
                     <TextView
+                        android:id="@+id/tvJalanRusak"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Jalan Rusak"
                         android:fontFamily="@font/poppins_medium"
                         android:textSize="13sp"
                         android:layout_marginTop="5dp"
-                        android:textColor="#6C7278"/>
+                        android:textColor="@color/primary"/>
 
                 </LinearLayout>
 
 
                 <LinearLayout
+                    android:id="@+id/layoutSampah"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -294,11 +300,13 @@
                     android:orientation="vertical">
 
                     <ImageView
+                        android:id="@+id/icSampah"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_jalan_rusak_unselected"/>
+                        android:src="@drawable/ic_trash_unselected"/>
 
                     <TextView
+                        android:id="@+id/tvSampah"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Sampah"
@@ -311,6 +319,7 @@
 
 
                 <LinearLayout
+                    android:id="@+id/layoutaBanjir"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -321,11 +330,13 @@
                     android:orientation="vertical">
 
                     <ImageView
+                        android:id="@+id/icBanjir"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_jalan_rusak_unselected"/>
+                        android:src="@drawable/ic_banjir_unselected"/>
 
                     <TextView
+                        android:id="@+id/tvBanjir"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Banjir"
@@ -338,13 +349,290 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginHorizontal="15dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/layoutMacet"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_category_unselected"
+                    android:paddingVertical="15dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/icMacet"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_macet_unselected"/>
+
+                    <TextView
+                        android:id="@+id/tvMacet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Macet"
+                        android:fontFamily="@font/poppins_medium"
+                        android:textSize="13sp"
+                        android:layout_marginTop="5dp"
+                        android:textColor="#6C7278"/>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/layoutPolusi"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:background="@drawable/bg_category_unselected"
+                    android:paddingVertical="15dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/icPolusi"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_polusi_unselected"/>
+
+                    <TextView
+                        android:id="@+id/tvPolusi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Polusi"
+                        android:fontFamily="@font/poppins_medium"
+                        android:textSize="13sp"
+                        android:layout_marginTop="5dp"
+                        android:textColor="#6C7278"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutOther"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_category_unselected"
+                    android:paddingVertical="15dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/icOther"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_other_unselected"/>
+
+                    <TextView
+                        android:id="@+id/tvOther"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lainya"
+                        android:fontFamily="@font/poppins_medium"
+                        android:textSize="13sp"
+                        android:layout_marginTop="5dp"
+                        android:textColor="#6C7278"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnGps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical"
+                android:focusable="true"
+                android:clickable="true"
+                android:layout_marginHorizontal="15dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Lokasi Kejadian"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="17sp"
+                    android:fontFamily="@font/poppins_semibold"/>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_gps"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gunakan GPS"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textSize="13sp"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/primary"/>
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/white"
+                android:layout_marginBottom="5dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:orientation="vertical">
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/mapFragment"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="135dp" />
+
+                    <EditText
+                        android:id="@+id/etSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="15dp"
+                        android:background="@drawable/bg_search_maps"
+                        android:drawableStart="@drawable/ic_search"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="5dp"
+                        android:hint="Cari alamat atau nama jalan..."
+                        android:textColorHint="#929292"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="12sp"
+                        android:drawablePadding="10dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:src="@drawable/ic_info"
+                            android:layout_marginLeft="15dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_height="wrap_content"
+                            android:text="Pastikan pin lokasi sesuai dengan tempat kejadian."
+                            android:fontFamily="@font/poppins_medium"
+                            android:textSize="10sp"
+                            android:layout_marginTop="0.5dp"
+                            android:textColor="#929292"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"
+                android:text="Lokasi Kejadian"
+                android:textColor="@color/textPrimary"
+                android:textSize="17sp"
+                android:fontFamily="@font/poppins_semibold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Judul Laporan"
+                android:fontFamily="@font/poppins_medium"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"/>
+
+            <EditText
+                android:id="@+id/etFullname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_input"
+                android:hint="Masukan Judul Laporan"
+                android:textColorHint="@color/hint"
+                android:textColor="@color/textPrimary"
+                android:layout_marginHorizontal="15dp"
+                android:textSize="13sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:fontFamily="@font/poppins_medium"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_marginTop="5dp"
+                android:inputType="text"
+                android:singleLine="true" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Deskripsi"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/etDesc"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:background="@drawable/bg_input"
+                android:hint="Masukan Deskripsi"
+                android:textColorHint="@color/hint"
+                android:textColor="@color/textPrimary"
+                android:layout_marginHorizontal="15dp"
+                android:textSize="13sp"
+                android:maxLines="6"
+                android:gravity="top|start"
+                android:minLines="6"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/poppins_medium"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_marginTop="5dp"
+                android:inputType="textMultiLine" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
     <RelativeLayout
+        android:id="@+id/layoutBtnn"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
+        android:background="@color/white"
         android:layout_height="wrap_content">
 
         <View
@@ -353,17 +641,27 @@
             android:background="#D0D0D0"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSend"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginHorizontal="15dp"
             android:backgroundTint="@color/primary"
             android:layout_marginVertical="15dp"
             app:cornerRadius="10dp"
-            android:text="Lanjutkan ke Detail"
+            android:text="Kirim Laporan"
             android:fontFamily="@font/poppins_semibold"
             android:textSize="14sp"
             android:textColor="@color/white"
-            android:drawableEnd="@drawable/ic_arrow_right"/>
+            android:drawableEnd="@drawable/ic_send"/>
+
+        <ProgressBar
+            android:id="@+id/pbLoading"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:layout_marginVertical="15dp"
+            android:indeterminateTint="@color/primary"
+            android:visibility="gone" />
 
 
     </RelativeLayout>

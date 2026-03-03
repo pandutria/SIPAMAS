@@ -21,11 +21,11 @@ class LampiranAdapter(
 
                 Glide.with(binding.root.context)
                     .load(imageUrl)
-                    .placeholder(R.drawable.example_home)
-                    .error(R.drawable.example_home)
+                    .placeholder(R.drawable.img_black)
+                    .error(R.drawable.img_black)
                     .into(binding.image)
             } else {
-                binding.image.setImageResource(R.drawable.example_home)
+                binding.image.setImageResource(R.drawable.img_black)
             }
         }
     }

@@ -13,15 +13,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.sipamas_android.R
+import com.example.sipamas_android.data.model.Pengaduan
+import com.example.sipamas_android.data.remote.RetrofitInstance
 import com.example.sipamas_android.data.repository.PengaduanRepository
 import com.example.sipamas_android.data.state.State
 import com.example.sipamas_android.databinding.ActivityPengaduanDetailBinding
 import com.example.sipamas_android.presentation.adapter.LampiranAdapter
 import com.example.sipamas_android.presentation.adapter.LinimasaAdapter
+import com.example.sipamas_android.presentation.review.PengaduanReviewActivity
 import com.example.sipamas_android.utils.DateHelper
 import com.example.sipamas_android.utils.IdHelper
 import com.example.sipamas_android.utils.IntenHelper
-import com.example.sipamas_android.utils.LogHelper
 import com.example.sipamas_android.utils.Toasthelper
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -44,7 +46,9 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mMap: GoogleMap? = null
     private var currentLatLng: LatLng? = null
 
-    private lateinit var googleMap: GoogleMap
+    private var pengaduan: Pengaduan? = null
+
+    private var imageUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,10 +100,22 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.tvDate.text =
                         "Diajukan pada ${DateHelper.format(state.data.created_at)}"
                     binding.tvKordinat.text =
-                        "Kordinat: ${state.data.latitude} ${state.data.longitude}"
+                        "Koordinat: ${state.data.latitude} ${state.data.longitude}"
+
+                    binding.tvCatatan.text = state.data.catatan ?: "-"
 
                     mediaAdapter.setData(state.data.medias ?: emptyList())
-                    timelineAdapter.setData(state.data.timelines?.sortedByDescending { x -> x.created_at } ?: emptyList())
+                    timelineAdapter.setData(state.data.timelines?.sortedByDescending { x -> x.created_at }
+                        ?: emptyList())
+
+                    if (!state.data.medias.isNullOrEmpty()) {
+                        val firstMedia = state.data.medias!![0]
+                        if (!firstMedia.media_file.isNullOrEmpty()) {
+                            val baseUrl = RetrofitInstance.baseUrl.replace("api/", "")
+                            val cleanPath = firstMedia.media_file!!.replace("\\", "/")
+                            imageUrl = baseUrl + cleanPath
+                        }
+                    }
 
                     val lat = state.data.latitude?.toDoubleOrNull()
                     val lng = state.data.longitude?.toDoubleOrNull()
@@ -110,6 +126,23 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                         state.data.alamat?.let { address ->
                             getLatLngFromAddress(address)
                         }
+                    }
+                    if (state.data.status?.lowercase() == "selesai") {
+                        binding.layoutButton.visibility = View.VISIBLE
+                    } else {
+                        binding.layoutButton.visibility = View.GONE
+                    }
+                    pengaduan = state.data
+
+                    if (state.data.review != null) {
+                        binding.layoutButton.visibility = View.GONE
+                        binding.layoutReview.visibility = View.VISIBLE
+                        binding.rbReview.rating = state.data.review!!.rating?.toFloat() ?: 0f
+                        binding.tvReviewCatatan.text = state.data.review!!.catatan ?: "-"
+                        binding.layoutButton.visibility = View.GONE
+                    } else {
+                        binding.layoutButton.visibility = View.VISIBLE
+                        binding.layoutReview.visibility = View.GONE
                     }
                 }
 
@@ -124,6 +157,22 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
+
+        binding.btnReview.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString(
+                    "id", binding.tvHeaderTitle.text.toString()
+                        .replace("Pelaporan", "")
+                        .replace(" ", "")
+                )
+                putInt("pengaduanId", pengaduan?.id ?: 0)
+                putString("title", binding.tvTitle.text.toString())
+                putString("image", imageUrl)
+                putString("updated_at", pengaduan?.updated_at)
+                putString("address", pengaduan?.alamat)
+            }
+            IntenHelper.navigate(this, PengaduanReviewActivity::class.java, bundle)
+        }
     }
 
     private fun getLatLngFromAddress(address: String) {
@@ -134,7 +183,7 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                 val location = list[0]
                 currentLatLng = LatLng(location.latitude, location.longitude)
                 updateMap()
-                binding.tvKordinat.text = "Kordinat: ${location.latitude} ${location.longitude}"
+                binding.tvKordinat.text = "Koordinat: ${location.latitude} ${location.longitude}"
             }
         } catch (e: IOException) {
             Log.e("Geocoder", "Error fetching location from address", e)

@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.sipamas_android.MainActivity
 import com.example.sipamas_android.R
 import com.example.sipamas_android.data.local.AuthManager
+import com.example.sipamas_android.data.local.TokenManager
 import com.example.sipamas_android.presentation.onboarding.OnBoardingActivity
 import com.example.sipamas_android.utils.IntenHelper
 import kotlinx.coroutines.delay
@@ -32,8 +33,8 @@ class SplashActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             delay(3000)
-            val auth = AuthManager(this@SplashActivity).get()
-            if (auth != null) {
+            val token = TokenManager(this@SplashActivity).getToken()
+            if (token != "") {
                 IntenHelper.navigate(this@SplashActivity, MainActivity::class.java)
             } else {
                 IntenHelper.navigate(this@SplashActivity, OnBoardingActivity::class.java)

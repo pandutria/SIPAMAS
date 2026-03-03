@@ -38,7 +38,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btnLayout"
+        android:layout_above="@id/layoutButton"
         android:layout_below="@id/header"
         android:descendantFocusability="afterDescendants"
         android:fillViewport="true">
@@ -241,7 +241,79 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_semibold"
                             android:justificationMode="inter_word"
-                            android:text="Lubang cukup dalam dilajur kiri dekat sebelah danau, membahayakan pengguna jalan karena takut tercebur kedalam danau. Kondisinya mungkin akan semakin parah karena disitu sedang banyak kendaraan berat atau truk yang membawa barang barang berat."
+                            android:text="-"
+                            android:textColor="@color/textSecondary"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="15dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_input"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:text="CATATAN TINDAK LANJUT"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/tvCatatan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:justificationMode="inter_word"
+                            android:text="-"
+                            android:textColor="@color/textSecondary"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutReview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="15dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_input"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:text="REVIEW LAYANAN"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="15sp" />
+
+                        <RatingBar
+                            android:id="@+id/rbReview"
+                            style="?android:attr/ratingBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:isIndicator="true"
+                            android:numStars="5"
+                            android:progressTint="#FFCB45"
+                            android:progressBackgroundTint="#F2F2F2"
+                            android:secondaryProgressTint="#FFCB45" />
+
+                        <TextView
+                            android:id="@+id/tvReviewCatatan"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:fontFamily="@font/poppins_medium"
+                            android:text="-"
                             android:textColor="@color/textSecondary"
                             android:textSize="13sp" />
 
@@ -391,23 +463,24 @@
     </androidx.core.widget.NestedScrollView>
 
     <RelativeLayout
-        android:id="@+id/btnLayout"
+        android:id="@+id/layoutButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:visibility="gone">
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnReview"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginHorizontal="15dp"
             android:layout_marginVertical="15dp"
-            android:background="@drawable/bg_btn_gradient"
+            android:backgroundTint="@color/primary"
             android:fontFamily="@font/poppins_semibold"
             android:text="Review Pelaporan"
             android:textAllCaps="false"
+            app:cornerRadius="8dp"
             android:textColor="@color/white"
             android:textSize="15sp" />
 
