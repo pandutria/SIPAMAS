@@ -36,7 +36,7 @@ export default function Testimonial() {
     }
 
     return (
-        <div data-aos="fade-up" data-aos-duration="1000" className="mb-16">
+        <div className="mb-16">
             <SafeAreaView className="flex lg:flex-row flex-col items-center gap-12">
                 <div className="flex flex-col gap-2 lg:w-150 w-auto">
                     <div className="bg-linear-to-r from-primary to-secondary w-fit py-2 px-4 rounded-md">

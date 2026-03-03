@@ -136,6 +136,7 @@ export default function useUserHooks() {
             const formData = new FormData();
             formData.append("email", email);
             if (fullname) formData.append("fullname", fullname);
+            if (nik) formData.append("nik", nik);
             if (password) formData.append("password", password);
             if (address) formData.append("address", address);
             if (ktpFile ) formData.append("ktp_file", ktpFile);
