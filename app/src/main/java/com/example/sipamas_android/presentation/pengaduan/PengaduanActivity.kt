@@ -2,6 +2,7 @@ package com.example.sipamas_android.presentation.pengaduan
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
@@ -20,11 +21,13 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.sipamas_android.R
+import com.example.sipamas_android.data.local.PrivacyManager
 import com.example.sipamas_android.data.model.CategoryView
 import com.example.sipamas_android.data.repository.PengaduanRepository
 import com.example.sipamas_android.data.state.State
 import com.example.sipamas_android.databinding.ActivityPengaduanBinding
 import com.example.sipamas_android.presentation.detail.PengaduanDetailActivity
+import com.example.sipamas_android.presentation.map.SelectMapActivity
 import com.example.sipamas_android.utils.IntenHelper
 import com.example.sipamas_android.utils.LogHelper
 import com.example.sipamas_android.utils.Toasthelper
@@ -53,6 +56,9 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mMap: GoogleMap? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLatLng: LatLng? = null
+    private lateinit var privacyManager: PrivacyManager
+
+    private val defaultLatLng = LatLng(0.4811, 128.2411)
 
     private var pengaduanId: Int? = null
     private var uploadedMediaCount = 0
@@ -64,24 +70,41 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        when {
-            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
-            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                getCurrentLocation()
-            }
-            else -> {
-                Toasthelper.show(this, "Izin lokasi diperlukan untuk mendapatkan lokasi kejadian secara otomatis.")
-                IntenHelper.finish(this)
-            }
+        val fineLocationGranted =
+            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)
+        val coarseLocationGranted =
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false)
+
+        if (fineLocationGranted || coarseLocationGranted) {
+            getCurrentLocation()
+        } else {
+            Toasthelper.show(
+                this,
+                "Izin lokasi ditolak. Menggunakan lokasi default Halmahera Tengah."
+            )
+            useDefaultLocation()
         }
     }
+
+    private val selectMapLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val lat = result.data?.getDoubleExtra("latitude", 0.0) ?: 0.0
+                val lng = result.data?.getDoubleExtra("longitude", 0.0) ?: 0.0
+                if (lat != 0.0 && lng != 0.0) {
+                    currentLatLng = LatLng(lat, lng)
+                    updateMap()
+                    getAddressFromLatLng(lat, lng)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         _binding = ActivityPengaduanBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -91,6 +114,7 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
         val insetsController = WindowInsetsControllerCompat(window, window.decorView)
         insetsController.isAppearanceLightStatusBars = true
 
+        privacyManager = PrivacyManager(this)
         mediaUris = intent.getParcelableArrayListExtra<Uri>("EXTRA_MEDIA_URIS") ?: listOf()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -115,7 +139,8 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
             IntenHelper.finish(this)
         }
         binding.btnGps.setOnClickListener {
-            Toasthelper.show(this, "Navigasi ke pencarian lokasi...")
+            val intent = Intent(this, SelectMapActivity::class.java)
+            selectMapLauncher.launch(intent)
         }
 
         binding.btnSend.setOnClickListener {
@@ -146,6 +171,7 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.pbLoading.visibility = View.VISIBLE
                     binding.btnSend.visibility = View.INVISIBLE
                 }
+
                 is State.Success -> {
                     pengaduanId = state.data.id
                     if (mediaUris.isNotEmpty()) {
@@ -154,11 +180,13 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
                         navigateToDetail(pengaduanId!!)
                     }
                 }
+
                 is State.Error -> {
                     binding.pbLoading.visibility = View.GONE
                     binding.btnSend.visibility = View.VISIBLE
                     Toasthelper.show(this, state.message ?: "Gagal membuat pengaduan")
                 }
+
                 else -> {
                     binding.pbLoading.visibility = View.GONE
                     binding.btnSend.visibility = View.VISIBLE
@@ -173,12 +201,14 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
                     uploadedMediaCount++
                     checkUploadStatus()
                 }
+
                 is State.Error -> {
                     uploadedMediaCount++
                     Toasthelper.show(this, "Gagal mengunggah salah satu media: ${state.message}")
                     LogHelper.log(state.error)
                     checkUploadStatus()
                 }
+
                 else -> {}
             }
         }
@@ -194,10 +224,9 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.pbLoading.visibility = View.GONE
         Toasthelper.show(this, "Berhasil membuat pengaduan")
         val bundle = Bundle().apply { putInt("id", id) }
-        
-        // Mengirim RESULT_OK agar PengaduanMediaActivity juga ditutup
+
         setResult(RESULT_OK)
-        
+
         IntenHelper.navigate(this, PengaduanDetailActivity::class.java, bundle)
         finish()
     }
@@ -207,7 +236,10 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
         mediaUris.forEach { uri ->
             lifecycleScope.launch {
                 val file = withContext(Dispatchers.IO) { uriToFile(uri) }
-                val mediaType = if (contentResolver.getType(uri)?.contains("video") == true || uri.toString().contains(".mp4")) "video" else "image"
+                val mediaType =
+                    if (contentResolver.getType(uri)?.contains("video") == true || uri.toString()
+                            .contains(".mp4")
+                    ) "video" else "image"
                 viewModel.createMedia(this@PengaduanActivity, pengaduanId, mediaType, file)
             }
         }
@@ -229,13 +261,31 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun checkLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            
-            requestPermissionLauncher.launch(arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
+        if (!privacyManager.isLocationEnabled()) {
+            Toasthelper.show(
+                this,
+                "Akses lokasi dinonaktifkan di Pengaturan Privasi. Menggunakan lokasi default."
+            )
+            useDefaultLocation()
+            return
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
                 Manifest.permission.ACCESS_COARSE_LOCATION
-            ))
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         } else {
             getCurrentLocation()
         }
@@ -249,9 +299,21 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
                 updateMap()
                 getAddressFromLatLng(location.latitude, location.longitude)
             } else {
-                Toasthelper.show(this, "Gagal mendapatkan lokasi otomatis. Pastikan GPS aktif.")
+                Toasthelper.show(
+                    this,
+                    "Gagal mendapatkan lokasi otomatis. Menggunakan lokasi default."
+                )
+                useDefaultLocation()
             }
+        }.addOnFailureListener {
+            useDefaultLocation()
         }
+    }
+
+    private fun useDefaultLocation() {
+        currentLatLng = defaultLatLng
+        updateMap()
+        getAddressFromLatLng(defaultLatLng.latitude, defaultLatLng.longitude)
     }
 
     private fun getAddressFromLatLng(lat: Double, lng: Double) {
@@ -269,12 +331,54 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setupCategorySelection() {
         val categories = listOf(
-            CategoryView(binding.layoutJalanRusak, binding.icJalanRusak, binding.tvJalanRusak, "Jalan Rusak", R.drawable.ic_jalan_rusak_selected, R.drawable.ic_jalan_rusak_unselected),
-            CategoryView(binding.layoutSampah, binding.icSampah, binding.tvSampah, "Sampah", R.drawable.ic_trash_selected, R.drawable.ic_trash_unselected),
-            CategoryView(binding.layoutaBanjir, binding.icBanjir, binding.tvBanjir, "Banjir", R.drawable.ic_banjir_selected, R.drawable.ic_banjir_unselected),
-            CategoryView(binding.layoutMacet, binding.icMacet, binding.tvMacet, "Macet", R.drawable.ic_macet_selected, R.drawable.ic_macet_unselected),
-            CategoryView(binding.layoutPolusi, binding.icPolusi, binding.tvPolusi, "Polusi", R.drawable.ic_polusi_selected, R.drawable.ic_polusi_unselected),
-            CategoryView(binding.layoutOther, binding.icOther, binding.tvOther, "Lainnya", R.drawable.ic_other_selected, R.drawable.ic_other_unselected)
+            CategoryView(
+                binding.layoutJalanRusak,
+                binding.icJalanRusak,
+                binding.tvJalanRusak,
+                "Jalan Rusak",
+                R.drawable.ic_jalan_rusak_selected,
+                R.drawable.ic_jalan_rusak_unselected
+            ),
+            CategoryView(
+                binding.layoutSampah,
+                binding.icSampah,
+                binding.tvSampah,
+                "Sampah",
+                R.drawable.ic_trash_selected,
+                R.drawable.ic_trash_unselected
+            ),
+            CategoryView(
+                binding.layoutaBanjir,
+                binding.icBanjir,
+                binding.tvBanjir,
+                "Banjir",
+                R.drawable.ic_banjir_selected,
+                R.drawable.ic_banjir_unselected
+            ),
+            CategoryView(
+                binding.layoutMacet,
+                binding.icMacet,
+                binding.tvMacet,
+                "Macet",
+                R.drawable.ic_macet_selected,
+                R.drawable.ic_macet_unselected
+            ),
+            CategoryView(
+                binding.layoutPolusi,
+                binding.icPolusi,
+                binding.tvPolusi,
+                "Polusi",
+                R.drawable.ic_polusi_selected,
+                R.drawable.ic_polusi_unselected
+            ),
+            CategoryView(
+                binding.layoutOther,
+                binding.icOther,
+                binding.tvOther,
+                "Lainnya",
+                R.drawable.ic_other_selected,
+                R.drawable.ic_other_unselected
+            )
         )
 
         categories.forEach { category ->
@@ -288,12 +392,12 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun selectCategory(selected: CategoryView, allCategories: List<CategoryView>) {
         selectedCategory = selected.name
-        
+
         allCategories.forEach { category ->
             val isSelected = category == selected
 
             category.layout.background = ContextCompat.getDrawable(
-                this, 
+                this,
                 if (isSelected) R.drawable.bg_category_selected else R.drawable.bg_category_unselected
             )
 
@@ -305,7 +409,8 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun displayMediaPreviews() {
-        val placeholders = listOf(binding.imgPlaceholder1, binding.imgPlaceholder2, binding.imgPlaceholder3)
+        val placeholders =
+            listOf(binding.imgPlaceholder1, binding.imgPlaceholder2, binding.imgPlaceholder3)
         val previews = listOf(binding.cvPreview1, binding.cvPreview2, binding.cvPreview3)
         val previewImages = listOf(binding.imgPreview1, binding.imgPreview2, binding.imgPreview3)
 
@@ -317,7 +422,7 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
             if (i < mediaUris.size) {
                 placeholders[i].visibility = View.GONE
                 previews[i].visibility = View.VISIBLE
-                
+
                 Glide.with(this)
                     .load(mediaUris[i])
                     .into(previewImages[i])
@@ -335,7 +440,7 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun updateMap() {
         val map = mMap ?: return
-        val latLng = currentLatLng ?: return
+        val latLng = currentLatLng ?: defaultLatLng
 
         map.clear()
         map.addMarker(MarkerOptions().position(latLng).title("Lokasi Kejadian"))

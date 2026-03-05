@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".presentation.profile.edit.ProfileEditActivity">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingVertical="12dp">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="7dp"
+            android:padding="7dp"
+            android:src="@drawable/ic_arrow_left" />
+
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="Edit Profile"
+            android:textColor="@color/textPrimary"
+            android:textSize="17sp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D9D9D9"/>
+
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/progress"
+        android:layout_above="@id/layoutBtnn"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginTop="20dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/ivProfile"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/img_black"/>
+                
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="end|bottom"
+                    android:src="@drawable/ic_edit"
+                    android:padding="8dp"
+                    android:backgroundTint="@color/white"/>
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvUbahFoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ubah Foto Profile"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="15sp"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/primary"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:text="NAMA LENGKAP"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="14sp"
+                android:textColor="#6C7278"
+                android:layout_marginTop="20dp"/>
+
+            <EditText
+                android:id="@+id/etNama"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_input"
+                android:hint="Masukan Nama Lengkap"
+                android:textColorHint="@color/hint"
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:paddingStart="16dp"
+                android:layout_marginHorizontal="15dp"
+                android:paddingEnd="16dp"
+                android:fontFamily="@font/poppins_medium"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_marginTop="5dp"
+                android:inputType="textPersonName"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:text="ALAMAT EMAIL"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="14sp"
+                android:textColor="#6C7278"
+                android:layout_marginTop="20dp"/>
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_input"
+                android:hint="Masukan Email"
+                android:textColorHint="@color/hint"
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:paddingStart="16dp"
+                android:layout_marginHorizontal="15dp"
+                android:paddingEnd="16dp"
+                android:fontFamily="@font/poppins_medium"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_marginTop="5dp"
+                android:inputType="textEmailAddress"
+                android:singleLine="true" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <RelativeLayout
+        android:id="@+id/layoutBtnn"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D0D0D0"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="15dp"
+            android:backgroundTint="@color/primary"
+            android:layout_marginVertical="15dp"
+            app:cornerRadius="10dp"
+            android:text="Simpan Perubahan"
+            android:fontFamily="@font/poppins_semibold"
+            android:textSize="14sp"
+            android:visibility="visible"
+            android:textColor="@color/white"/>
+
+        <ProgressBar
+            android:id="@+id/pbLoading"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginVertical="15dp"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/primary"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -77,7 +77,7 @@ class PengaduanRepository {
         catatan: String
     ): Response<BaseResponse<PengaduanReview>> {
         val token = TokenManager(context).getToken()
-        val res = RetrofitInstance.api.CreatePengaduanReview(token, pengaduanId, rating, catatan)
+        val res = RetrofitInstance.api.createPengaduanReview(token, pengaduanId, rating, catatan)
         return res
     }
 }

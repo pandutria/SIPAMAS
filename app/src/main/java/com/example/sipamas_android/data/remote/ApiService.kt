@@ -15,6 +15,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
@@ -39,6 +40,15 @@ interface ApiService {
     @GET("auth/me")
     suspend fun me(
         @Header("Authorization") token: String
+    ): Response<BaseResponse<User>>
+
+    @Multipart
+    @PUT("auth/profile/update")
+    suspend fun updateProfile(
+        @Header("Authorization") token: String,
+        @Part("fullname") fullname: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part profile_photo: MultipartBody.Part?,
     ): Response<BaseResponse<User>>
 
     @GET("pengaduan")
@@ -75,7 +85,7 @@ interface ApiService {
 
     @Multipart
     @POST("pengaduan/review/create")
-    suspend fun CreatePengaduanReview(
+    suspend fun createPengaduanReview(
         @Header("Authorization") token: String,
         @Part("pengaduan_id") pengaduan_id: Int,
         @Part("rating") rating: Int,

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.sipamas_android.R
 import com.example.sipamas_android.data.repository.AuthRepository
 import com.example.sipamas_android.data.state.State
@@ -66,6 +67,9 @@ class RegisterActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+        insetsController.isAppearanceLightStatusBars = true
 
         binding.tvLogin.setOnClickListener {
             IntenHelper.navigate(this, LoginActivity::class.java)

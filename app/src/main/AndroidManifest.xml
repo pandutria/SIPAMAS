@@ -24,6 +24,15 @@
         android:theme="@style/Theme.SIPAMASAndroid"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".presentation.map.SelectMapActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.privasi.PrivasiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.profile.edit.ProfileEditActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.review.PengaduanReviewActivity"
             android:exported="false" />
         <activity

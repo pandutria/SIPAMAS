@@ -59,4 +59,32 @@ class AuthRepository {
         val res = RetrofitInstance.api.me(token)
         return res
     }
+
+    suspend fun updateProfile(
+        context: Context,
+        fullname: String,
+        email: String,
+        profilePhoto: File?
+    ): Response<BaseResponse<User>> {
+        val token = TokenManager(context).getToken()
+        val fullnameBody = fullname.toRequestBody("text/plain".toMediaType())
+        val emailBody = email.toRequestBody("text/plain".toMediaType())
+
+        var profilePhotoPart: MultipartBody.Part? = null
+        profilePhoto?.let {
+            val requestFile = it.asRequestBody("image/*".toMediaType())
+            profilePhotoPart = MultipartBody.Part.createFormData(
+                "profile_photo",
+                it.name,
+                requestFile
+            )
+        }
+
+        return RetrofitInstance.api.updateProfile(
+            token,
+            fullnameBody,
+            emailBody,
+            profilePhotoPart
+        )
+    }
 }

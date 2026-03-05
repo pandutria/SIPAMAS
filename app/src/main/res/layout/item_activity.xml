@@ -2,25 +2,120 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="15dp"
-    android:layout_marginTop="10dp">
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:background="@color/bg">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@drawable/bg_input"
+        android:orientation="horizontal"
+        android:paddingHorizontal="15dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="12dp"
+        android:paddingVertical="15dp">
+
+
+        <ImageView
+            android:id="@+id/imgImage"
+            android:layout_width="63dp"
+            android:layout_height="63dp"
+            android:src="@drawable/img_menunggu" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_input"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="12dp">
+            android:layout_marginLeft="15dp"
+            android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jalan Berlubang"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="15sp"
+                android:textColor="@color/textPrimary"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jl. Cililitan, dekat dengan danau"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="13sp"
+                android:textColor="@color/textPrimary"
+                android:maxLines="1"
+                android:layout_marginTop="-2dp"
+                android:ellipsize="end"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginBottom="1dp"
+                    android:src="@drawable/ic_calendar"/>
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="9sp"
+                    android:textColor="#929292"
+                    android:fontFamily="@font/poppins_regular"
+                    android:layout_marginLeft="5dp"
+                    android:text="17 December 2025"/>
+
+                <ImageView
+                    android:layout_width="3dp"
+                    android:layout_height="3dp"
+                    android:layout_marginHorizontal="7dp"
+                    android:src="@drawable/circle"/>
+
+                <TextView
+                    android:id="@+id/tvId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="9sp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textColor="#929292"
+                    android:text="AZA-1011"/>
+
+            </LinearLayout>
 
         </LinearLayout>
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="31dp"
+            android:padding="3dp"
+            android:src="@drawable/ic_arror_right_grey"/>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Diproses"
+        android:elevation="2dp"
+        android:background="@drawable/bg_status_item_process"
+        android:textSize="11sp"
+        android:paddingHorizontal="8dp"
+        android:fontFamily="@font/poppins_bold"
+        android:textColor="#FF8400"
+        android:layout_gravity="end"
+        android:layout_marginEnd="2dp"
+        android:paddingVertical="2.5dp"/>
+
 
 </FrameLayout>

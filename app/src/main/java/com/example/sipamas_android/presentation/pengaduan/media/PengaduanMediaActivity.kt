@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.bumptech.glide.Glide
 import com.example.sipamas_android.R
+import com.example.sipamas_android.data.local.PrivacyManager
 import com.example.sipamas_android.databinding.ActivityPengaduanMediaBinding
 import com.example.sipamas_android.presentation.pengaduan.PengaduanActivity
 import com.example.sipamas_android.utils.IntenHelper
@@ -34,6 +35,7 @@ class PengaduanMediaActivity : AppCompatActivity() {
 
     private val selectedMediaUris = mutableListOf<Uri>()
     private var tempUri: Uri? = null
+    private lateinit var privacyManager: PrivacyManager
 
     private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
@@ -63,7 +65,6 @@ class PengaduanMediaActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
-            // Cek apakah dipicu dari onCreate (useCamera=true) atau klik manual
             if (intent.getBooleanExtra("useCamera", false) && selectedMediaUris.isEmpty()) {
                 openCameraForPhoto()
             } else {
@@ -71,7 +72,6 @@ class PengaduanMediaActivity : AppCompatActivity() {
             }
         } else {
             Toasthelper.show(this, "Izin kamera ditolak")
-            // Jika izin ditolak, selalu kembali ke halaman sebelumnya (finish)
             IntenHelper.finish(this)
         }
     }
@@ -97,6 +97,8 @@ class PengaduanMediaActivity : AppCompatActivity() {
         val insetsController = WindowInsetsControllerCompat(window, window.decorView)
         insetsController.isAppearanceLightStatusBars = true
 
+        privacyManager = PrivacyManager(this)
+
         setupAction()
         isUseCamera()
         updateUI()
@@ -105,7 +107,12 @@ class PengaduanMediaActivity : AppCompatActivity() {
     private fun isUseCamera() {
         val useCamera = intent.getBooleanExtra("useCamera", false)
         if (useCamera) {
-            checkPermissionAndOpenCameraDirectly()
+            if (privacyManager.isCameraEnabled()) {
+                checkPermissionAndOpenCameraDirectly()
+            } else {
+                Toasthelper.show(this, "Akses kamera dinonaktifkan. Silakan aktifkan di Pengaturan Privasi.")
+                finish()
+            }
         }
     }
 
@@ -113,7 +120,6 @@ class PengaduanMediaActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             openCameraForPhoto()
         } else {
-            // Minta izin ke sistem (bukan buka pengaturan)
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
@@ -124,10 +130,14 @@ class PengaduanMediaActivity : AppCompatActivity() {
         }
 
         binding.layoutTakePhoto.setOnClickListener {
-            if (selectedMediaUris.size < 3) {
-                checkPermissionAndShowOptions()
+            if (privacyManager.isCameraEnabled()) {
+                if (selectedMediaUris.size < 3) {
+                    checkPermissionAndShowOptions()
+                } else {
+                    Toasthelper.show(this, "Maksimal memilih 3 File")
+                }
             } else {
-                Toasthelper.show(this, "Maksimal memilih 3 File")
+                Toasthelper.show(this, "Akses kamera dinonaktifkan. Silakan aktifkan di Pengaturan Privasi.")
             }
         }
 
