@@ -20,6 +20,7 @@ import com.example.sipamas_android.data.state.State
 import com.example.sipamas_android.databinding.ActivityPengaduanDetailBinding
 import com.example.sipamas_android.presentation.adapter.LampiranAdapter
 import com.example.sipamas_android.presentation.adapter.LinimasaAdapter
+import com.example.sipamas_android.presentation.detail.media.DetailMediaActivity
 import com.example.sipamas_android.presentation.review.PengaduanReviewActivity
 import com.example.sipamas_android.utils.DateHelper
 import com.example.sipamas_android.utils.IdHelper
@@ -73,7 +74,18 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapFragment.getMapAsync(this)
 
-        mediaAdapter = LampiranAdapter()
+        mediaAdapter = LampiranAdapter { media ->
+            val baseUrl = RetrofitInstance.baseUrl.replace("api/", "")
+            val cleanPath = media.media_file?.replace("\\", "/") ?: ""
+            val fullUrl = baseUrl + cleanPath
+            
+            val bundle = Bundle().apply {
+                putString("media_url", fullUrl)
+                putString("media_type", media.media_tipe)
+            }
+            IntenHelper.navigate(this, DetailMediaActivity::class.java, bundle)
+        }
+
         timelineAdapter = LinimasaAdapter()
         binding.rvLampiran.adapter = mediaAdapter
         binding.rvTimeline.adapter = timelineAdapter

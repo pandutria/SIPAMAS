@@ -24,6 +24,9 @@
         android:theme="@style/Theme.SIPAMASAndroid"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".presentation.detail.media.DetailMediaActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.map.SelectMapActivity"
             android:exported="false" />
         <activity
