@@ -33,6 +33,10 @@ func SetupRoutes(r *gin.Engine) {
 		private.PUT("/identitas-proyek/update/:id", controllers.UpdateIdentitas)
 		private.DELETE("/identitas-proyek/delete/:id", controllers.DeleteIdentitas)
 
+		private.GET("/identitas-proyek/location", controllers.GetAllIdentitasProyekLocation)
+		private.GET("/identitas-proyek/location/:id", controllers.GetIdentitasProyekLocationById)
+		private.POST("/identitas-proyek/location/create", controllers.CreateIdentitasProyekLocation)
+
 		private.GET("/identitas-proyek/photo", controllers.GetAllIdentitasProyekPhoto)
 		private.GET("/identitas-proyek/photo/:id", controllers.GetIdentitasProyekPhotoById)
 		private.POST("/identitas-proyek/photo/create", controllers.CreateIdentitasProyekPhoto)

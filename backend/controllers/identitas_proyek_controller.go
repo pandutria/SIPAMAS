@@ -23,6 +23,7 @@ func GetAllIdentitas(c *gin.Context) {
 		Preload("Pengaduan.Medias").
 		Preload("Pengaduan.Timelines").
 		Preload("Pengaduan.Review").
+		Preload("Locations").
 		Find(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
@@ -44,10 +45,12 @@ func GetIdentitasById(c *gin.Context) {
 		Preload("CreatedBy").
 		Preload("Photos").
 		Preload("Documents").
+		Preload("Pengaduan").
 		Preload("Pengaduan.CreatedBy").
 		Preload("Pengaduan.Medias").
 		Preload("Pengaduan.Timelines").
 		Preload("Pengaduan.Review").
+		Preload("Locations").
 		First(&data, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Mengambil data gagal",
@@ -112,11 +115,6 @@ func CreateIdentitas(c *gin.Context) {
 
 	if utils.NilIfEmpty(req.Nama) == nil ||
 		utils.NilIfEmpty(req.TahunAnggaran) == nil ||
-		utils.NilIfEmpty(req.Kategori) == nil ||
-		utils.NilIfEmpty(req.Kecamatan) == nil ||
-		utils.NilIfEmpty(req.Kelurahan) == nil ||
-		utils.NilIfEmpty(req.Latitude) == nil ||
-		utils.NilIfEmpty(req.Longitude) == nil ||
 		utils.NilIfEmpty(req.NilaiKontrak) == nil ||
 		utils.NilIfEmpty(req.KontraktorPelaksana) == nil ||
 		utils.NilIfEmpty(req.KonsultasPengawas) == nil ||
@@ -132,13 +130,6 @@ func CreateIdentitas(c *gin.Context) {
 		Nama:                utils.NilIfEmpty(req.Nama),
 		TahunAnggaran:       utils.NilIfEmpty(req.TahunAnggaran),
 		Kategori:            utils.NilIfEmpty(req.Kategori),
-		Provinsi:            utils.NilIfEmpty(req.Provinsi),
-		Kabupaten:           utils.NilIfEmpty(req.Kabupaten),
-		Kecamatan:           utils.NilIfEmpty(req.Kecamatan),
-		KecamatanKode:       utils.NilIfEmpty(req.KecamatanKode),
-		Kelurahan:           utils.NilIfEmpty(req.Kelurahan),
-		Latitude:            utils.NilIfEmpty(req.Latitude),
-		Longitude:           utils.NilIfEmpty(req.Longitude),
 		NilaiKontrak:        utils.NilIfEmpty(req.NilaiKontrak),
 		KontraktorPelaksana: utils.NilIfEmpty(req.KontraktorPelaksana),
 		KonsultasPengawas:   utils.NilIfEmpty(req.KonsultasPengawas),
@@ -221,11 +212,6 @@ func UpdateIdentitas(c *gin.Context) {
 	utils.SetIfNotEmpty(&data.Nama, req.Nama)
 	utils.SetIfNotEmpty(&data.TahunAnggaran, req.TahunAnggaran)
 	utils.SetIfNotEmpty(&data.Kategori, req.Kategori)
-	utils.SetIfNotEmpty(&data.Kecamatan, req.Kecamatan)
-	utils.SetIfNotEmpty(&data.KecamatanKode, req.KecamatanKode)
-	utils.SetIfNotEmpty(&data.Kelurahan, req.Kelurahan)
-	utils.SetIfNotEmpty(&data.Latitude, req.Latitude)
-	utils.SetIfNotEmpty(&data.Longitude, req.Longitude)
 	utils.SetIfNotEmpty(&data.NilaiKontrak, req.NilaiKontrak)
 	utils.SetIfNotEmpty(&data.KontraktorPelaksana, req.KontraktorPelaksana)
 	utils.SetIfNotEmpty(&data.KonsultasPengawas, req.KonsultasPengawas)
@@ -297,6 +283,17 @@ func DeleteIdentitas(c *gin.Context) {
 		return
 	}
 
+	var location []models.IdentitasProyekLocation
+	if err := query.
+		Where("identitas_proyek_id = ?", data.ID).
+		Find(&location).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
 	var photo []models.IdentitasProyekPhoto
 	if err := query.
 		Where("identitas_proyek_id = ?", data.ID).
@@ -312,6 +309,14 @@ func DeleteIdentitas(c *gin.Context) {
 	if err := query.
 		Where("identitas_proyek_id = ?", data.ID).
 		Find(&document).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Menghapus data gagal",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := query.Delete(&location).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
 			"error":   err.Error(),

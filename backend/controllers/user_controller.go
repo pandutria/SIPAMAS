@@ -390,7 +390,7 @@ func Register(c *gin.Context) {
 		Email:    utils.NilIfEmpty(req.Email),
 		Address:  utils.NilIfEmpty(req.Address),
 		Password: utils.HashSHA512(req.Password),
-		Nik: utils.NilIfEmpty(req.Nik),
+		Nik:      utils.NilIfEmpty(req.Nik),
 		IsActive: &active,
 		Role:     &role,
 		KtpFile:  ktpPath,
@@ -437,6 +437,13 @@ func Login(c *gin.Context) {
 	if !utils.CompareHashSHA512(*utils.NilIfEmpty(req.Password), user.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Email atau password tidak benar!",
+		})
+		return
+	}
+
+	if user.IsActive != nil && *user.IsActive == "false" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Status akun tidak aktif",
 		})
 		return
 	}
