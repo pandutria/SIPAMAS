@@ -51,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.etEmail.setText("masyarakat@gmail.com")
-        binding.etPassword.setText("masyarakat123")
+        binding.etPassword.setText("Masyarakat123$")
 
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString()

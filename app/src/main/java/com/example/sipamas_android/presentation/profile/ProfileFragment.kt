@@ -73,8 +73,7 @@ class ProfileFragment : Fragment() {
                 is State.Success -> {
                     val user = state.data
                     binding.tvFullname.text = user.fullname ?: "-"
-                    
-                    // Cek privasi untuk email
+
                     if (privacyManager.isEmailVisible()) {
                         binding.tvEmail.text = user.email ?: "-"
                         binding.tvEmail.visibility = View.VISIBLE
@@ -82,7 +81,6 @@ class ProfileFragment : Fragment() {
                         binding.tvEmail.visibility = View.GONE
                     }
 
-                    // Load Profile Photo
                     if (!user.profile_photo.isNullOrEmpty()) {
                         val baseUrl = RetrofitInstance.baseUrl.replace("api/", "")
                         val cleanPath = user.profile_photo.replace("\\", "/")
@@ -90,8 +88,8 @@ class ProfileFragment : Fragment() {
 
                         Glide.with(this)
                             .load(imageUrl)
-                            .placeholder(R.drawable.example_user)
-                            .error(R.drawable.example_user)
+                            .placeholder(R.drawable.img_black)
+                            .error(R.drawable.img_black)
                             .into(binding.ivProfile)
                     }
 

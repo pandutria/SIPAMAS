@@ -1,5 +1,6 @@
 package com.example.sipamas_android.presentation.detail
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.location.Geocoder
 import android.os.Bundle
@@ -139,23 +140,25 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                             getLatLngFromAddress(address)
                         }
                     }
-                    if (state.data.status?.lowercase() == "selesai") {
+
+                    val isSelesai = state.data.status?.lowercase() == "selesai"
+                    val hasReview = state.data.review != null
+
+                    if (isSelesai && !hasReview) {
                         binding.layoutButton.visibility = View.VISIBLE
                     } else {
                         binding.layoutButton.visibility = View.GONE
                     }
-                    pengaduan = state.data
 
-                    if (state.data.review != null) {
-                        binding.layoutButton.visibility = View.GONE
+                    if (hasReview) {
                         binding.layoutReview.visibility = View.VISIBLE
                         binding.rbReview.rating = state.data.review!!.rating?.toFloat() ?: 0f
                         binding.tvReviewCatatan.text = state.data.review!!.catatan ?: "-"
-                        binding.layoutButton.visibility = View.GONE
                     } else {
-                        binding.layoutButton.visibility = View.VISIBLE
                         binding.layoutReview.visibility = View.GONE
                     }
+
+                    pengaduan = state.data
                 }
 
                 is State.Error -> {
@@ -290,6 +293,7 @@ class PengaduanDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+    @SuppressLint("GestureBackNavigation")
     override fun onBackPressed() {
         super.onBackPressed()
         IntenHelper.finish(this)

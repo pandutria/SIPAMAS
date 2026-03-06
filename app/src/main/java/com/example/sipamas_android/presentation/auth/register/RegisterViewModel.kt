@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.sipamas_android.data.model.User
 import com.example.sipamas_android.data.repository.AuthRepository
 import com.example.sipamas_android.data.response.BaseResponse
-import com.example.sipamas_android.data.response.LoginResponse
 import com.example.sipamas_android.data.state.State
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -21,6 +20,7 @@ class RegisterViewModel(private val repo: AuthRepository) : ViewModel() {
     fun register(
         fullname: String,
         email: String,
+        nik: String,
         address: String,
         password: String,
         ktpFile: File,
@@ -28,7 +28,7 @@ class RegisterViewModel(private val repo: AuthRepository) : ViewModel() {
         viewModelScope.launch {
             _registerState.postValue(State.Loading)
             try {
-                val res = repo.register(fullname, email, address, password, ktpFile)
+                val res = repo.register(fullname, email, nik, address, password, ktpFile)
                 val body = res.body()
 
                 if (res.isSuccessful && body?.data != null) {

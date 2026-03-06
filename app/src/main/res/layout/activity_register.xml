@@ -61,7 +61,35 @@
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
                 android:layout_marginTop="5dp"
-                android:inputType="textEmailAddress"
+                android:inputType="textPersonName"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NIK (Nomor Induk Kependudukan)"
+                android:fontFamily="@font/poppins_medium"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"
+                android:layout_marginTop="10dp"/>
+
+            <EditText
+                android:id="@+id/etNik"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_input"
+                android:hint="Masukan NIK Anda"
+                android:textColorHint="@color/hint"
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:fontFamily="@font/poppins_medium"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_marginTop="5dp"
+                android:inputType="number"
+                android:maxLength="16"
                 android:singleLine="true" />
 
             <TextView
@@ -115,7 +143,7 @@
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
                 android:layout_marginTop="5dp"
-                android:inputType="textEmailAddress"
+                android:inputType="textPostalAddress"
                 android:singleLine="true" />
 
             <TextView
@@ -142,7 +170,7 @@
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
                 android:layout_marginTop="5dp"
-                android:inputType="text"
+                android:inputType="textPassword"
                 android:singleLine="true" />
 
             <TextView
@@ -282,7 +310,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="25dp"
             android:gravity="center">
 
             <TextView
@@ -290,20 +318,19 @@
                 android:layout_height="wrap_content"
                 android:text="Sudah punya akun? "
                 android:fontFamily="@font/poppins_medium"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textColor="@color/textSecondary"/>
 
             <TextView
                 android:id="@+id/tvLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Masuk Sekarang"
-                android:fontFamily="@font/poppins_medium"
-                android:textSize="12sp"
+                android:text="Masuk"
+                android:fontFamily="@font/poppins_semibold"
+                android:textSize="14sp"
                 android:textColor="@color/primary"/>
 
         </LinearLayout>
-        
 
     </RelativeLayout>
 

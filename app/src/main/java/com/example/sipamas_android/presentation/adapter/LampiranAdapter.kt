@@ -27,12 +27,12 @@ class LampiranAdapter(
                     .error(R.drawable.img_black)
                     .into(binding.image)
 
-                if (media.media_tipe == "photo") {
-                    binding.overlay.visibility = View.GONE
-                    binding.play.visibility = View.GONE
-                } else {
+                if (media.media_tipe?.equals("video", ignoreCase = true) == true) {
                     binding.overlay.visibility = View.VISIBLE
                     binding.play.visibility = View.VISIBLE
+                } else {
+                    binding.overlay.visibility = View.GONE
+                    binding.play.visibility = View.GONE
                 }
 
                 binding.root.setOnClickListener {

@@ -1,5 +1,6 @@
 package com.example.sipamas_android.presentation.privasi
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -60,6 +61,12 @@ class PrivasiActivity : AppCompatActivity() {
         binding.switchCamera.setOnCheckedChangeListener { _, isChecked ->
             privacyManager.setCameraAccess(isChecked)
         }
+    }
+
+    @SuppressLint("GestureBackNavigation")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        IntenHelper.finish(this)
     }
 
     override fun onDestroy() {

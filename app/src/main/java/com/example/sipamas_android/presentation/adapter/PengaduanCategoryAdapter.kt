@@ -28,7 +28,7 @@ class PengaduanCategoryAdapter(
             when (pengaduan.status) {
                 "Ditolak" -> {
                     binding.tvStatus.setTextColor(Color.parseColor("#FF0000"))
-                    binding.imgImage.setImageResource(R.drawable.img_menunggu)
+                    binding.imgImage.setImageResource(R.drawable.img_ditolak)
                     binding.tvStatus.background = ContextCompat.getDrawable(binding.root.context, R.drawable.bg_status_item_cancel)
                 }
                 "Menunggu" -> {

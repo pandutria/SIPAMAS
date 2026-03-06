@@ -126,14 +126,15 @@ class RegisterActivity : AppCompatActivity() {
             val email = binding.etEmail.text.toString()
             val address = binding.etAddress.text.toString()
             val password = binding.etPassword.text.toString()
+            val nik = binding.etNik.text.toString()
 
             val file = selectedKtpFile
-            if (file == null || fullname.isEmpty() || email.isEmpty() || address.isEmpty() || password.isEmpty()) {
+            if (file == null || fullname.isEmpty() || email.isEmpty() || address.isEmpty() || password.isEmpty() || nik.isEmpty()) {
                 Toasthelper.show(this, "Semua input wajib di isi")
                 return@setOnClickListener
             }
 
-            viewModel.register(fullname, email, address, password, file)
+            viewModel.register(fullname, email, nik, address, password, file)
         }
 
         binding.btnRetakeFile.setOnClickListener {

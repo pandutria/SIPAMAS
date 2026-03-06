@@ -1,5 +1,6 @@
 package com.example.sipamas_android.presentation.profile.edit
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -136,6 +137,12 @@ class ProfileEditActivity : AppCompatActivity() {
         outputStream.close()
         inputStream?.close()
         return myFile
+    }
+
+    @SuppressLint("GestureBackNavigation")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        IntenHelper.finish(this)
     }
 
     override fun onDestroy() {

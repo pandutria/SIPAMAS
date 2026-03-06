@@ -23,6 +23,8 @@ import com.example.sipamas_android.data.local.PrivacyManager
 import com.example.sipamas_android.databinding.ActivitySelectMapBinding
 import com.example.sipamas_android.utils.IntenHelper
 import com.example.sipamas_android.utils.Toasthelper
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -49,6 +51,7 @@ class SelectMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var searchJob: Job? = null
     private lateinit var privacyManager: PrivacyManager
     private lateinit var placesClient: PlacesClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private val defaultLatLng = LatLng(0.4811, 128.2411)
 
@@ -68,6 +71,7 @@ class SelectMapActivity : AppCompatActivity(), OnMapReadyCallback {
         insetsController.isAppearanceLightStatusBars = true
 
         privacyManager = PrivacyManager(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val apiKey = try {
             val ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
@@ -218,7 +222,14 @@ class SelectMapActivity : AppCompatActivity(), OnMapReadyCallback {
             updateMapSelection(selectedLatLng!!, "Lokasi Terpilih")
         } else if (privacyManager.isLocationEnabled() && hasPermission) {
             mMap?.isMyLocationEnabled = true
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLng, 10f))
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val currentLatLng = LatLng(location.latitude, location.longitude)
+                    updateMapSelection(currentLatLng, "Lokasi Saya")
+                } else {
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLng, 10f))
+                }
+            }
         } else {
             if (!privacyManager.isLocationEnabled()) {
                 Toasthelper.show(this, "Akses lokasi dinonaktifkan di Pengaturan Privasi. Menggunakan lokasi default.")

@@ -25,6 +25,7 @@ interface ApiService {
     suspend fun register(
         @Part("fullname") fullname: RequestBody,
         @Part("email") email: RequestBody,
+        @Part("nik") nik: RequestBody,
         @Part("address") address: RequestBody,
         @Part("password") password: RequestBody,
         @Part ktp_file: MultipartBody.Part
@@ -48,7 +49,7 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Part("fullname") fullname: RequestBody,
         @Part("email") email: RequestBody,
-        @Part profile_photo: MultipartBody.Part?,
+        @Part profile_file: MultipartBody.Part?,
     ): Response<BaseResponse<User>>
 
     @GET("pengaduan")

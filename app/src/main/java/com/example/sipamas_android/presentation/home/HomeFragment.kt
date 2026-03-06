@@ -6,11 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.sipamas_android.R
 import com.example.sipamas_android.data.local.AuthManager
 import com.example.sipamas_android.data.local.PrivacyManager
 import com.example.sipamas_android.data.local.TokenManager
 import com.example.sipamas_android.data.model.Pengaduan
+import com.example.sipamas_android.data.remote.RetrofitInstance
+import com.example.sipamas_android.data.repository.AuthRepository
 import com.example.sipamas_android.data.repository.PengaduanRepository
 import com.example.sipamas_android.data.state.State
 import com.example.sipamas_android.databinding.FragmentHomeBinding
@@ -30,7 +33,7 @@ class HomeFragment : Fragment() {
     private var data: List<Pengaduan> = mutableListOf()
 
     private val viewModel: HomeViewModel by viewModels {
-        HomeViewModelFactory(PengaduanRepository())
+        HomeViewModelFactory(PengaduanRepository(), AuthRepository())
     }
 
     override fun onCreateView(
@@ -64,6 +67,7 @@ class HomeFragment : Fragment() {
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.getPengaduan(requireContext())
+            viewModel.getMe(requireContext())
         }
 
         binding.etSearch.setOnClickListener {
@@ -92,18 +96,58 @@ class HomeFragment : Fragment() {
         }
 
         viewModel.getPengaduan(requireContext())
+        viewModel.getMe(requireContext())
+        
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        val authManager = AuthManager(requireContext())
+        
+        viewModel.meState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is State.Loading -> { }
+                is State.Success -> {
+                    val user = state.data
+                    binding.tvFullname.text = user.fullname ?: "Masyarakat"
+
+                    if (!user.profile_photo.isNullOrEmpty()) {
+                        val baseUrl = RetrofitInstance.baseUrl.replace("api/", "")
+                        val cleanPath = user.profile_photo.replace("\\", "/")
+                        val imageUrl = if (cleanPath.startsWith("/")) {
+                            baseUrl.removeSuffix("/") + cleanPath
+                        } else {
+                            baseUrl + cleanPath
+                        }
+
+                        Glide.with(this)
+                            .load(imageUrl)
+                            .placeholder(R.drawable.example_user)
+                            .error(R.drawable.example_user)
+                            .into(binding.ivProfile)
+                    } else {
+                        binding.ivProfile.setImageResource(R.drawable.example_user)
+                    }
+
+                    authManager.save(user)
+                }
+                is State.Error -> {
+                    // Fail silently or show minor toast for profile refresh
+                }
+            }
+        }
+
         viewModel.getState.observe(viewLifecycleOwner) { state ->
+            val auth = authManager.get()
             when (state) {
                 is State.Loading -> {
-                    binding.tvTotalPengaduan.text = "0"
-                    binding.tvPengaduanProses.text = "0"
-                    binding.tvPengaduanSelesai.text = "0"
-                    binding.pbLoading.visibility = View.VISIBLE
-                    binding.rvPengaduan.visibility = View.GONE
-                    binding.tvEmpty.visibility = View.GONE
-
                     if (!binding.swipeRefresh.isRefreshing) {
+                        binding.tvTotalPengaduan.text = "0"
+                        binding.tvPengaduanProses.text = "0"
+                        binding.tvPengaduanSelesai.text = "0"
                         binding.pbLoading.visibility = View.VISIBLE
+                        binding.rvPengaduan.visibility = View.GONE
+                        binding.tvEmpty.visibility = View.GONE
                     }
                 }
 
@@ -112,7 +156,6 @@ class HomeFragment : Fragment() {
                     binding.swipeRefresh.isRefreshing = false
 
                     if (state.data.isEmpty()) {
-                        binding.pbLoading.visibility = View.GONE
                         binding.tvEmpty.visibility = View.VISIBLE
                         return@observe
                     }
@@ -122,7 +165,6 @@ class HomeFragment : Fragment() {
 
                     binding.rvPengaduan.adapter = adapter
                     binding.rvPengaduan.visibility = View.VISIBLE
-                    binding.pbLoading.visibility = View.GONE
 
                     binding.tvTotalPengaduan.text = data.count().toString()
                     binding.tvPengaduanProses.text =
@@ -132,6 +174,8 @@ class HomeFragment : Fragment() {
                 }
 
                 is State.Error -> {
+                    binding.swipeRefresh.isRefreshing = false
+                    binding.pbLoading.visibility = View.GONE
                     TokenManager(requireContext()).removeToken()
                     requireActivity().finishAffinity()
                 }
@@ -139,8 +183,6 @@ class HomeFragment : Fragment() {
                 else -> {
                     binding.swipeRefresh.isRefreshing = false
                     binding.pbLoading.visibility = View.GONE
-                    binding.tvEmpty.visibility = View.VISIBLE
-                    Toasthelper.show(requireContext(), "Error")
                 }
             }
         }

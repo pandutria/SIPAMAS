@@ -17,6 +17,7 @@ class AuthRepository {
     suspend fun register(
         fullname: String,
         email: String,
+        nik: String,
         address: String,
         password: String,
         ktpFile: File
@@ -24,6 +25,7 @@ class AuthRepository {
 
         val fullnameBody = fullname.toRequestBody("text/plain".toMediaType())
         val emailBody = email.toRequestBody("text/plain".toMediaType())
+        val nikBody = nik.toRequestBody("text/plain".toMediaType())
         val addressBody = address.toRequestBody("text/plain".toMediaType())
         val passwordBody = password.toRequestBody("text/plain".toMediaType())
 
@@ -38,6 +40,7 @@ class AuthRepository {
         val res = RetrofitInstance.api.register(
             fullnameBody,
             emailBody,
+            nikBody,
             addressBody,
             passwordBody,
             ktpPart
@@ -74,7 +77,7 @@ class AuthRepository {
         profilePhoto?.let {
             val requestFile = it.asRequestBody("image/*".toMediaType())
             profilePhotoPart = MultipartBody.Part.createFormData(
-                "profile_photo",
+                "profile_file",
                 it.name,
                 requestFile
             )
