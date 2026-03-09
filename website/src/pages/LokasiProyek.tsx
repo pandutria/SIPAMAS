@@ -24,8 +24,14 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
     }
 }
 
-function getAlamat(project: ProjectIdentityProps): string {
-    return [project.kecamatan, project.kabupaten, project.provinsi].filter(Boolean).join(', ') || '-';
+function getLocationLabel(loc: ProjectIdentityLocationProps): string {
+    return [loc.kelurahan, loc.kecamatan, loc.kabupaten, loc.provinsi].filter(Boolean).join(', ') || '-';
+}
+
+function getProjectSummaryLabel(project: ProjectIdentityProps): string {
+    if (!project.locations || project.locations.length === 0) return '-';
+    const first = project.locations[0];
+    return [first.kecamatan, first.kabupaten, first.provinsi].filter(Boolean).join(', ') || '-';
 }
 
 function getStatus(project: ProjectIdentityProps) {
@@ -36,25 +42,43 @@ function getStatus(project: ProjectIdentityProps) {
 }
 
 function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-        day: 'numeric', month: 'short', year: 'numeric',
-    });
+    return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ── Resolved structures ────────────────────────────────────────────────────
+
+interface ResolvedLocation {
+    location: ProjectIdentityLocationProps;
+    lat: number;
+    lng: number;
+    projectId: number;
 }
 
 interface ResolvedProject extends ProjectIdentityProps {
-    resolvedLat: number;
-    resolvedLng: number;
+    resolvedLocations: ResolvedLocation[];
 }
 
-function CustomMarker({ project, isSelected, onClick }: {
-    project: ResolvedProject;
-    isSelected: boolean;
+// ── Custom marker — one pin per resolved location ──────────────────────────
+
+function CustomMarker({
+    resolved,
+    isProjectSelected,
+    isHighlighted,
+    onClick,
+    locationIndex,
+}: {
+    resolved: ResolvedLocation;
+    isProjectSelected: boolean;
+    isHighlighted: boolean;
     onClick: () => void;
+    locationIndex: number;
 }) {
-    const status = getStatus(project);
+    const color = isProjectSelected ? '#16a34a' : '#f97316';
+    const size = isHighlighted ? 38 : isProjectSelected ? 30 : 24;
+
     return (
         <OverlayView
-            position={{ lat: project.resolvedLat, lng: project.resolvedLng }}
+            position={{ lat: resolved.lat, lng: resolved.lng }}
             mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
         >
             <div
@@ -62,23 +86,28 @@ function CustomMarker({ project, isSelected, onClick }: {
                 className="relative cursor-pointer flex flex-col items-center"
                 style={{ transform: 'translate(-50%, -100%)' }}
             >
-                <div className={`transition-all duration-300 ${isSelected ? 'scale-125' : 'hover:scale-110'}`}>
+                <div
+                    className="transition-all duration-300"
+                    style={{ transform: isHighlighted ? 'scale(1.2)' : isProjectSelected ? 'scale(1.05)' : 'scale(1)' }}
+                >
                     <div
-                        className="relative flex items-center justify-center rounded-full shadow-xl border-2 border-white"
+                        className="relative flex items-center justify-center rounded-full border-2 border-white"
                         style={{
-                            width: isSelected ? 36 : 28,
-                            height: isSelected ? 36 : 28,
-                            background: status.color,
-                            boxShadow: isSelected
-                                ? `0 0 0 4px ${status.color}40, 0 4px 20px ${status.color}60`
-                                : `0 2px 12px ${status.color}50`,
+                            width: size,
+                            height: size,
+                            background: color,
+                            boxShadow: isHighlighted
+                                ? `0 0 0 5px ${color}30, 0 4px 20px ${color}60`
+                                : `0 2px 10px ${color}50`,
                             transition: 'all 0.3s ease',
                         }}
                     >
-                        {isSelected ? (
-                            <svg width="14" height="14" fill="white" viewBox="0 0 24 24">
+                        {isHighlighted ? (
+                            <svg width="13" height="13" fill="white" viewBox="0 0 24 24">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                             </svg>
+                        ) : isProjectSelected ? (
+                            <span className="text-white font-bold" style={{ fontSize: 10 }}>{locationIndex + 1}</span>
                         ) : (
                             <div className="w-2 h-2 rounded-full bg-white opacity-80" />
                         )}
@@ -86,10 +115,10 @@ function CustomMarker({ project, isSelected, onClick }: {
                     <div
                         className="absolute left-1/2 -translate-x-1/2 w-0 h-0"
                         style={{
-                            bottom: isSelected ? -7 : -5,
-                            borderLeft: `${isSelected ? 6 : 5}px solid transparent`,
-                            borderRight: `${isSelected ? 6 : 5}px solid transparent`,
-                            borderTop: `${isSelected ? 8 : 6}px solid ${status.color}`,
+                            bottom: isHighlighted ? -8 : -5,
+                            borderLeft: `${isHighlighted ? 7 : 5}px solid transparent`,
+                            borderRight: `${isHighlighted ? 7 : 5}px solid transparent`,
+                            borderTop: `${isHighlighted ? 9 : 6}px solid ${color}`,
                         }}
                     />
                 </div>
@@ -98,17 +127,20 @@ function CustomMarker({ project, isSelected, onClick }: {
     );
 }
 
-function ProjectCard({ project, isSelected, onClick, index }: {
-    project: ResolvedProject;
-    isSelected: boolean;
-    onClick: () => void;
-    index: number;
+// ── Project card in sidebar ────────────────────────────────────────────────
+
+function ProjectCard({
+    project, isSelected, onClick, index,
+}: {
+    project: ResolvedProject; isSelected: boolean; onClick: () => void; index: number;
 }) {
     const status = getStatus(project);
+    const locCount = project.resolvedLocations.length;
+
     return (
         <button
             onClick={onClick}
-            className="w-full text-left p-4 rounded-2xl border transition-all duration-300 group"
+            className="w-full text-left p-4 rounded-2xl border transition-all duration-300"
             style={{
                 background: isSelected ? 'white' : '#f9fafb',
                 borderColor: isSelected ? 'transparent' : '#f3f4f6',
@@ -122,35 +154,55 @@ function ProjectCard({ project, isSelected, onClick, index }: {
                     style={{ background: status.color, boxShadow: `0 0 6px ${status.color}60` }}
                 />
                 <div className="flex-1 min-w-0">
-                    <span className={`inline-flex text-[9px] font-poppins-semibold text-white px-2 py-0.5 rounded-full mb-1.5 ${status.bg}`}>
-                        Proyek {status.label}
-                    </span>
+                    <div className="flex items-center gap-2 mb-1.5">
+                        <span className={`inline-flex text-[9px] font-poppins-semibold text-white px-2 py-0.5 rounded-full ${status.bg}`}>
+                            {status.label}
+                        </span>
+                        {locCount > 0 && (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-poppins-semibold text-primary bg-green-50 border border-green-100 px-2 py-0.5 rounded-full">
+                                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                </svg>
+                                {locCount} titik
+                            </span>
+                        )}
+                    </div>
                     <p className={`font-poppins-semibold text-[13px] leading-snug mb-1.5 truncate ${isSelected ? 'text-gray-900' : 'text-gray-700'}`}>
                         {project.nama}
                     </p>
-                    <div className="flex items-start gap-1">
-                        <svg className="w-3 h-3 text-gray-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <p className="font-poppins-regular text-[11px] text-gray-400 leading-relaxed line-clamp-2">{getAlamat(project)}</p>
-                    </div>
+                    <p className="font-poppins-regular text-[11px] text-gray-400 leading-relaxed line-clamp-1">
+                        {getProjectSummaryLabel(project)}
+                        {locCount > 1 && <span className="text-gray-300"> +{locCount - 1} lokasi lainnya</span>}
+                    </p>
                 </div>
             </div>
         </button>
     );
 }
 
-function InfoPanel({ project, onClose }: { project: ResolvedProject; onClose: () => void }) {
+// ── Info panel ─────────────────────────────────────────────────────────────
+
+function InfoPanel({
+    project, highlightedLocIdx, onClose, onLocationClick,
+}: {
+    project: ResolvedProject;
+    highlightedLocIdx: number | null;
+    onClose: () => void;
+    onLocationClick: (idx: number) => void;
+}) {
     const status = getStatus(project);
+
     return (
         <div
             className="bg-white mt-6 rounded-2xl border border-gray-100 p-5 w-80"
             style={{
                 boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
                 animation: 'infoPanelIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                maxHeight: '70vh',
+                overflowY: 'auto',
             }}
         >
+            {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex-1 min-w-0">
                     <span className={`inline-flex text-[9px] font-poppins-bold text-white px-2.5 py-1 rounded-full mb-2 ${status.bg}`}>
@@ -170,31 +222,67 @@ function InfoPanel({ project, onClose }: { project: ResolvedProject; onClose: ()
 
             <div className="h-px bg-gray-100 mb-4" />
 
-            <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gray-50 rounded-xl p-3">
-                        <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest mb-1">Mulai</p>
-                        <p className="font-poppins-bold text-[11px] text-gray-800">{formatDate(project.created_at)}</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-xl p-3">
-                        <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest mb-1">Selesai</p>
-                        <p className="font-poppins-bold text-[11px] text-gray-800">{formatDate(project.updated_at)}</p>
-                    </div>
+            {/* Dates */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="bg-gray-50 rounded-xl p-3">
+                    <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest mb-1">Mulai</p>
+                    <p className="font-poppins-bold text-[11px] text-gray-800">{formatDate(project.created_at)}</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3">
-                    <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest mb-1">Lokasi</p>
-                    <p className="font-poppins-medium text-[12px] text-gray-700 leading-relaxed">{getAlamat(project)}</p>
+                    <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest mb-1">Diperbarui</p>
+                    <p className="font-poppins-bold text-[11px] text-gray-800">{formatDate(project.updated_at)}</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-3">
-                    <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest mb-1">Koordinat</p>
-                    <p className="font-poppins-regular text-[11px] text-gray-500">
-                        {project.resolvedLat.toFixed(5)}, {project.resolvedLng.toFixed(5)}
-                    </p>
-                </div>
+            </div>
+
+            {/* Location list */}
+            <div className="flex flex-col gap-2">
+                <p className="font-poppins-semibold text-[9px] text-gray-400 uppercase tracking-widest">
+                    {project.resolvedLocations.length} Titik Lokasi
+                </p>
+                {project.resolvedLocations.map((resolved, idx) => {
+                    const loc = resolved.location;
+                    const isActive = highlightedLocIdx === idx;
+                    return (
+                        <button
+                            key={loc.id}
+                            onClick={() => onLocationClick(idx)}
+                            className="w-full text-left flex items-start gap-2.5 p-3 rounded-xl border transition-all duration-200"
+                            style={{
+                                background: isActive ? '#f0fdf4' : '#f9fafb',
+                                borderColor: isActive ? '#bbf7d0' : '#f3f4f6',
+                            }}
+                        >
+                            <div
+                                className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-white mt-0.5"
+                                style={{ background: '#16a34a', fontSize: 9, fontWeight: 700 }}
+                            >
+                                {idx + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className={`font-poppins-semibold text-[12px] leading-snug ${isActive ? 'text-primary' : 'text-gray-700'}`}>
+                                    {[loc.kelurahan, loc.kecamatan].filter(Boolean).join(', ') || '—'}
+                                </p>
+                                <p className="font-poppins-regular text-[10px] text-gray-400 mt-0.5 line-clamp-1">
+                                    {[loc.kabupaten, loc.provinsi].filter(Boolean).join(', ') || '—'}
+                                </p>
+                                <p className="font-poppins-regular text-[9px] text-gray-300 mt-0.5">
+                                    {resolved.lat.toFixed(5)}, {resolved.lng.toFixed(5)}
+                                </p>
+                            </div>
+                            {isActive && (
+                                <div className="shrink-0 w-4 h-4 flex items-center justify-center">
+                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                </div>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );
 }
+
+// ── Sidebar fade wrapper ───────────────────────────────────────────────────
 
 function SidebarContent({ visible, children }: { visible: boolean; children: React.ReactNode }) {
     const [rendered, setRendered] = useState(visible);
@@ -228,6 +316,8 @@ function SidebarContent({ visible, children }: { visible: boolean; children: Rea
     );
 }
 
+// ── Main page ──────────────────────────────────────────────────────────────
+
 export default function LokasiProyek() {
     const { projectIdentityData } = useProjectIdentity();
     const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
@@ -235,6 +325,7 @@ export default function LokasiProyek() {
     const mapRef = useRef<google.maps.Map | null>(null);
     const [resolvedProjects, setResolvedProjects] = useState<ResolvedProject[]>([]);
     const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [highlightedLocIdx, setHighlightedLocIdx] = useState<number | null>(null);
     const [search, setSearch] = useState('');
     const [tahun, setTahun] = useState('');
     const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -249,7 +340,7 @@ export default function LokasiProyek() {
         resolvedProjects.filter(p => {
             const matchSearch = search === '' ||
                 p.nama?.toLowerCase().includes(search.toLowerCase()) ||
-                getAlamat(p).toLowerCase().includes(search.toLowerCase());
+                getProjectSummaryLabel(p).toLowerCase().includes(search.toLowerCase());
             const matchTahun = tahun === '' || p.tahun_anggaran === tahun;
             return matchSearch && matchTahun;
         }),
@@ -261,24 +352,38 @@ export default function LokasiProyek() {
         [filtered, selectedId]
     );
 
-    console.log(filtered)
     const countSelesai = useMemo(() => filtered.filter(p => getStatus(p).label === 'Selesai').length, [filtered]);
     const countBerproses = useMemo(() => filtered.filter(p => getStatus(p).label === 'Berproses').length, [filtered]);
 
+    // Resolve all locations (geocode if no coords)
     useEffect(() => {
         if (!projectIdentityData) return;
         const resolve = async () => {
             const results = await Promise.all(
                 projectIdentityData.map(async (p) => {
-                    const lat = parseFloat(p.latitude ?? '');
-                    const lng = parseFloat(p.longitude ?? '');
-                    if (!isNaN(lat) && !isNaN(lng)) return { ...p, resolvedLat: lat, resolvedLng: lng };
-                    const alamat = getAlamat(p);
-                    if (alamat && alamat !== '-') {
-                        const coords = await geocodeAddress(alamat);
-                        if (coords) return { ...p, resolvedLat: coords.lat, resolvedLng: coords.lng };
-                    }
-                    return null;
+                    const locs = p.locations ?? [];
+
+                    const resolvedLocs: ResolvedLocation[] = (
+                        await Promise.all(
+                            locs.map(async (loc) => {
+                                const lat = parseFloat(loc.latitude ?? '');
+                                const lng = parseFloat(loc.longitude ?? '');
+                                if (!isNaN(lat) && !isNaN(lng)) {
+                                    return { location: loc, lat, lng, projectId: p.id };
+                                }
+                                // Try to geocode from address fields
+                                const addr = getLocationLabel(loc);
+                                if (addr && addr !== '-') {
+                                    const coords = await geocodeAddress(addr);
+                                    if (coords) return { location: loc, lat: coords.lat, lng: coords.lng, projectId: p.id };
+                                }
+                                return null;
+                            })
+                        )
+                    ).filter(Boolean) as ResolvedLocation[];
+
+                    if (resolvedLocs.length === 0) return null;
+                    return { ...p, resolvedLocations: resolvedLocs };
                 })
             );
             setResolvedProjects(results.filter(Boolean) as ResolvedProject[]);
@@ -288,15 +393,39 @@ export default function LokasiProyek() {
 
     const flyToProject = useCallback((project: ResolvedProject) => {
         setSelectedId(project.id);
+        setHighlightedLocIdx(null);
+        if (mapRef.current && project.resolvedLocations.length > 0) {
+            if (project.resolvedLocations.length === 1) {
+                mapRef.current.panTo({ lat: project.resolvedLocations[0].lat, lng: project.resolvedLocations[0].lng });
+                mapRef.current.setZoom(13);
+            } else {
+                // Fit all pins in bounds
+                const bounds = new window.google.maps.LatLngBounds();
+                project.resolvedLocations.forEach(r => bounds.extend({ lat: r.lat, lng: r.lng }));
+                mapRef.current.fitBounds(bounds, { top: 60, right: 60, bottom: 60, left: 60 });
+            }
+        }
+    }, []);
+
+    const flyToLocation = useCallback((resolved: ResolvedLocation, locIdx: number) => {
+        setHighlightedLocIdx(locIdx);
         if (mapRef.current) {
-            mapRef.current.panTo({ lat: project.resolvedLat, lng: project.resolvedLng });
-            mapRef.current.setZoom(11);
+            mapRef.current.panTo({ lat: resolved.lat, lng: resolved.lng });
+            mapRef.current.setZoom(15);
         }
     }, []);
 
     const onMapLoad = useCallback((map: google.maps.Map) => {
         mapRef.current = map;
     }, []);
+
+    // All markers to render (from filtered projects)
+    const allMarkers = useMemo(() =>
+        filtered.flatMap(p =>
+            p.resolvedLocations.map((r, locIdx) => ({ resolved: r, project: p, locIdx }))
+        ),
+        [filtered]
+    );
 
     return (
         <div>
@@ -306,6 +435,7 @@ export default function LokasiProyek() {
                 className="relative flex overflow-hidden"
                 style={{ height: 'calc(100vh - 64px)', marginTop: '64px' }}
             >
+                {/* ── Desktop Sidebar ── */}
                 <div
                     className="hidden md:flex relative z-10 flex-col shrink-0 bg-white border-r border-gray-100 overflow-hidden"
                     style={{
@@ -315,6 +445,7 @@ export default function LokasiProyek() {
                 >
                     <SidebarContent visible={sidebarVisible}>
                         <div className="p-5 pt-10 flex flex-col gap-4 min-w-96">
+                            {/* Year filter */}
                             <div>
                                 <p className="font-poppins-semibold text-[10px] text-gray-400 uppercase tracking-widest mb-2">Tahun Pengadaan</p>
                                 <div className="relative">
@@ -324,9 +455,7 @@ export default function LokasiProyek() {
                                         className="w-full font-poppins-medium text-[13px] text-gray-700 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-gray-400 appearance-none bg-gray-50 cursor-pointer transition-colors duration-200"
                                     >
                                         <option value="">Semua Anggaran</option>
-                                        {uniqueYears.map(y => (
-                                            <option key={y} value={y}>Anggaran {y}</option>
-                                        ))}
+                                        {uniqueYears.map(y => <option key={y} value={y}>Anggaran {y}</option>)}
                                     </select>
                                     <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -334,6 +463,7 @@ export default function LokasiProyek() {
                                 </div>
                             </div>
 
+                            {/* Search */}
                             <div>
                                 <p className="font-poppins-semibold text-[10px] text-gray-400 uppercase tracking-widest mb-2">Pencarian Proyek</p>
                                 <div className="relative">
@@ -348,10 +478,7 @@ export default function LokasiProyek() {
                                         className="w-full font-poppins-regular text-[13px] text-gray-700 border border-gray-200 rounded-xl pl-9 pr-9 py-2.5 focus:outline-none focus:border-gray-400 transition-colors duration-200 placeholder:text-gray-300 bg-gray-50"
                                     />
                                     {search && (
-                                        <button
-                                            onClick={() => setSearch('')}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-gray-600 transition-all duration-200 hover:rotate-90"
-                                        >
+                                        <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-gray-600 transition-all duration-200 hover:rotate-90">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
@@ -360,17 +487,14 @@ export default function LokasiProyek() {
                                 </div>
                             </div>
 
+                            {/* Stats */}
                             <div className="flex gap-3">
                                 {[
                                     { count: countSelesai, label: 'Selesai', textColor: 'text-green-600', labelColor: 'text-green-500', bg: 'bg-green-50', border: 'border-green-100', delay: '0ms' },
                                     { count: countBerproses, label: 'Berproses', textColor: 'text-orange-500', labelColor: 'text-orange-400', bg: 'bg-orange-50', border: 'border-orange-100', delay: '60ms' },
                                     { count: filtered.length, label: 'Total', textColor: 'text-gray-700', labelColor: 'text-gray-400', bg: 'bg-gray-50', border: 'border-gray-100', delay: '120ms' },
                                 ].map(s => (
-                                    <div
-                                        key={s.label}
-                                        className={`stats-card flex-1 ${s.bg} border ${s.border} rounded-xl p-3 text-center`}
-                                        style={{ animationDelay: s.delay }}
-                                    >
+                                    <div key={s.label} className={`stats-card flex-1 ${s.bg} border ${s.border} rounded-xl p-3 text-center`} style={{ animationDelay: s.delay }}>
                                         <p className={`font-poppins-bold text-[18px] ${s.textColor}`}>{s.count}</p>
                                         <p className={`font-poppins-regular text-[10px] ${s.labelColor}`}>{s.label}</p>
                                     </div>
@@ -378,7 +502,7 @@ export default function LokasiProyek() {
                             </div>
                         </div>
 
-                        <div className="px-5 py-2.5 border-b border-gray-100 min-w-96 flex items-center justify-between">
+                        <div className="px-5 py-2.5 border-b border-gray-100 min-w-96">
                             <p className="font-poppins-semibold text-[10px] text-gray-400 uppercase tracking-widest">Daftar Proyek</p>
                         </div>
 
@@ -415,6 +539,7 @@ export default function LokasiProyek() {
                     </SidebarContent>
                 </div>
 
+                {/* Sidebar toggle */}
                 <button
                     onClick={() => setSidebarVisible(v => !v)}
                     className="hidden md:flex absolute top-1/2 -translate-y-1/2 z-600 border border-gray-200 rounded-r-xl shadow-md w-6 h-14 items-center justify-center bg-white hover:bg-gray-50 hover:shadow-lg hover:w-7"
@@ -425,16 +550,14 @@ export default function LokasiProyek() {
                 >
                     <svg
                         className="w-3 h-3 text-gray-500"
-                        style={{
-                            transform: sidebarVisible ? 'rotate(0deg)' : 'rotate(180deg)',
-                            transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
-                        }}
+                        style={{ transform: sidebarVisible ? 'rotate(0deg)' : 'rotate(180deg)', transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)' }}
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
                     >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
 
+                {/* ── Map ── */}
                 <div className="flex-1 relative">
                     {loadError && (
                         <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -451,10 +574,9 @@ export default function LokasiProyek() {
                             mapContainerStyle={MAP_CONTAINER_STYLE}
                             center={DEFAULT_CENTER}
                             zoom={5}
-                            mapTypeId="roadmap"
                             onLoad={onMapLoad}
                             options={{
-                                mapTypeId: "roadmap",
+                                mapTypeId: 'roadmap',
                                 zoomControl: true,
                                 streetViewControl: false,
                                 mapTypeControl: false,
@@ -462,23 +584,36 @@ export default function LokasiProyek() {
                                 scrollwheel: true,
                             }}
                         >
-                            {filtered.map(project => (
+                            {allMarkers.map(({ resolved, project, locIdx }) => (
                                 <CustomMarker
-                                    key={project.id}
-                                    project={project}
-                                    isSelected={selectedId === project.id}
-                                    onClick={() => { flyToProject(project); setMobileSheet(true); }}
+                                    key={`${project.id}-${resolved.location.id}`}
+                                    resolved={resolved}
+                                    isProjectSelected={selectedId === project.id}
+                                    isHighlighted={selectedId === project.id && highlightedLocIdx === locIdx}
+                                    locationIndex={locIdx}
+                                    onClick={() => {
+                                        flyToProject(project);
+                                        setHighlightedLocIdx(locIdx);
+                                        setMobileSheet(true);
+                                    }}
                                 />
                             ))}
                         </GoogleMap>
                     )}
 
+                    {/* Desktop info panel */}
                     {selectedProject && (
                         <div className="hidden md:block absolute top-4 right-4 z-400">
-                            <InfoPanel project={selectedProject} onClose={() => setSelectedId(null)} />
+                            <InfoPanel
+                                project={selectedProject}
+                                highlightedLocIdx={highlightedLocIdx}
+                                onClose={() => { setSelectedId(null); setHighlightedLocIdx(null); }}
+                                onLocationClick={(idx) => flyToLocation(selectedProject.resolvedLocations[idx], idx)}
+                            />
                         </div>
                     )}
 
+                    {/* Mobile FAB */}
                     <button
                         onClick={() => setMobileSheet(true)}
                         className="md:hidden absolute bottom-28 left-1/2 -translate-x-1/2 z-400 text-white font-poppins-semibold text-[13px] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 active:scale-95 transition-transform duration-200"
@@ -491,6 +626,7 @@ export default function LokasiProyek() {
                     </button>
                 </div>
 
+                {/* ── Mobile bottom sheet ── */}
                 <div className={`md:hidden fixed inset-0 z-500 transition-all duration-300 ${mobileSheet ? 'pointer-events-auto' : 'pointer-events-none'}`}>
                     <div
                         className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${mobileSheet ? 'opacity-100' : 'opacity-0'}`}
@@ -540,9 +676,7 @@ export default function LokasiProyek() {
                                     className="font-poppins-medium text-[12px] text-gray-700 border border-gray-200 rounded-xl px-3 py-2 focus:outline-none bg-gray-50 appearance-none cursor-pointer"
                                 >
                                     <option value="">Semua</option>
-                                    {uniqueYears.map(y => (
-                                        <option key={y} value={y}>{y}</option>
-                                    ))}
+                                    {uniqueYears.map(y => <option key={y} value={y}>{y}</option>)}
                                 </select>
                             </div>
 
@@ -562,9 +696,14 @@ export default function LokasiProyek() {
 
                         <div className="overflow-y-auto flex-1 px-4 pb-4 flex flex-col gap-2">
                             {selectedProject && (
-                                <div className="mb-1">
+                                <div className="mb-2">
                                     <p className="font-poppins-semibold text-[10px] text-gray-400 uppercase tracking-widest mb-2 px-1">Dipilih</p>
-                                    <InfoPanel project={selectedProject} onClose={() => setSelectedId(null)} />
+                                    <InfoPanel
+                                        project={selectedProject}
+                                        highlightedLocIdx={highlightedLocIdx}
+                                        onClose={() => { setSelectedId(null); setHighlightedLocIdx(null); }}
+                                        onLocationClick={(idx) => { flyToLocation(selectedProject.resolvedLocations[idx], idx); setMobileSheet(false); }}
+                                    />
                                 </div>
                             )}
                             <p className="font-poppins-semibold text-[10px] text-gray-400 uppercase tracking-widest px-1 mt-1">Semua Proyek</p>

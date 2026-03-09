@@ -54,7 +54,6 @@ export default function useRealisasiHooks() {
                     tahun_anggaran: item?.schedule.rab?.proyek.tahun_anggaran,
                     proyek_id: `TND-0${item.schedule.rab?.proyek.id}`,
                     nama: item.schedule.rab?.proyek.nama,
-                    lokasi: item.schedule.rab?.proyek.kecamatan,
                     status: item.evaluasi.some(item => item.deleted_at === null) ? "Sudah Di Evaluasi" : "Belum Di Evaluasi"
                 }))
 
