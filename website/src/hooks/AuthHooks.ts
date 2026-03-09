@@ -107,7 +107,7 @@ export default function useAuthHooks() {
         if (name === "password") return setPassword(value);
     }
 
-    const handleChangePassword = async (email: string, tokenEmail: string) => {
+    const handleResetPassword = async (email: string, tokenEmail: string) => {
         try {
             if (!email) {
                 SwalMessage({
@@ -163,6 +163,53 @@ export default function useAuthHooks() {
         }
     }
 
+    const handleResetPasswordRequest = async (email: string) => {
+        try {
+            if (!email) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Email wajib diisi!"
+                })
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Email tidak sesuai format!"
+                })
+                return;
+            }
+
+            SwalLoading();
+            const response = await API.post('/auth/password/request', {
+                email
+            });
+
+            const message = response.data.message;
+            SwalMessage({
+                type: "success",
+                title: "Berhasil!",
+                text: message
+            });
+
+            setTimeout(() => {
+                window.location.href = "/masuk";
+            }, 2000);
+        } catch (error) {
+            if (error) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Terjadi Kesalahan!"
+                })
+            }
+        }
+    }
+
     return {
         email,
         password,
@@ -173,6 +220,7 @@ export default function useAuthHooks() {
         captchaInput,
         setCaptchaInput,
         handleLogout,
-        handleChangePassword
+        handleResetPassword,
+        handleResetPasswordRequest
     }
 }

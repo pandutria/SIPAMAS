@@ -3,72 +3,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from "/image/logo/logo-sipamas.png";
 import background from "/image/auth/background.jpg";
-import emailjs from "@emailjs/browser"
-import { SwalMessage } from '../../utils/SwalMessage';
+import useAuthHooks from '../../hooks/AuthHooks';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { handleResetPasswordRequest } = useAuthHooks();
   const navigate = useNavigate();
-
-  const handleSendResetLink = async () => {
-    if (!email) {
-      SwalMessage({
-        type: "error",
-        title: "Gagal!",
-        text: "Email wajib diisi!"
-      })
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      SwalMessage({
-        type: "error",
-        title: "Gagal!",
-        text: "Email tidak sesuai format!"
-      })
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const resetLink = `${window.location.origin}/reset-kata-sandi?token=${resetToken}&email=${encodeURIComponent(email)}`;
-
-      const templateParams = {
-        recipient: email,
-        reset_link: resetLink,
-      };
-
-      await emailjs.send(
-        'service_monalisa',
-        'template_tp9yd1z',
-        templateParams,
-        '4xmHCdiisL4Jr1CLL'
-      );
-
-      SwalMessage({
-        type: "success",
-        title: "Berhasil!",
-        text: "Email berhasil terkirim!"
-      });
-
-      setTimeout(() => {
-        navigate('/masuk');
-      }, 2000);
-    } catch (error) {
-      console.error('Error:', error);
-      SwalMessage({
-        type: "error",
-        title: "Gagal!",
-        text: "Terjadi Kesalahan!"
-      })
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div
@@ -92,11 +32,11 @@ export default function ForgotPassword() {
       >
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-4 mb-4">
-            <ArrowLeft 
-              className="w-6 h-6 cursor-pointer hover:scale-90 transition-all text-gray-700" 
+            <ArrowLeft
+              className="w-6 h-6 cursor-pointer hover:scale-90 transition-all text-gray-700"
               onClick={() => navigate("/masuk")}
             />
-            <img src={logo} className='w-auto h-4 mx-auto'/>
+            <img src={logo} className='w-auto h-4 mx-auto' />
             <div className="w-6"></div>
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Lupa Kata Sandi?</h1>
@@ -121,7 +61,7 @@ export default function ForgotPassword() {
                 placeholder="contoh@email.com"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    handleSendResetLink();
+                    handleResetPasswordRequest(email);
                   }
                 }}
               />
@@ -130,21 +70,13 @@ export default function ForgotPassword() {
 
           <button
             type="button"
-            onClick={handleSendResetLink}
-            disabled={loading}
+            onClick={() => handleResetPasswordRequest(email)}
             className="w-full text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-primary"
           >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                Mengirim...
-              </>
-            ) : (
-              <>
-                <Send className="h-5 w-5" />
-                Kirim Link Reset
-              </>
-            )}
+            <div className='flex items-center gap-3'>
+              <Send className="h-5 w-5" />
+              Kirim Link Reset
+            </div>
           </button>
 
           <div className="text-center">
