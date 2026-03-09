@@ -18,6 +18,7 @@ func GetAllRabHader(c *gin.Context) {
 	if err := query.
 		Preload("CreatedBy").
 		Preload("IdentitasProyek").
+		Preload("IdentitasProyek.Locations").
 		Preload("IdentitasProyek.CreatedBy").
 		Preload("IdentitasProyek.Photos").
 		Preload("IdentitasProyek.Documents").
@@ -44,6 +45,7 @@ func GetRabHaderById(c *gin.Context) {
 	if err := query.
 		Preload("CreatedBy").
 		Preload("IdentitasProyek").
+		Preload("IdentitasProyek.Locations").
 		Preload("IdentitasProyek.CreatedBy").
 		Preload("IdentitasProyek.Photos").
 		Preload("IdentitasProyek.Documents").

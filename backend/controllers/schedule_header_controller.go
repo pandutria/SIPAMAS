@@ -20,6 +20,7 @@ func GetAllScheduleHeader(c *gin.Context) {
 		Preload("Items").
 		Preload("Items.Weeks").
 		Preload("Rab.IdentitasProyek").
+		Preload("Rab.IdentitasProyek.Locations").
 		Preload("Rab.IdentitasProyek.CreatedBy").
 		Preload("Rab.IdentitasProyek.Photos").
 		Preload("Rab.IdentitasProyek.Documents").
@@ -48,6 +49,7 @@ func GetScheduleHeaderById(c *gin.Context) {
 		Preload("Items").
 		Preload("Items.Weeks").
 		Preload("Rab.IdentitasProyek").
+		Preload("Rab.IdentitasProyek.Locations").
 		Preload("Rab.IdentitasProyek.CreatedBy").
 		Preload("Rab.IdentitasProyek.Photos").
 		Preload("Rab.IdentitasProyek.Documents").
@@ -210,11 +212,6 @@ func CreateScheduleHeader(c *gin.Context) {
 	config.DB.
 		Preload("CreatedBy.Role").
 		First(&data, data.ID)
-
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "Membuat data berhasil",
-		"data":    data,
-	})
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Membuat data berhasil",

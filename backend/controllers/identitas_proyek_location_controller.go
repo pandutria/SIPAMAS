@@ -61,7 +61,6 @@ func CreateIdentitasProyekLocation(c *gin.Context) {
 		Alamat:            utils.NilIfEmpty(req.Alamat),
 		Kabupaten:         utils.NilIfEmpty(req.Kabupaten),
 		Kecamatan:         utils.NilIfEmpty(req.Kecamatan),
-		KecamatanKode:     utils.NilIfEmpty(req.KecamatanKode),
 		Kelurahan:         utils.NilIfEmpty(req.Kelurahan),
 		Latitude:          utils.NilIfEmpty(req.Latitude),
 		Longitude:         utils.NilIfEmpty(req.Longitude),
