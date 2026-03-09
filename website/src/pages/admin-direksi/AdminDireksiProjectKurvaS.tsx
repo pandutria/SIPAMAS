@@ -152,7 +152,7 @@ export default function AdminDireksiProjectKurvaS() {
                   Provinsi
                 </td>
                 <td style="padding: 12px 15px; border: 1px solid #e5e7eb; color: #1f2937;">
-                  ${selectedProject.schedule.rab?.proyek.provinsi || '-'}
+                  ${selectedProject.schedule.rab?.proyek.locations.map(loc => loc.provinsi).join(', ') || '-'}
                 </td>
               </tr>
 
@@ -161,7 +161,7 @@ export default function AdminDireksiProjectKurvaS() {
                   Kabupaten
                 </td>
                 <td style="padding: 12px 15px; border: 1px solid #e5e7eb; color: #1f2937;">
-                  ${selectedProject.schedule.rab?.proyek.kabupaten || '-'}
+                  ${selectedProject.schedule.rab?.proyek.locations.map(loc => loc.kabupaten).join(', ') || '-'}
                 </td>
               </tr>
 
@@ -170,16 +170,7 @@ export default function AdminDireksiProjectKurvaS() {
                   Kecamatan
                 </td>
                 <td style="padding: 12px 15px; border: 1px solid #e5e7eb; color: #1f2937;">
-                  ${selectedProject.schedule.rab?.proyek.kecamatan || '-'}
-                </td>
-              </tr>
-
-              <tr>
-                <td style="padding: 12px 15px; font-weight: 600; border: 1px solid #e5e7eb; background: #f9fafb; color: #374151;">
-                  Kode Kecamatan
-                </td>
-                <td style="padding: 12px 15px; border: 1px solid #e5e7eb; color: #1f2937;">
-                  ${selectedProject.schedule.rab?.proyek.kecamatan_kode || '-'}
+                  ${selectedProject.schedule.rab?.proyek.locations.map(loc => loc.kecamatan).join(', ') || '-'}
                 </td>
               </tr>
 
@@ -188,7 +179,7 @@ export default function AdminDireksiProjectKurvaS() {
                   Kelurahan
                 </td>
                 <td style="padding: 12px 15px; border: 1px solid #e5e7eb; color: #1f2937;">
-                  ${selectedProject.schedule.rab?.proyek.kelurahan || '-'}
+                  ${selectedProject.schedule.rab?.proyek.locations.map(loc => loc.kelurahan).join(', ')|| '-'}
                 </td>
               </tr>
               <tr>
