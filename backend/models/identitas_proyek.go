@@ -7,13 +7,6 @@ type IdentitasProyek struct {
 	Nama                *string   `json:"nama"`
 	TahunAnggaran       *string   `json:"tahun_anggaran"`
 	Kategori            *string   `json:"kategori"`
-	Provinsi            *string   `json:"provinsi"`
-	Kabupaten           *string   `json:"kabupaten"`
-	Kecamatan           *string   `json:"kecamatan"`
-	KecamatanKode       *string   `json:"kecamatan_kode"`
-	Kelurahan           *string   `json:"kelurahan"`
-	Latitude            *string   `json:"latitude"`
-	Longitude           *string   `json:"longitude"`
 	NilaiKontrak        *string   `json:"nilai_kontrak"`
 	KontraktorPelaksana *string   `json:"kontraktor_pelaksana"`
 	KonsultasPengawas   *string   `json:"konsultas_pengawas"`
@@ -32,4 +25,5 @@ type IdentitasProyek struct {
 	Photos    []*IdentitasProyekPhoto    `gorm:"foreignKey:IdentitasProyekId " json:"photos"`
 	Documents []*IdentitasProyekDocument `gorm:"foreignKey:IdentitasProyekId " json:"documents"`
 	Pengaduan []*Pengaduan               `gorm:"foreignKey:IdentitasProyekId" json:"pengaduan"`
+	Locations []*IdentitasProyekLocation `gorm:"foreignKey:IdentitasProyekId" json:"locations"`
 }

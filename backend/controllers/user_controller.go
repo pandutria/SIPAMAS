@@ -118,7 +118,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	user := models.User{
-		FullName:     utils.NilIfEmpty(req.FullName),
+		Fullname:     utils.NilIfEmpty(req.FullName),
 		Email:        utils.NilIfEmpty(req.Email),
 		Password:     utils.HashSHA512(req.Password),
 		Role:         utils.NilIfEmpty(req.Role),
@@ -160,6 +160,7 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
+<<<<<<< HEAD
 	// if req.Password != "" {
 	// 	if !isValidPassword(req.Password) {
 	// 		c.JSON(http.StatusBadRequest, gin.H{
@@ -169,6 +170,8 @@ func UpdateProfile(c *gin.Context) {
 	// 	}
 	// }
 
+=======
+>>>>>>> 27db81e6f2f3de18a00e483d0962a5e4d96e43b5
 	user, err := components.GetCurrentUser(c, query)
 	if err != nil {
 		return
@@ -211,7 +214,7 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	utils.SetIfNotEmpty(&user.FullName, req.FullName)
+	utils.SetIfNotEmpty(&user.Fullname, req.FullName)
 	utils.SetIfNotEmpty(&user.Email, req.Email)
 	utils.SetIfNotEmpty(&user.Role, req.Role)
 	utils.SetIfNotEmpty(&user.Nik, req.Nik)
@@ -299,13 +302,13 @@ func UpdateUser(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Upload SK file gagal",
+			"message": "Upload file gagal",
 			"error":   err.Error(),
 		})
 		return
 	}
 
-	utils.SetIfNotEmpty(&user.FullName, req.FullName)
+	utils.SetIfNotEmpty(&user.Fullname, req.FullName)
 	utils.SetIfNotEmpty(&user.Email, req.Email)
 	utils.SetIfNotEmpty(&user.Role, req.Role)
 	utils.SetIfNotEmpty(&user.Nik, req.Nik)
@@ -383,6 +386,7 @@ func Register(c *gin.Context) {
 	if utils.NilIfEmpty(req.Fullname) == nil ||
 		utils.NilIfEmpty(req.Email) == nil ||
 		utils.NilIfEmpty(req.Address) == nil ||
+		utils.NilIfEmpty(req.Nik) == nil ||
 		utils.NilIfEmpty(req.Password) == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Semua input wajib di isi",
@@ -394,10 +398,11 @@ func Register(c *gin.Context) {
 	active := "false"
 
 	data := models.User{
-		FullName: utils.NilIfEmpty(req.Fullname),
+		Fullname: utils.NilIfEmpty(req.Fullname),
 		Email:    utils.NilIfEmpty(req.Email),
 		Address:  utils.NilIfEmpty(req.Address),
 		Password: utils.HashSHA512(req.Password),
+		Nik:      utils.NilIfEmpty(req.Nik),
 		IsActive: &active,
 		Role:     &role,
 		KtpFile:  ktpPath,
@@ -451,6 +456,13 @@ func Login(c *gin.Context) {
 	if !utils.CompareHashSHA512(*utils.NilIfEmpty(req.Password), user.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Email atau password tidak benar!",
+		})
+		return
+	}
+
+	if user.IsActive != nil && *user.IsActive == "false" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Status akun tidak aktif",
 		})
 		return
 	}

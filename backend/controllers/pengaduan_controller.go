@@ -60,6 +60,15 @@ func GetPengaduanById(c *gin.Context) {
 		return
 	}
 
+	var review models.PengaduanReview
+	if err := query.Where("pengaduan_id = ?", data.ID).Find(&review).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Review tidak ada",
+			"error": err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Mengambil data berhasil",
 		"data":    data,

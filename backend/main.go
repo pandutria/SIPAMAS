@@ -28,6 +28,7 @@ func main() {
 	config.DB.AutoMigrate(
 		&models.User{},
 		&models.IdentitasProyek{},
+		&models.IdentitasProyekLocation{},
 		&models.IdentitasProyekPhoto{},
 		&models.IdentitasProyekDocument{},
 		&models.RabHeader{},
@@ -70,7 +71,10 @@ func SeedSuperAdmin() {
 
 	password := "SuperAdminss7617&"
 	role := "super-admin"
+<<<<<<< HEAD
 	fullname := "Super Admin"
+=======
+>>>>>>> 27db81e6f2f3de18a00e483d0962a5e4d96e43b5
 	isActive := "true"
 
 	superAdmin := models.User{
