@@ -16,7 +16,7 @@ export default function ResetPassword() {
   const token = searchParams.get('token');
   const email = searchParams.get('email');
 
-  const { handleChangePassword, handleChange, password } = useAuthHooks();
+  const { handleResetPassword, handleChange, password } = useAuthHooks();
 
   useEffect(() => {
     const checkToken = () => {
@@ -107,7 +107,7 @@ export default function ResetPassword() {
                 placeholder="Ulangi kata sandi baru"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    handleChangePassword(email as any, token as any)
+                    handleResetPassword(email as any, token as any)
                   }
                 }}
               />
@@ -134,7 +134,7 @@ export default function ResetPassword() {
 
           <button
             type="button"
-            onClick={() => handleChangePassword(email as any, token as any)}
+            onClick={() => handleResetPassword(email as any, token as any)}
             className="w-full text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-primary"
           >
             Reset Kata Sandi
