@@ -347,10 +347,10 @@ export default function MasyarakatLaporanDetail() {
     </div>
     <p class="proyek-name">${data.proyek?.nama ?? "—"}</p>
     <div class="grid-4">
-        ${data.proyek?.provinsi ? `<div><p class="field-label">Provinsi</p><p class="field-value-light">${data.proyek.provinsi}</p></div>` : ""}
-        ${data.proyek?.kabupaten ? `<div><p class="field-label">Kabupaten/Kota</p><p class="field-value-light">${data.proyek.kabupaten}</p></div>` : ""}
-        ${data.proyek?.kecamatan ? `<div><p class="field-label">Kecamatan</p><p class="field-value-light">${data.proyek.kecamatan}</p></div>` : ""}
-        ${data.proyek?.kelurahan ? `<div><p class="field-label">Kelurahan</p><p class="field-value-light">${data.proyek.kelurahan}</p></div>` : ""}
+        ${data.proyek.locations.map(loc => loc.provinsi).length > 0 ? `<div><p class="field-label">Provinsi</p><p class="field-value-light">${data.proyek.locations.map(loc => loc.provinsi).join(", ")}</p></div>` : ""}
+        ${data.proyek.locations.map(loc => loc.kabupaten).length > 0 ? `<div><p class="field-label">Kabupaten</p><p class="field-value-light">${data.proyek.locations.map(loc => loc.kabupaten).join(", ")}</p></div>` : ""}
+        ${data.proyek.locations.map(loc => loc.kecamatan).length > 0 ? `<div><p class="field-label">Kecamatan</p><p class="field-value-light">${data.proyek.locations.map(loc => loc.kecamatan).join(", ")}</p></div>` : ""}
+        ${data.proyek.locations.map(loc => loc.kelurahan).length > 0 ? `<div><p class="field-label">Kelurahan</p><p class="field-value-light">${data.proyek.locations.map(loc => loc.kelurahan).join(", ")}</p></div>` : ""}
     </div>
 </div>
 
@@ -463,8 +463,6 @@ ${data.created_by ? `
     if (loading || !data) return <LoadingSpinner />;
     if (!user || user.role !== "masyarakat") return <Navigate to="/" replace />;
 
-    const proyekLocation = [data.proyek?.kecamatan, data.proyek?.kabupaten, data.proyek?.provinsi].filter(Boolean).join(", ");
-
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
@@ -551,16 +549,10 @@ ${data.created_by ? `
                                         <p className="text-[10px] font-poppins-semibold text-gray-400 uppercase tracking-wider mb-0.5">Nama Proyek</p>
                                         <p className="font-poppins-semibold text-[13px] text-gray-800">{data.proyek.nama}</p>
                                     </div>
-                                    {proyekLocation && (
+                                    {data.proyek?.locations?.length > 0 && (
                                         <div>
                                             <p className="text-[10px] font-poppins-semibold text-gray-400 uppercase tracking-wider mb-0.5">Lokasi</p>
-                                            <p className="font-poppins-medium text-[13px] text-gray-700">{proyekLocation}</p>
-                                        </div>
-                                    )}
-                                    {data.proyek.kelurahan && (
-                                        <div>
-                                            <p className="text-[10px] font-poppins-semibold text-gray-400 uppercase tracking-wider mb-0.5">Kelurahan</p>
-                                            <p className="font-poppins-medium text-[13px] text-gray-700">{data.proyek.kelurahan}</p>
+                                            <p className="font-poppins-medium text-[13px] text-gray-700">{data.proyek.locations.map(loc => loc.kecamatan).join(", ")}</p>
                                         </div>
                                     )}
                                 </div>
