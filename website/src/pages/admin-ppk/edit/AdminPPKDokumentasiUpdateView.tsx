@@ -11,6 +11,7 @@ import useRealisasiHooks from "../../../hooks/RealisasiHooks";
 import BackButton from "../../../ui/BackButton";
 import FormInput from "../../../ui/FormInput";
 import ShowTableForm from "../../../ui/ShowTableForm";
+import MapsShow from "../../../components/maps/MapsShow";
 
 type PhotoType = "start" | "progres" | "end";
 
@@ -162,6 +163,12 @@ export default function AdminPPKDokumentasiUpdateView() {
                 disabled={true}
               />
 
+              <div className="grid col-span-2">
+                {projectIdentityByIdData?.locations && (
+                  <MapsShow data={projectIdentityByIdData?.locations} />
+                )}
+              </div>
+
               <FormInput
                 title='Kontraktor Pelaksana'
                 placeholder='Masukkan kontrator pelaksana (otomatis)'
@@ -173,13 +180,6 @@ export default function AdminPPKDokumentasiUpdateView() {
                 title='Konsultas Pengawas'
                 placeholder='Masukkan konsultas pengawas (otomatis)'
                 value={projectIdentityByIdData?.konsultas_pengawas}
-                disabled={true}
-              />
-
-              <FormInput
-                title='Lokasi'
-                placeholder='Masukkan lokasi (otomatis)'
-                value={projectIdentityByIdData?.kecamatan}
                 disabled={true}
               />
 

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen, MessageSquareWarning, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen, MessageSquareWarning, ChevronDown, ChevronUp, ExternalLink, Navigation } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import BackButton from "../../../ui/BackButton";
 import FormInput from "../../../ui/FormInput";
@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import TableContent from "../../../ui/TableContent";
 import TableHeader from "../../../ui/TableHeader";
 import useProjectIdentity from "../../../hooks/ProjectIdentity";
-import LocationData from "../../../data/LocationData";
 import { Navigate, useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
@@ -18,12 +17,12 @@ import { BASE_URL_FILE } from "../../../server/API";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import maps from "/icon/maps.png";
 import usePengaduanHooks from "../../../hooks/PengaduanHooks";
+import { TahunData } from "../../../data/TahunData";
 
 type PhotoType = "start" | "end";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
-const DEFAULT_CENTER = { lat: -2.5489, lng: 118.0149 };
 
 const statusConfig: Record<string, { label: string; badge: string; dot: string }> = {
     menunggu: { label: "Menunggu", badge: "bg-blue-100 text-blue-600 border border-blue-200", dot: "bg-blue-500" },
@@ -42,37 +41,37 @@ function resolveStatusKey(raw: string): string {
     return "menunggu";
 }
 
-function GoogleMapView({ coords }: { coords: { lat: number; lng: number } | null }) {
-    const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
+interface MiniMapProps {
+    coords: { lat: number; lng: number };
+    label: string;
+}
+
+function MiniMap({ coords, label }: MiniMapProps) {
+    const { isLoaded } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
 
     const customMarkerIcon: google.maps.Icon | undefined = isLoaded
-        ? { url: maps, scaledSize: new window.google.maps.Size(36, 36), anchor: new window.google.maps.Point(18, 36) }
+        ? {
+              url: maps,
+              scaledSize: new window.google.maps.Size(30, 30),
+              anchor: new window.google.maps.Point(15, 30),
+          }
         : undefined;
 
-    if (loadError) {
-        return (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
-                <p className="text-sm text-gray-400 font-poppins-regular">Gagal memuat Google Maps</p>
-            </div>
-        );
-    }
-
-    if (!isLoaded) {
-        return (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
-                <p className="text-sm text-gray-400 font-poppins-regular">Memuat peta...</p>
-            </div>
-        );
-    }
+    if (!isLoaded) return <div className="w-full h-full bg-gray-100 animate-pulse" />;
 
     return (
         <GoogleMap
             mapContainerStyle={MAP_CONTAINER_STYLE}
-            center={coords ?? DEFAULT_CENTER}
-            zoom={coords ? 15 : 5}
-            options={{ zoomControl: true, streetViewControl: false, mapTypeControl: false, fullscreenControl: false, scrollwheel: false }}
+            center={coords}
+            zoom={14}
+            options={{
+                disableDefaultUI: true,
+                gestureHandling: "none",
+                zoomControl: false,
+                draggable: false,
+            }}
         >
-            {coords && <Marker position={coords} icon={customMarkerIcon} />}
+            <Marker position={coords} title={label} icon={customMarkerIcon} />
         </GoogleMap>
     );
 }
@@ -91,6 +90,68 @@ function SectionHeader({ icon, title, badge }: { icon: React.ReactNode; title: s
                         {badge}
                     </span>
                 )}
+            </div>
+        </div>
+    );
+}
+
+interface ReadOnlyLocationCardProps {
+    location: ProjectIdentityLocationProps;
+    index: number;
+}
+
+function ReadOnlyLocationCard({ location, index }: ReadOnlyLocationCardProps) {
+    const coords =
+        location.latitude && location.longitude
+            ? { lat: parseFloat(location.latitude), lng: parseFloat(location.longitude) }
+            : null;
+
+    const label = [location.kelurahan, location.kecamatan, location.kabupaten].filter(Boolean).join(", ");
+
+    return (
+        <div
+            className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+            data-aos="fade-up"
+            data-aos-delay={index * 60}
+        >
+            <div className="h-36 relative overflow-hidden">
+                {coords ? (
+                    <MiniMap coords={coords} label={label} />
+                ) : (
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <MapPinIcon size={24} className="text-gray-300" />
+                    </div>
+                )}
+                <div className="absolute inset-0 pointer-events-none bg-linear-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 shadow-sm">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <span className="font-poppins-semibold text-[11px] text-gray-700">Lokasi {index + 1}</span>
+                </div>
+            </div>
+
+            <div className="p-3.5 flex flex-col gap-2.5">
+                <div>
+                    <p className="font-poppins-semibold text-[12px] text-gray-800 line-clamp-1">
+                        {location.kelurahan || "—"}, {location.kecamatan || "—"}
+                    </p>
+                    <p className="font-poppins-regular text-[11px] text-gray-400 mt-0.5 line-clamp-1">
+                        {location.kabupaten}, {location.provinsi}
+                    </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-gray-50">
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-poppins-medium text-gray-400 uppercase tracking-wider">Latitude</span>
+                        <span className="font-poppins-semibold text-[11px] text-primary mt-0.5">
+                            {coords ? coords.lat.toFixed(6) : "—"}
+                        </span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-poppins-medium text-gray-400 uppercase tracking-wider">Longitude</span>
+                        <span className="font-poppins-semibold text-[11px] text-primary mt-0.5">
+                            {coords ? coords.lng.toFixed(6) : "—"}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -119,10 +180,12 @@ function PengaduanCard({ item }: { item: any }) {
                             </p>
                         </div>
                     </div>
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-poppins-semibold px-2.5 py-1 rounded-full shrink-0 ${statusCfg.badge}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
-                        {statusCfg.label}
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <span className={`inline-flex items-center gap-1.5 text-[10px] font-poppins-semibold px-2.5 py-1 rounded-full ${statusCfg.badge}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
+                            {statusCfg.label}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-3">
@@ -136,7 +199,7 @@ function PengaduanCard({ item }: { item: any }) {
                         <div className="bg-gray-50 rounded-xl px-3 py-2.5">
                             <p className="text-[9px] font-poppins-semibold text-gray-400 uppercase tracking-wider mb-0.5">Pelapor</p>
                             <p className="text-[12px] font-poppins-semibold text-gray-700 truncate">
-                                {item.created_by.fullname ?? item.created_by.name ?? "—"}
+                                {item.created_by?.fullname ?? "—"}
                             </p>
                         </div>
                     )}
@@ -210,23 +273,19 @@ export default function AdminPPKIdentitasProyekUpdateView() {
     const [documentData, setDocumentData] = useState<any[]>([]);
     const [selectedRemove, setSelectedRemove] = useState<number[]>([]);
     const [pengaduanSearch, setPengaduanSearch] = useState("");
-    const [pengaduanStatus, setPengaduanStatus] = useState("");
+    const { id } = useParams();
 
     const {
         handleChangeFile,
         handleChangeForm,
         projectIdentityForm,
-        setProjectIdentityForm,
         projectIdentityByIdData,
         setSelectedProjectIdentityId,
         handleProjectIdentityDocumentDelete,
     } = useProjectIdentity();
 
     const { pengaduanData } = usePengaduanHooks();
-    const { kecamatanData, kelurahanData, setSelectedKecamatamCode } = LocationData();
-    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const { loading, user } = useAuth();
-    const { id } = useParams();
 
     const projectCategory = [
         { id: 1, text: "Keterlambatan" },
@@ -250,30 +309,24 @@ export default function AdminPPKIdentitasProyekUpdateView() {
     const proyekPengaduan = pengaduanData.filter((item) => {
         const matchProyek = item.identitas_proyek_id === Number(id);
         const matchSearch = item.judul?.toLowerCase().includes(pengaduanSearch.toLowerCase()) ?? true;
-        const matchStatus = pengaduanStatus ? resolveStatusKey(item.status ?? "") === pengaduanStatus : true;
-        return matchProyek && matchSearch && matchStatus;
+        return matchProyek && matchSearch;
     });
 
     const pengaduanStats = {
         total: proyekPengaduan.length,
-        menunggu: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "menunggu").length,
-        diproses: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "diproses").length,
-        selesai: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "selesai").length,
-        ditolak: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "ditolak").length,
     };
 
+    const locations: ProjectIdentityLocationProps[] = projectIdentityByIdData?.locations ?? [];
+
     useEffect(() => {
-        document.body.style.overflow = "auto";
         if (id) setSelectedProjectIdentityId(Number(id));
 
         if (projectIdentityByIdData) {
-            setCoords({ lat: Number(projectIdentityByIdData.latitude), lng: Number(projectIdentityByIdData.longitude) });
             setPhotoData({
                 start: projectIdentityByIdData.photos.filter((item) => item.type === "start"),
                 end: projectIdentityByIdData.photos.filter((item) => item.type === "end"),
             });
             setDocumentData(projectIdentityByIdData.documents);
-            setSelectedKecamatamCode(String(projectIdentityByIdData.kecamatan_kode));
         }
 
         const dataFiltering = documentData?.filter((item) =>
@@ -285,15 +338,6 @@ export default function AdminPPKIdentitasProyekUpdateView() {
     if (loading || !projectIdentityByIdData) return <LoadingSpinner />;
     if (!user || user.role !== "admin-ppk") return <Navigate to="/" replace />;
 
-    const statusFilterOptions = [
-        { key: "", label: "Semua Status" },
-        { key: "menunggu", label: "Menunggu" },
-        { key: "diterima", label: "Diterima" },
-        { key: "diproses", label: "Diproses" },
-        { key: "selesai", label: "Selesai" },
-        { key: "ditolak", label: "Ditolak" },
-    ];
-
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
@@ -303,12 +347,18 @@ export default function AdminPPKIdentitasProyekUpdateView() {
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-4">
                     <div className="flex items-center justify-between mb-8">
-                        <h1 className="font-poppins-bold text-2xl text-gray-800">Lihat Identitas Proyek</h1>
+                        <h1 className="font-poppins-bold text-2xl text-gray-800">
+                            Lihat Identitas Proyek
+                        </h1>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
                         <FormInput disabled={true} value={projectIdentityForm.nama} name="nama" onChange={handleChangeForm} title="Nama Proyek" placeholder="Masukkan nama proyek" />
-                        <FormInput disabled={true} value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran" placeholder="Masukkan tahun anggaran" />
+                        <FormSelect disabled={true} value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran">
+                            {TahunData?.map((item, index) => (
+                                <option key={index} value={item.text}>{item.text}</option>
+                            ))}
+                        </FormSelect>
                         <FormSelect disabled={true} value={projectIdentityForm.kategori} name="kategori" onChange={handleChangeForm} title="Kategori Proyek">
                             {projectCategory.map((item, index) => (
                                 <option key={index} value={item.text}>{item.text}</option>
@@ -320,74 +370,66 @@ export default function AdminPPKIdentitasProyekUpdateView() {
 
                     <SectionHeader icon={<MapPinIcon size={18} />} title="Lokasi & Koordinat Proyek" />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-                        <div className="flex flex-col gap-6">
-                            <FormInput disabled={true} value={projectIdentityForm.provinsi} name="provinsi" onChange={handleChangeForm} title="Provinsi" placeholder="Masukkan provinsi" />
-                            <FormInput disabled={true} value={projectIdentityForm.kabupaten} name="kabupaten" onChange={handleChangeForm} title="Kabupaten/Kota" placeholder="Masukkan kabupaten/kota" />
-                            <FormSelect
-                                disabled={true}
-                                value={projectIdentityForm.kecamatan}
-                                name="kecamatan"
-                                title="Kecamatan"
-                                onChange={(e) => {
-                                    handleChangeForm(e);
-                                    const selected = kecamatanData.find(item => item.name === e.target.value);
-                                    setSelectedKecamatamCode(String(selected?.code));
-                                    setProjectIdentityForm(prev => ({ ...prev, kelurahan: "", kecamatan_kode: String(selected?.code) }));
-                                }}
-                            >
-                                {kecamatanData.map((item, index) => (
-                                    <option key={index} value={item.name}>{item.name}</option>
-                                ))}
-                            </FormSelect>
-                            <FormSelect disabled={true} value={projectIdentityForm.kelurahan} name="kelurahan" onChange={handleChangeForm} title="Desa / Kelurahan">
-                                {kelurahanData.map((item, index) => (
-                                    <option key={index} value={item.name}>{item.name}</option>
-                                ))}
-                            </FormSelect>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <p className="font-poppins-semibold text-[14px]">
-                                Peta Lokasi (Google Maps) <span className="text-primary">*</span>
-                            </p>
-                            <div className="border border-gray-200 rounded-xl overflow-hidden">
-                                <div className="relative w-full h-64 bg-gray-100">
-                                    <GoogleMapView coords={coords} />
+                    {locations.length > 0 ? (
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Navigation size={14} className="text-primary" />
+                                    <p className="font-poppins-semibold text-[13px] text-gray-600">
+                                        Daftar Titik Lokasi
+                                    </p>
                                 </div>
-                                <div className="grid grid-cols-2 border-t border-gray-200">
-                                    <div className="flex flex-col p-4 border-r border-gray-200">
-                                        <span className="text-xs font-poppins-medium text-gray-400">Latitude</span>
-                                        <span className={`font-poppins-semibold text-sm mt-1 ${coords ? "text-primary" : "text-gray-300"}`}>
-                                            {coords ? coords.lat.toFixed(6) : "0.000000"}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col p-4">
-                                        <span className="text-xs font-poppins-medium text-gray-400">Longitude</span>
-                                        <span className={`font-poppins-semibold text-sm mt-1 ${coords ? "text-primary" : "text-gray-300"}`}>
-                                            {coords ? coords.lng.toFixed(6) : "0.000000"}
-                                        </span>
-                                    </div>
+                                <div className="flex items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1">
+                                    <MapPinIcon size={11} className="text-gray-500" />
+                                    <span className="font-poppins-semibold text-[11px] text-gray-500">
+                                        {locations.length} titik lokasi
+                                    </span>
                                 </div>
                             </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {locations.map((loc, index) => (
+                                    <ReadOnlyLocationCard
+                                        key={loc.id}
+                                        location={loc}
+                                        index={index}
+                                    />
+                                ))}
+                            </div>
+
+                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
+                                <MapPinIcon size={14} className="text-amber-500 shrink-0" />
+                                <p className="font-poppins-regular text-[12px] text-amber-600">
+                                    Data lokasi tidak dapat diubah atau dihapus melalui halaman ini.
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-12 gap-3 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center">
+                                <MapPinIcon size={28} className="text-gray-300" />
+                            </div>
+                            <p className="font-poppins-medium text-gray-400 text-[14px]">Belum ada data lokasi</p>
+                        </div>
+                    )}
 
                     <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent mt-8" />
 
                     <SectionHeader icon={<Image size={18} />} title="Dokumentasi Lapangan" />
 
                     <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 flex flex-col gap-6">
-                        <div className="flex bg-white rounded-xl p-1 gap-1 border border-gray-100 shadow-sm w-fit">
-                            {(["start", "end"] as PhotoType[]).map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setSelectedPhoto(tab)}
-                                    className={`font-poppins-semibold transition-all duration-300 flex-1 sm:flex-none px-4 py-2 cursor-pointer rounded-lg text-[13px] sm:text-[14px] ${selectedPhoto === tab ? "text-white bg-linear-to-r from-primary to-secondary shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-                                >
-                                    {tab === "start" ? "Foto Lokasi Awal" : "Foto Lokasi Akhir"}
-                                </button>
-                            ))}
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                            <div className="flex bg-white rounded-xl p-1 gap-1 border border-gray-100 shadow-sm">
+                                {(["start", "end"] as PhotoType[]).map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setSelectedPhoto(tab)}
+                                        className={`font-poppins-semibold transition-all duration-300 flex-1 sm:flex-none px-4 py-2 cursor-pointer rounded-lg text-[13px] sm:text-[14px] ${selectedPhoto === tab ? "text-white bg-linear-to-r from-primary to-secondary shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                    >
+                                        {tab === "start" ? "Foto Lokasi Awal" : "Foto Lokasi Akhir"}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         {photoData[selectedPhoto].length > 0 ? (
@@ -457,18 +499,20 @@ export default function AdminPPKIdentitasProyekUpdateView() {
                     <SectionHeader icon={<FolderOpen size={18} />} title="Dokumen Pendukung" />
 
                     <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 flex flex-col gap-6">
-                        <div className="flex flex-col gap-1">
-                            <h3 className="font-poppins-semibold text-[16px] lg:text-[18px] text-gray-800">Dokumen Pendukung Lainnya</h3>
-                            <p className="font-poppins-regular text-[12px] lg:text-[13px] text-gray-400">
-                                Addendum kontrak, jaminan pelaksanaan, jaminan pemeliharaan, dsb.
-                            </p>
+                        <div className="flex lg:flex-row flex-col lg:gap-0 gap-4 justify-between items-start lg:items-center">
+                            <div className="flex flex-col gap-1">
+                                <h3 className="font-poppins-semibold text-[16px] lg:text-[18px] text-gray-800">Dokumen Pendukung Lainnya</h3>
+                                <p className="font-poppins-regular text-[12px] lg:text-[13px] text-gray-400">
+                                    Addendum kontrak, jaminan pelaksanaan, jaminan pemeliharaan, dsb.
+                                </p>
+                            </div>
                         </div>
 
                         {documentData.length > 0 ? (
                             <div>
                                 <TableHeader
                                     showTitle={false}
-                                    showHapus={false}
+                                    showHapus={!true}
                                     showTambah={false}
                                     showTahun={false}
                                     searchValue={search}
@@ -480,7 +524,7 @@ export default function AdminPPKIdentitasProyekUpdateView() {
                                     data={documentDataFilter}
                                     showPreview={false}
                                     showEdit={false}
-                                    isSelect={false}
+                                    isSelect={!true}
                                     onSelectedIdsChange={(item) => setSelectedRemove(item)}
                                     showDownload={true}
                                     downloadKey="photo_file"
@@ -505,50 +549,24 @@ export default function AdminPPKIdentitasProyekUpdateView() {
                     />
 
                     <div className="flex flex-col gap-4">
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                            {[
-                                { label: "Total", value: pengaduanStats.total, color: "text-gray-700", bg: "bg-gray-50", border: "border-gray-200" },
-                                { label: "Menunggu", value: pengaduanStats.menunggu, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
-                                { label: "Diproses", value: pengaduanStats.diproses, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-100" },
-                                { label: "Selesai", value: pengaduanStats.selesai, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
-                                { label: "Ditolak", value: pengaduanStats.ditolak, color: "text-red-600", bg: "bg-red-50", border: "border-red-100" },
-                            ].map((stat, i) => (
-                                <div key={i} className={`${stat.bg} border ${stat.border} rounded-xl px-4 py-3 flex flex-col gap-0.5`}>
-                                    <p className={`font-poppins-bold text-2xl ${stat.color}`}>{stat.value}</p>
-                                    <p className="font-poppins-medium text-[11px] text-gray-400">{stat.label}</p>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <div className="relative flex-1">
-                                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                <input
-                                    type="text"
-                                    value={pengaduanSearch}
-                                    onChange={(e) => setPengaduanSearch(e.target.value)}
-                                    placeholder="Cari laporan..."
-                                    className="w-full pl-9 pr-4 py-2.5 text-[13px] font-poppins-regular border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors duration-200"
-                                />
-                            </div>
-                            <select
-                                value={pengaduanStatus}
-                                onChange={(e) => setPengaduanStatus(e.target.value)}
-                                className="text-[13px] font-poppins-regular border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-primary transition-colors duration-200 bg-white"
-                            >
-                                {statusFilterOptions.map((opt) => (
-                                    <option key={opt.key} value={opt.key}>{opt.label}</option>
-                                ))}
-                            </select>
+                        <div className="relative flex-1">
+                            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input
+                                type="text"
+                                value={pengaduanSearch}
+                                onChange={(e) => setPengaduanSearch(e.target.value)}
+                                placeholder="Cari laporan..."
+                                className="w-full pl-9 pr-4 py-2.5 text-[13px] font-poppins-regular border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors duration-200"
+                            />
                         </div>
 
                         {proyekPengaduan.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {proyekPengaduan.map((item, index) => (
                                     <div key={item.id} data-aos="fade-up" data-aos-delay={index * 60} data-aos-duration="400">
-                                        <PengaduanCard item={item} />
+                                        <PengaduanCard item={item as any} />
                                     </div>
                                 ))}
                             </div>
@@ -558,7 +576,7 @@ export default function AdminPPKIdentitasProyekUpdateView() {
                                     <MessageSquareWarning size={28} className="text-gray-300" />
                                 </div>
                                 <p className="font-poppins-medium text-gray-400 text-[14px]">
-                                    {pengaduanSearch || pengaduanStatus ? "Tidak ada laporan yang cocok" : "Belum ada laporan pengaduan untuk proyek ini"}
+                                    {pengaduanSearch ? "Tidak ada laporan yang cocok" : "Belum ada laporan pengaduan untuk proyek ini"}
                                 </p>
                             </div>
                         )}
