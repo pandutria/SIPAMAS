@@ -71,15 +71,12 @@ func SeedSuperAdmin() {
 
 	password := "SuperAdminss7617&"
 	role := "super-admin"
-<<<<<<< HEAD
-	fullname := "Super Admin"
-=======
->>>>>>> 27db81e6f2f3de18a00e483d0962a5e4d96e43b5
 	isActive := "true"
+	fullname := "Super Admin"
 
 	superAdmin := models.User{
 		Email:    &email,
-		FullName: &fullname,
+		Fullname: &fullname,
 		Password: utils.HashSHA512(password),
 		Role:     &role,
 		IsActive: &isActive,
