@@ -26,13 +26,6 @@ declare global {
     nama: string;
     tahun_anggaran: string;
     kategori?: string;
-    provinsi?: string;
-    kabupaten?: string;
-    kecamatan?: string;
-    kecamatan_kode?: string;
-    kelurahan?: string;
-    latitude?: string;
-    longitude?: string;
     nilai_kontrak?: string;
     kontraktor_pelaksana?: string;
     konsultas_pengawas?: string;
@@ -51,9 +44,24 @@ declare global {
     updated_at: string;
     created_by: UserProps;
 
+    locations: ProjectIdentityLocationProps[]; 
     photos: ProjectIdentityPhotoProps[];
     documents: ProjectIdentityDocumentProps[];
     pengaduan: PengaduanProps[];
+  }
+
+  export interface ProjectIdentityLocationProps {
+    id: number
+    identitas_proyek_id: number;
+    alamat: string;
+    provinsi: string;
+    kabupaten: string;
+    kecamatan: string;
+    kelurahan: string;
+    latitude: string;
+    longitude: string;
+    created_at: string;
+    updated_at: string;
   }
 
   export interface ProjectIdentityPhotoProps {

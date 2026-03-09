@@ -20,11 +20,6 @@ export default function useProjectIdentity() {
         nama: "",
         tahun_anggaran: "",
         kategori: "",
-        provinsi: "Maluku Utara",
-        kabupaten: "Halmahera Tengah",
-        kecamatan: "",
-        kecamatan_kode: "",
-        kelurahan: "",
         nilai_kontrak: "",
         sumber_dana: "",
         kontraktor_pelaksana: "",
@@ -73,11 +68,6 @@ export default function useProjectIdentity() {
             nama: data?.nama ?? "",
             tahun_anggaran: data?.tahun_anggaran ?? "",
             kategori: data?.kategori ?? "",
-            provinsi: data?.provinsi ?? "",
-            kabupaten: data?.kabupaten ?? "",
-            kecamatan: data?.kecamatan ?? "",
-            kecamatan_kode: data?.kecamatan_kode ?? "",
-            kelurahan: data?.kelurahan ?? "",
             nilai_kontrak: data?.nilai_kontrak ?? "",
             sumber_dana: data?.sumber_dana ?? "",
             kontraktor_pelaksana: data?.kontraktor_pelaksana ?? "",
@@ -139,9 +129,9 @@ export default function useProjectIdentity() {
         }))
     }
 
-    const handleProjectIdentityPost = async (photosData: any, documentsData: ProjectIdentityDocumentProps[], coords: any) => {
+    const handleProjectIdentityPost = async (photosData: any, documentsData: ProjectIdentityDocumentProps[], locations: ProjectIdentityLocationProps[]) => {
         try {
-            if (photosData.start.length == 0 || !coords || documentsData.length == 0) {
+            if (photosData.start.length == 0 || locations.length == 0|| documentsData.length == 0) {
                 SwalMessage({
                     type: "error",
                     title: "Gagal!",
@@ -155,12 +145,6 @@ export default function useProjectIdentity() {
             formData.append("nama", projectIdentityForm.nama);
             formData.append("tahun_anggaran", projectIdentityForm.tahun_anggaran);
             formData.append("kategori", projectIdentityForm.kategori);
-            formData.append("provinsi", "Maluku Utara");
-            formData.append("kabupaten", "Halmahera Tengah");
-            formData.append("kecamatan", projectIdentityForm.kecamatan);
-            formData.append("kelurahan", projectIdentityForm.kelurahan);
-            formData.append("longitude", coords.lng);
-            formData.append("latitude", coords.lat);
             formData.append("nilai_kontrak", projectIdentityForm.nilai_kontrak);
             formData.append("kontraktor_pelaksana", projectIdentityForm.kontraktor_pelaksana);
             formData.append("konsultas_pengawas", projectIdentityForm.konsultas_pengawas);
@@ -226,6 +210,25 @@ export default function useProjectIdentity() {
                 });
             }
 
+            for (let index = 0; index < locations.length; index++) {
+                const location = locations[index];
+                const formData = new FormData();
+                formData.append("identitas_proyek_id", parentId);
+                formData.append("alamat", location.alamat);
+                formData.append("provinsi", location.provinsi);
+                formData.append("kabupaten", location.kabupaten);
+                formData.append("kecamatan", location.kecamatan);
+                formData.append("kelurahan", location.kelurahan);
+                formData.append("latitude", location.latitude);
+                formData.append("longitude", location.longitude);
+
+                await API.post("/identitas-proyek/location/create", formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+            }
+
             const message = responseParent?.data?.message;
             SwalMessage({
                 type: "success",
@@ -250,13 +253,6 @@ export default function useProjectIdentity() {
             const formData = new FormData();
             formData.append("nama", projectIdentityForm.nama);
             formData.append("tahun_anggaran", projectIdentityForm.tahun_anggaran);
-            formData.append("provinsi", "Maluku Utara");
-            formData.append("kabupaten", "Halmahera Tengah");
-            formData.append("kategori", projectIdentityForm.kategori);
-            formData.append("kecamatan", projectIdentityForm.kecamatan);
-            formData.append("kelurahan", projectIdentityForm.kelurahan);
-            formData.append("longitude", coords.lng);
-            formData.append("latitude", coords.lat);
             formData.append("nilai_kontrak", projectIdentityForm.nilai_kontrak);
             formData.append("kontraktor_pelaksana", projectIdentityForm.kontraktor_pelaksana);
             formData.append("konsultas_pengawas", projectIdentityForm.konsultas_pengawas);
