@@ -333,7 +333,7 @@ export default function SuperAdminModalUbahStatusLaporan({ isOpen, onClose, data
                                 onChange={(e) => setProjectIdentityForm(e.target.value)}
                             >
                                 {projectIdentityData.map((item) => (
-                                    <option key={item.id} value={item.id}>{`${item.nama} - ${item.kecamatan}, ${item.kelurahan} Tahun ${item.tahun_anggaran}`}</option>
+                                    <option key={item.id} value={item.id}>{`${item.nama} -  Tahun ${item.tahun_anggaran}`}</option>
                                 ))}
                             </FormSelect>
                         )}
