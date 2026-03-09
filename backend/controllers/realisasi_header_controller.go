@@ -25,6 +25,7 @@ func GetAllRealisasiHeader(c *gin.Context) {
 		Preload("ScheduleHeader.Items").
 		Preload("ScheduleHeader.Items.Weeks").
 		Preload("ScheduleHeader.Rab.IdentitasProyek").
+		Preload("ScheduleHeader.Rab.IdentitasProyek.Locations").
 		Preload("ScheduleHeader.Rab.IdentitasProyek.CreatedBy").
 		Preload("ScheduleHeader.Rab.IdentitasProyek.Photos").
 		Preload("ScheduleHeader.Rab.IdentitasProyek.Documents").
@@ -57,6 +58,7 @@ func GetRealisasiById(c *gin.Context) {
 		Preload("ScheduleHeader.Items").
 		Preload("ScheduleHeader.Items.Weeks").
 		Preload("ScheduleHeader.Rab.IdentitasProyek").
+		Preload("ScheduleHeader.Rab.IdentitasProyek.Locations").
 		Preload("ScheduleHeader.Rab.IdentitasProyek.CreatedBy").
 		Preload("ScheduleHeader.Rab.IdentitasProyek.Photos").
 		Preload("ScheduleHeader.Rab.IdentitasProyek.Documents").
