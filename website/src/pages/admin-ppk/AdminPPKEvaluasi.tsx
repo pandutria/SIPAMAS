@@ -58,10 +58,6 @@ export default function AdminPPKEvaluasi() {
             label: 'Nama Proyek'
         },
         {
-            key: 'lokasi',
-            label: 'Lokasi Proyek'
-        },
-        {
             key: 'status',
             label: 'Status'
         },

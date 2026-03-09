@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../../../components/Navbar';
 import BackButton from '../../../ui/BackButton';
 import ShowTableForm from '../../../ui/ShowTableForm';
@@ -11,59 +11,7 @@ import { Navigate, useLocation, useParams } from 'react-router-dom';
 import FormSelect from '../../../ui/FormSelect';
 import RabDetailTable from '../../../ui/RabDetailTable';
 import { FormatDate } from '../../../utils/FormatDate';
-import L from "leaflet";
-import maps from "/icon/maps.png";
-import "leaflet/dist/leaflet.css";
-
-const customIcon = L.icon({
-  iconUrl: maps,
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-  popupAnchor: [0, -36],
-});
-
-function MapPicker({
-  latitude,
-  longitude
-}: {
-  latitude: number;
-  longitude: number;
-}) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-
-  useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
-
-    const map = L.map(mapRef.current, {
-      attributionControl: false,
-    }).setView([-2.5489, 118.0149], 5);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-    if (latitude || longitude) {
-      markerRef.current = L.marker(
-        [latitude, longitude],
-        { icon: customIcon }
-      ).addTo(map);
-    }
-
-    mapInstanceRef.current = map;
-
-    return () => {
-      map.remove();
-      mapInstanceRef.current = null;
-      markerRef.current = null;
-    };
-  }, [latitude, longitude]);
-
-  return (
-    <div className="relative w-full h-80">
-      <div ref={mapRef} className="w-full h-full rounded-lg z-0" />
-    </div>
-  );
-}
+import MapsShow from '../../../components/maps/MapsShow';
 
 export default function AdminPPKRencanaAnggaranUpdateView() {
   const location = useLocation();
@@ -155,37 +103,11 @@ export default function AdminPPKRencanaAnggaranUpdateView() {
                 />
               </div>
 
-              <MapPicker latitude={Number(rabDataByid?.proyek.latitude)} longitude={Number(rabDataByid?.proyek.longitude)} />
+              {(rabDataByid.proyek?.locations?.length || 0) > 0 && (
+                <MapsShow data={rabDataByid.proyek.locations} />
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-                <FormInput
-                  title='Provinsi'
-                  placeholder='Masukkan provinsi'
-                  value={rabDataByid?.proyek.provinsi}
-                  disabled={true}
-                />
-
-                <FormInput
-                  title='Kabupaten/Kota'
-                  placeholder='Masukkan kabupaten/kota'
-                  value={rabDataByid?.proyek.kabupaten}
-                  disabled={true}
-                />
-
-                <FormInput
-                  title='Kecamatan'
-                  placeholder='Masukkan kecamatan'
-                  value={rabDataByid?.proyek.kecamatan}
-                  disabled={true}
-                />
-
-                <FormInput
-                  title='Kelurahan/Desa'
-                  placeholder='Masukkan kelurahan/desa'
-                  value={rabDataByid?.proyek.kelurahan}
-                  disabled={true}
-                />
-
                 <FormInput
                   title='Nilai Kontrak'
                   placeholder='Masukkan nilai kontrak (otomatis)'

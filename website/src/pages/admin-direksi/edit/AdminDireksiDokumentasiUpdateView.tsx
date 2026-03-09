@@ -151,10 +151,10 @@ export default function AdminDireksiDokumentasiUpdateView() {
 
           <div className="flex flex-col gap-4 mb-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-              <ShowTableForm 
-                disabled={true} 
-                tenderCode={`TND-0${projectIdentityByIdData?.id}`} 
-                onClick={() => false} 
+              <ShowTableForm
+                disabled={true}
+                tenderCode={`TND-0${projectIdentityByIdData?.id}`}
+                onClick={() => false}
               />
 
               <FormInput
@@ -179,7 +179,9 @@ export default function AdminDireksiDokumentasiUpdateView() {
               />
 
               <div className="grid col-span-2">
-                <MapsShow data={projectIdentityByIdData.locations} />
+                {projectIdentityByIdData?.locations && (
+                  <MapsShow data={projectIdentityByIdData?.locations} />
+                )}
               </div>
 
               <FormInput

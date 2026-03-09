@@ -144,7 +144,9 @@ export default function AdminPPKEvaluasiUpdateView() {
                                 />
 
                                 <div className="grid col-span-2">
-                                    <MapsShow data={projectIdentityByIdData!.locations} />
+                                    {projectIdentityByIdData?.locations && (
+                                        <MapsShow data={projectIdentityByIdData?.locations} />
+                                    )}
                                 </div>
 
                                 <FormInput
@@ -260,11 +262,10 @@ export default function AdminPPKEvaluasiUpdateView() {
                                                     key={item.val}
                                                     type="button"
                                                     onClick={() => handleSkorChange(item.val)}
-                                                    className={`text-[10px] font-poppins-semibold px-2 py-1 rounded-lg transition-all duration-200 cursor-pointer ${
-                                                        skorValue === item.val
+                                                    className={`text-[10px] font-poppins-semibold px-2 py-1 rounded-lg transition-all duration-200 cursor-pointer ${skorValue === item.val
                                                             ? `${colorConfig.text} bg-white shadow-sm`
                                                             : "text-gray-400 hover:text-gray-600"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {item.label}
                                                 </button>

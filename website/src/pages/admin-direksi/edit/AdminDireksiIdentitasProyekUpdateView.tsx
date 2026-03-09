@@ -384,7 +384,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
                         <FormInput disabled={isDisabled} value={projectIdentityForm.nama} name="nama" onChange={handleChangeForm} title="Nama Proyek" placeholder="Masukkan nama proyek" />
-                        <FormSelect value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran">
+                        <FormSelect disabled={isDisabled} value={projectIdentityForm.tahun_anggaran} name="tahun_anggaran" onChange={handleChangeForm} title="Tahun Anggaran">
                             {TahunData?.map((item, index) => (
                                 <option key={index} value={item.text}>{item.text}</option>
                             ))}
