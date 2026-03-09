@@ -203,6 +203,7 @@ export default function useScheduleHooks() {
                     text: error.response.data.message
                 });
             }
+            console.error(error)
         }
     }
 

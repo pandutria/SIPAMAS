@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../../../components/Navbar';
 import * as XLSX from 'xlsx';
 import { SwalMessage } from '../../../utils/SwalMessage';
@@ -18,9 +18,7 @@ import useScheduleHooks from '../../../hooks/ScheduleHooks';
 import WeekScheduleTable from '../../../ui/WeekScheduleTable';
 import useRABHooks from '../../../hooks/RABHooks';
 import { ParseNumber } from '../../../utils/ParseNumber';
-import L from "leaflet";
-import maps from "/icon/maps.png";
-import "leaflet/dist/leaflet.css";
+import MapsShow from '../../../components/maps/MapsShow';
 
 const WEEK_START_COL = 'E';
 const formatLoopExcel = (index: number): string => {
@@ -109,56 +107,6 @@ const parseRABExcel = (
 const getTotalMingguFromData = (data: ScheduleItemProps[]): number => {
   return data.length > 0 ? data[0].weeks.length : 0;
 };
-
-const customIcon = L.icon({
-  iconUrl: maps,
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-  popupAnchor: [0, -36],
-});
-
-function MapPicker({
-  latitude,
-  longitude
-}: {
-  latitude: number;
-  longitude: number;
-}) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-
-  useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
-
-    const map = L.map(mapRef.current, {
-      attributionControl: false,
-    }).setView([-2.5489, 118.0149], 5);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-    if (latitude || longitude) {
-      markerRef.current = L.marker(
-        [latitude, longitude],
-        { icon: customIcon }
-      ).addTo(map);
-    }
-
-    mapInstanceRef.current = map;
-
-    return () => {
-      map.remove();
-      mapInstanceRef.current = null;
-      markerRef.current = null;
-    };
-  }, [latitude, longitude]);
-
-  return (
-    <div className="relative w-full h-80">
-      <div ref={mapRef} className="w-full h-full rounded-lg z-0" />
-    </div>
-  );
-}
 
 export default function AdminDireksiJadwalPelaksanaanAdd() {
   const [dataFile, setDataFile] = useState<ScheduleItemProps[]>([]);
@@ -370,37 +318,11 @@ export default function AdminDireksiJadwalPelaksanaanAdd() {
                 />
               </div>
 
-              <MapPicker latitude={Number(selectedRab?.proyek.latitude)} longitude={Number(selectedRab?.proyek.longitude)} />
+              {(selectedRab?.proyek?.locations?.length || 0) > 0 && (
+                <MapsShow data={selectedRab!.proyek.locations} />
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-                <FormInput
-                  title='Provinsi'
-                  placeholder='Masukkan provinsi'
-                  value={selectedRab?.proyek.provinsi}
-                  disabled={true}
-                />
-
-                <FormInput
-                  title='Kabupaten/Kota'
-                  placeholder='Masukkan kabupaten/kota'
-                  value={selectedRab?.proyek.kabupaten}
-                  disabled={true}
-                />
-
-                <FormInput
-                  title='Kecamatan'
-                  placeholder='Masukkan kecamatan'
-                  value={selectedRab?.proyek.kecamatan}
-                  disabled={true}
-                />
-
-                <FormInput
-                  title='Kelurahan/Desa'
-                  placeholder='Masukkan kelurahan/desa'
-                  value={selectedRab?.proyek.kelurahan}
-                  disabled={true}
-                />
-
                 <FormInput
                   title='Nilai Kontrak'
                   placeholder='Masukkan nilai kontrak (otomatis)'
