@@ -248,7 +248,7 @@ export default function useProjectIdentity() {
         }
     }
 
-    const handleProjectIdentityPut = async (coords: any) => {
+    const handleProjectIdentityPut = async () => {
         try {
             const formData = new FormData();
             formData.append("nama", projectIdentityForm.nama);
@@ -545,6 +545,7 @@ export default function useProjectIdentity() {
             }
         }
     }
+
 
     return {
         projectIdentityData,

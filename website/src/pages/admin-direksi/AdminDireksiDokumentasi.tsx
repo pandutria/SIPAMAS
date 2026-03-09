@@ -62,10 +62,6 @@ export default function AdminDireksiDokumentasi() {
             label: 'Kategori Proyek'
         },
         {
-            key: 'kecamatan',
-            label: 'Lokasi Proyek'
-        },
-        {
             key: 'status',
             label: 'Status'
         },

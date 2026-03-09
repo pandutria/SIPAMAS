@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../../../components/Navbar';
 import { SwalMessage } from '../../../utils/SwalMessage';
 import TableContent from '../../../ui/TableContent';
@@ -16,59 +16,7 @@ import useScheduleHooks from '../../../hooks/ScheduleHooks';
 import WeekScheduleTable from '../../../ui/WeekScheduleTable';
 import useRealisasiHooks from '../../../hooks/RealisasiHooks';
 import RealizationModal from '../../../ui/RealizationModal';
-import L from "leaflet";
-import maps from "/icon/maps.png";
-import "leaflet/dist/leaflet.css";
-
-const customIcon = L.icon({
-    iconUrl: maps,
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -36],
-});
-
-function MapPicker({
-    latitude,
-    longitude
-}: {
-    latitude: number;
-    longitude: number;
-}) {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const mapInstanceRef = useRef<L.Map | null>(null);
-    const markerRef = useRef<L.Marker | null>(null);
-
-    useEffect(() => {
-        if (!mapRef.current || mapInstanceRef.current) return;
-
-        const map = L.map(mapRef.current, {
-            attributionControl: false,
-        }).setView([-2.5489, 118.0149], 5);
-
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-        if (latitude || longitude) {
-            markerRef.current = L.marker(
-                [latitude, longitude],
-                { icon: customIcon }
-            ).addTo(map);
-        }
-
-        mapInstanceRef.current = map;
-
-        return () => {
-            map.remove();
-            mapInstanceRef.current = null;
-            markerRef.current = null;
-        };
-    }, [latitude, longitude]);
-
-    return (
-        <div className="relative w-full h-80">
-            <div ref={mapRef} className="w-full h-full rounded-lg z-0" />
-        </div>
-    );
-}
+import MapsShow from '../../../components/maps/MapsShow';
 
 export default function AdminDireksiRealisasiAdd() {
     const [showTender, setShowTender] = useState(false);
@@ -189,7 +137,7 @@ export default function AdminDireksiRealisasiAdd() {
             <div className="pt-24 pb-12 px-4 md:px-8" data-aos="fade-up" data-aos-duration="1000">
                 <div className="max-w-7xl mx-auto">
                     <BackButton type='custom' link='/admin-direksi/realisasi-pekerjaan' />
-                    
+
                     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                         <h1 className="font-poppins-bold text-2xl text-gray-800 mb-6">
                             Realisasi Pekerjaan
@@ -238,37 +186,11 @@ export default function AdminDireksiRealisasiAdd() {
                                 />
                             </div>
 
-                            <MapPicker latitude={Number(selectedSchedule?.rab?.proyek.latitude)} longitude={Number(selectedSchedule?.rab?.proyek.longitude)} />
+                            {(selectedSchedule?.rab?.proyek?.locations?.length || 0) > 0 && (
+                                <MapsShow data={selectedSchedule!.rab!.proyek.locations} />
+                            )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-                                <FormInput
-                                    title='Provinsi'
-                                    placeholder='Masukkan provinsi'
-                                    value={selectedSchedule?.rab?.proyek.provinsi}
-                                    disabled={true}
-                                />
-
-                                <FormInput
-                                    title='Kabupaten/Kota'
-                                    placeholder='Masukkan kabupaten/kota'
-                                    value={selectedSchedule?.rab?.proyek.kabupaten}
-                                    disabled={true}
-                                />
-
-                                <FormInput
-                                    title='Kecamatan'
-                                    placeholder='Masukkan kecamatan'
-                                    value={selectedSchedule?.rab?.proyek.kecamatan}
-                                    disabled={true}
-                                />
-
-                                <FormInput
-                                    title='Kelurahan/Desa'
-                                    placeholder='Masukkan kelurahan/desa'
-                                    value={selectedSchedule?.rab?.proyek.kelurahan}
-                                    disabled={true}
-                                />
-
                                 <FormInput
                                     title='Nilai Kontrak'
                                     placeholder='Masukkan nilai kontrak (otomatis)'

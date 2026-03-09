@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Plus, MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen, CheckCircle2, Navigation, MousePointerClick, X } from "lucide-react";
+import { Plus, MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen, CheckCircle2, Navigation, X, Search } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import BackButton from "../../../ui/BackButton";
 import FormInput from "../../../ui/FormInput";
 import FormSelect from "../../../ui/FormSelect";
 import FormUploadFile from "../../../ui/FormUploadFile";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AdminDireksiTambahDokumentasiModal from "../modal/AdminDireksiTambahDokumentasiModal";
 import AdminDireksiTambahDokumenModal from "../modal/AdminDireksiTambahDokumenModal";
 import TableContent from "../../../ui/TableContent";
@@ -16,7 +16,7 @@ import useProjectIdentity from "../../../hooks/ProjectIdentity";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
 import { Navigate } from "react-router-dom";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import maps from "/icon/maps.png";
 import { TahunData } from "../../../data/TahunData";
 
@@ -25,6 +25,7 @@ type PhotoType = "start" | "end";
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
 const DEFAULT_CENTER = { lat: -2.5489, lng: 118.0149 };
+const LIBRARIES: ("places")[] = ["places"];
 
 async function reverseGeocode(lat: number, lng: number): Promise<{
     alamat: string;
@@ -62,7 +63,14 @@ interface ClickableMapProps {
 }
 
 function ClickableMap({ pendingCoords, onMapClick }: ClickableMapProps) {
-    const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
+    const { isLoaded, loadError } = useJsApiLoader({
+        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+        libraries: LIBRARIES,
+    });
+
+    const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+    const [searchValue, setSearchValue] = useState("");
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const customMarkerIcon: google.maps.Icon | undefined = isLoaded
         ? {
@@ -71,6 +79,23 @@ function ClickableMap({ pendingCoords, onMapClick }: ClickableMapProps) {
               anchor: new window.google.maps.Point(20, 40),
           }
         : undefined;
+
+    const onAutocompleteLoad = (ac: google.maps.places.Autocomplete) => {
+        setAutocomplete(ac);
+    };
+
+    const onPlaceChanged = () => {
+        if (autocomplete) {
+            const place = autocomplete.getPlace();
+            if (place.geometry?.location) {
+                onMapClick({
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng(),
+                });
+                setSearchValue(place.formatted_address ?? place.name ?? "");
+            }
+        }
+    };
 
     if (loadError) return (
         <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -88,32 +113,73 @@ function ClickableMap({ pendingCoords, onMapClick }: ClickableMapProps) {
     );
 
     return (
-        <GoogleMap
-            mapContainerStyle={MAP_CONTAINER_STYLE}
-            center={pendingCoords ?? DEFAULT_CENTER}
-            zoom={pendingCoords ? 15 : 5}
-            onClick={(e) => {
-                if (e.latLng) onMapClick({ lat: e.latLng.lat(), lng: e.latLng.lng() });
-            }}
-            options={{
-                mapTypeId: "roadmap",
-                disableDefaultUI: false,
-                zoomControl: true,
-                streetViewControl: false,
-                mapTypeControl: false,
-                fullscreenControl: false,
-                scrollwheel: true,
-                draggableCursor: "crosshair",
-            }}
-        >
-            {pendingCoords && (
-                <Marker
-                    position={pendingCoords}
-                    icon={customMarkerIcon}
-                    animation={window.google?.maps?.Animation?.DROP}
-                />
-            )}
-        </GoogleMap>
+        <div className="relative w-full h-full">
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-md">
+                <Autocomplete
+                    onLoad={onAutocompleteLoad}
+                    onPlaceChanged={onPlaceChanged}
+                    options={{ componentRestrictions: { country: "id" } }}
+                >
+                    <div className="relative flex items-center">
+                        <Search
+                            size={15}
+                            className="absolute left-3 text-gray-400 pointer-events-none"
+                        />
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            placeholder="Cari lokasi..."
+                            className="
+                                w-full pl-9 pr-9 py-2.5 rounded-xl
+                                bg-white/95 backdrop-blur-sm
+                                border border-gray-200 shadow-md
+                                font-poppins-regular text-[13px] text-gray-700
+                                placeholder:text-gray-400
+                                focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                                transition-all duration-200
+                            "
+                        />
+                        {searchValue && (
+                            <button
+                                onClick={() => setSearchValue("")}
+                                className="absolute right-3 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X size={12} />
+                            </button>
+                        )}
+                    </div>
+                </Autocomplete>
+            </div>
+
+            <GoogleMap
+                mapContainerStyle={MAP_CONTAINER_STYLE}
+                center={pendingCoords ?? DEFAULT_CENTER}
+                zoom={pendingCoords ? 15 : 5}
+                onClick={(e) => {
+                    if (e.latLng) onMapClick({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+                }}
+                options={{
+                    mapTypeId: "roadmap",
+                    disableDefaultUI: false,
+                    zoomControl: true,
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                    scrollwheel: true,
+                    draggableCursor: "crosshair",
+                }}
+            >
+                {pendingCoords && (
+                    <Marker
+                        position={pendingCoords}
+                        icon={customMarkerIcon}
+                        animation={window.google?.maps?.Animation?.DROP}
+                    />
+                )}
+            </GoogleMap>
+        </div>
     );
 }
 
@@ -123,7 +189,10 @@ interface MiniMapProps {
 }
 
 function MiniMap({ coords, label }: MiniMapProps) {
-    const { isLoaded } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
+    const { isLoaded } = useJsApiLoader({
+        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+        libraries: LIBRARIES,
+    });
 
     const customMarkerIcon: google.maps.Icon | undefined = isLoaded
         ? {
@@ -411,9 +480,11 @@ export default function AdminDireksiIdentitasProyekAdd() {
                                     <Navigation size={15} className="text-primary" />
                                     <p className="font-poppins-semibold text-[14px] text-gray-700">Tambah Titik Lokasi Baru</p>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full px-3 py-1.5">
-                                    <MousePointerClick size={12} className="text-blue-500" />
-                                    <span className="font-poppins-medium text-[11px] text-blue-500">Klik peta untuk menentukan lokasi</span>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full px-3 py-1.5">
+                                        <Search size={12} className="text-blue-500" />
+                                        <span className="font-poppins-medium text-[11px] text-blue-500">Cari atau klik peta untuk menentukan lokasi</span>
+                                    </div>
                                 </div>
                             </div>
 

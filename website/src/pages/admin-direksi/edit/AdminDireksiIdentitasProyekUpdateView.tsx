@@ -1,19 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Plus, MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen, Trash2, MessageSquareWarning, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { MapPin as MapPinIcon, FileText, Image, DollarSign, FolderOpen, Trash2, MessageSquareWarning, ChevronDown, ChevronUp, ExternalLink, Plus, Navigation } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import BackButton from "../../../ui/BackButton";
 import FormInput from "../../../ui/FormInput";
 import FormSelect from "../../../ui/FormSelect";
 import FormUploadFile from "../../../ui/FormUploadFile";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import AdminDireksiTambahDokumentasiModal from "../modal/AdminDireksiTambahDokumentasiModal";
 import AdminDireksiTambahDokumenModal from "../modal/AdminDireksiTambahDokumenModal";
 import TableContent from "../../../ui/TableContent";
 import TableHeader from "../../../ui/TableHeader";
 import SubmitButton from "../../../ui/SubmitButton";
 import useProjectIdentity from "../../../hooks/ProjectIdentity";
-import LocationData from "../../../data/LocationData";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
@@ -27,7 +26,6 @@ type PhotoType = "start" | "end";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
-const DEFAULT_CENTER = { lat: -2.5489, lng: 118.0149 };
 
 const statusConfig: Record<string, { label: string; badge: string; dot: string }> = {
     menunggu: { label: "Menunggu", badge: "bg-blue-100 text-blue-600 border border-blue-200", dot: "bg-blue-500" },
@@ -46,58 +44,37 @@ function resolveStatusKey(raw: string): string {
     return "menunggu";
 }
 
-async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-    try {
-        const res = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_API_KEY}`
-        );
-        const data = await res.json();
-        if (data.status === "OK" && data.results.length > 0) {
-            const { lat, lng } = data.results[0].geometry.location;
-            return { lat, lng };
-        }
-        return null;
-    } catch {
-        return null;
-    }
-}
-
-interface GoogleMapPickerProps {
-    coords: { lat: number; lng: number } | null;
+interface MiniMapProps {
+    coords: { lat: number; lng: number };
     label: string;
 }
 
-function GoogleMapPicker({ coords, label }: GoogleMapPickerProps) {
-    const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
+function MiniMap({ coords, label }: MiniMapProps) {
+    const { isLoaded } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
 
     const customMarkerIcon: google.maps.Icon | undefined = isLoaded
-        ? { url: maps, scaledSize: new window.google.maps.Size(36, 36), anchor: new window.google.maps.Point(18, 36) }
+        ? {
+              url: maps,
+              scaledSize: new window.google.maps.Size(30, 30),
+              anchor: new window.google.maps.Point(15, 30),
+          }
         : undefined;
 
-    if (loadError) {
-        return (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
-                <p className="text-sm text-gray-400 font-poppins-regular">Gagal memuat Google Maps</p>
-            </div>
-        );
-    }
-
-    if (!isLoaded) {
-        return (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl">
-                <p className="text-sm text-gray-400 font-poppins-regular">Memuat peta...</p>
-            </div>
-        );
-    }
+    if (!isLoaded) return <div className="w-full h-full bg-gray-100 animate-pulse" />;
 
     return (
         <GoogleMap
             mapContainerStyle={MAP_CONTAINER_STYLE}
-            center={coords ?? DEFAULT_CENTER}
-            zoom={coords ? 15 : 5}
-            options={{ zoomControl: true, streetViewControl: false, mapTypeControl: false, fullscreenControl: false, scrollwheel: true }}
+            center={coords}
+            zoom={14}
+            options={{
+                disableDefaultUI: true,
+                gestureHandling: "none",
+                zoomControl: false,
+                draggable: false,
+            }}
         >
-            {coords && <Marker position={coords} title={label} icon={customMarkerIcon} />}
+            <Marker position={coords} title={label} icon={customMarkerIcon} />
         </GoogleMap>
     );
 }
@@ -121,7 +98,69 @@ function SectionHeader({ icon, title, badge }: { icon: React.ReactNode; title: s
     );
 }
 
-function PengaduanCard({ item }: { item: PengaduanProps }) {
+interface ReadOnlyLocationCardProps {
+    location: ProjectIdentityLocationProps;
+    index: number;
+}
+
+function ReadOnlyLocationCard({ location, index }: ReadOnlyLocationCardProps) {
+    const coords =
+        location.latitude && location.longitude
+            ? { lat: parseFloat(location.latitude), lng: parseFloat(location.longitude) }
+            : null;
+
+    const label = [location.kelurahan, location.kecamatan, location.kabupaten].filter(Boolean).join(", ");
+
+    return (
+        <div
+            className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+            data-aos="fade-up"
+            data-aos-delay={index * 60}
+        >
+            <div className="h-36 relative overflow-hidden">
+                {coords ? (
+                    <MiniMap coords={coords} label={label} />
+                ) : (
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <MapPinIcon size={24} className="text-gray-300" />
+                    </div>
+                )}
+                <div className="absolute inset-0 pointer-events-none bg-linear-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 shadow-sm">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <span className="font-poppins-semibold text-[11px] text-gray-700">Lokasi {index + 1}</span>
+                </div>
+            </div>
+
+            <div className="p-3.5 flex flex-col gap-2.5">
+                <div>
+                    <p className="font-poppins-semibold text-[12px] text-gray-800 line-clamp-1">
+                        {location.kelurahan || "—"}, {location.kecamatan || "—"}
+                    </p>
+                    <p className="font-poppins-regular text-[11px] text-gray-400 mt-0.5 line-clamp-1">
+                        {location.kabupaten}, {location.provinsi}
+                    </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-gray-50">
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-poppins-medium text-gray-400 uppercase tracking-wider">Latitude</span>
+                        <span className="font-poppins-semibold text-[11px] text-primary mt-0.5">
+                            {coords ? coords.lat.toFixed(6) : "—"}
+                        </span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-poppins-medium text-gray-400 uppercase tracking-wider">Longitude</span>
+                        <span className="font-poppins-semibold text-[11px] text-primary mt-0.5">
+                            {coords ? coords.lng.toFixed(6) : "—"}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function PengaduanCard({ item }: { item: any }) {
     const [expanded, setExpanded] = useState(false);
     const statusKey = resolveStatusKey(item.status ?? "menunggu");
     const statusCfg = statusConfig[statusKey] ?? statusConfig["menunggu"];
@@ -163,7 +202,7 @@ function PengaduanCard({ item }: { item: PengaduanProps }) {
                         <div className="bg-gray-50 rounded-xl px-3 py-2.5">
                             <p className="text-[9px] font-poppins-semibold text-gray-400 uppercase tracking-wider mb-0.5">Pelapor</p>
                             <p className="text-[12px] font-poppins-semibold text-gray-700 truncate">
-                                {(item.created_by as any).fullname ?? item.created_by.fullname ?? "—"}
+                                {item.created_by?.fullname ?? "—"}
                             </p>
                         </div>
                     )}
@@ -183,7 +222,7 @@ function PengaduanCard({ item }: { item: PengaduanProps }) {
                         className="w-full flex items-center justify-between px-5 py-2.5 bg-gray-50 border-t border-gray-100 hover:bg-gray-100 transition-colors duration-150"
                     >
                         <span className="font-poppins-semibold text-[12px] text-gray-500">
-                            {item.medias!.length} Lampiran Media
+                            {item.medias.length} Lampiran Media
                         </span>
                         {expanded ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
                     </button>
@@ -191,7 +230,7 @@ function PengaduanCard({ item }: { item: PengaduanProps }) {
                     {expanded && (
                         <div className="px-5 pb-4 pt-3 border-t border-gray-100 bg-gray-50">
                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                                {item.medias!.map((media) => {
+                                {item.medias.map((media: any) => {
                                     const src = typeof media.media_file === "string"
                                         ? `${BASE_URL_FILE}/${media.media_file}`
                                         : URL.createObjectURL(media.media_file as File);
@@ -238,17 +277,17 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
     const [documentDataFilter, setDocumentDataFilter] = useState<any[]>([]);
     const [documentData, setDocumentData] = useState<any[]>([]);
     const [selectedRemove, setSelectedRemove] = useState<number[]>([]);
-    const [geocoding, setGeocoding] = useState(false);
     const [pengaduanSearch, setPengaduanSearch] = useState("");
-    const location = useLocation();
     const [isDisabled, setIsDisabled] = useState(false);
+
+    const location = useLocation();
+    const { id } = useParams();
 
     const {
         handleChangeFile,
         handleChangeForm,
         handleProjectIdentityPut,
         projectIdentityForm,
-        setProjectIdentityForm,
         projectIdentityByIdData,
         setSelectedProjectIdentityId,
         handleProjectIdentityPhotoDelete,
@@ -256,10 +295,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
     } = useProjectIdentity();
 
     const { pengaduanData } = usePengaduanHooks();
-    const { kecamatanData, kelurahanData, setSelectedKecamatamCode } = LocationData();
-    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const { loading, user } = useAuth();
-    const { id } = useParams();
 
     const projectCategory = [
         { id: 1, text: "Keterlambatan" },
@@ -288,11 +324,9 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
 
     const pengaduanStats = {
         total: proyekPengaduan.length,
-        menunggu: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "menunggu").length,
-        diproses: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "diproses").length,
-        selesai: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "selesai").length,
-        ditolak: proyekPengaduan.filter((i) => resolveStatusKey(i.status ?? "") === "ditolak").length,
     };
+
+    const locations: ProjectIdentityLocationProps[] = projectIdentityByIdData?.locations ?? [];
 
     useEffect(() => {
         document.body.style.overflow = showModalPhoto ? "hidden" : "auto";
@@ -301,13 +335,11 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
         if (id) setSelectedProjectIdentityId(Number(id));
 
         if (projectIdentityByIdData) {
-            setCoords({ lat: Number(projectIdentityByIdData.latitude), lng: Number(projectIdentityByIdData.longitude) });
             setPhotoData({
                 start: projectIdentityByIdData.photos.filter((item) => item.type === "start"),
                 end: projectIdentityByIdData.photos.filter((item) => item.type === "end"),
             });
             setDocumentData(projectIdentityByIdData.documents);
-            setSelectedKecamatamCode(String(projectIdentityByIdData.kecamatan_kode));
         }
 
         const dataFiltering = documentData?.filter((item) =>
@@ -315,38 +347,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
         );
         setDocumentDataFilter(dataFiltering);
     }, [showModalPhoto, documentData, search, projectIdentityByIdData]);
-
-    const buildAddressQuery = useCallback(() => {
-        const parts = [
-            projectIdentityForm.kelurahan,
-            projectIdentityForm.kecamatan,
-            projectIdentityForm.kabupaten,
-            projectIdentityForm.provinsi,
-            "Indonesia",
-        ].filter(Boolean);
-        return parts.join(", ");
-    }, [projectIdentityForm.kelurahan, projectIdentityForm.kecamatan, projectIdentityForm.kabupaten, projectIdentityForm.provinsi]);
-
-    useEffect(() => {
-        if (isDisabled) return;
-        const address = buildAddressQuery();
-        if (!address || address === "Indonesia") return;
-
-        const timeout = setTimeout(async () => {
-            setGeocoding(true);
-            const result = await geocodeAddress(address);
-            if (result) setCoords(result);
-            setGeocoding(false);
-        }, 600);
-
-        return () => clearTimeout(timeout);
-    }, [buildAddressQuery, isDisabled]);
-
-    const mapLabel = [
-        projectIdentityForm.kelurahan,
-        projectIdentityForm.kecamatan,
-        projectIdentityForm.kabupaten,
-    ].filter(Boolean).join(", ") || "Lokasi Proyek";
 
     if (loading || !projectIdentityByIdData) return <LoadingSpinner />;
     if (!user || user.role !== "admin-direksi") return <Navigate to="/" replace />;
@@ -389,7 +389,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                                 <option key={index} value={item.text}>{item.text}</option>
                             ))}
                         </FormSelect>
-
                         <FormSelect disabled={isDisabled} value={projectIdentityForm.kategori} name="kategori" onChange={handleChangeForm} title="Kategori Proyek">
                             {projectCategory.map((item, index) => (
                                 <option key={index} value={item.text}>{item.text}</option>
@@ -401,76 +400,48 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
 
                     <SectionHeader icon={<MapPinIcon size={18} />} title="Lokasi & Koordinat Proyek" />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-                        <div className="flex flex-col gap-6">
-                            <FormInput disabled={true} value={projectIdentityForm.provinsi} name="provinsi" onChange={handleChangeForm} title="Provinsi" placeholder="Masukkan provinsi" />
-                            <FormInput disabled={true} value={projectIdentityForm.kabupaten} name="kabupaten" onChange={handleChangeForm} title="Kabupaten/Kota" placeholder="Masukkan kabupaten/kota" />
-                            <FormSelect
-                                disabled={isDisabled}
-                                value={projectIdentityForm.kecamatan}
-                                name="kecamatan"
-                                title="Kecamatan"
-                                onChange={(e) => {
-                                    handleChangeForm(e);
-                                    const selected = kecamatanData.find(item => item.name === e.target.value);
-                                    setSelectedKecamatamCode(String(selected?.code));
-                                    setProjectIdentityForm(prev => ({ ...prev, kelurahan: "", kecamatan_kode: String(selected?.code) }));
-                                    setCoords(null);
-                                }}
-                            >
-                                {kecamatanData.map((item, index) => (
-                                    <option key={index} value={item.name}>{item.name}</option>
-                                ))}
-                            </FormSelect>
-                            <FormSelect disabled={isDisabled} value={projectIdentityForm.kelurahan} name="kelurahan" onChange={handleChangeForm} title="Desa / Kelurahan">
-                                {kelurahanData.map((item, index) => (
-                                    <option key={index} value={item.name}>{item.name}</option>
-                                ))}
-                            </FormSelect>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <p className="font-poppins-semibold text-[14px]">
-                                Peta Lokasi (Google Maps) <span className="text-primary">*</span>
-                            </p>
-                            <div className="border border-gray-200 rounded-xl overflow-hidden">
-                                <div className="relative w-full h-64 bg-gray-100">
-                                    {geocoding && (
-                                        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 rounded-xl">
-                                            <p className="text-sm text-gray-500 font-poppins-regular">Mencari lokasi...</p>
-                                        </div>
-                                    )}
-                                    <GoogleMapPicker coords={coords} label={mapLabel} />
+                    {locations.length > 0 ? (
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Navigation size={14} className="text-primary" />
+                                    <p className="font-poppins-semibold text-[13px] text-gray-600">
+                                        Daftar Titik Lokasi
+                                    </p>
                                 </div>
-                                <div className="grid grid-cols-2 border-t border-gray-200">
-                                    <div className="flex flex-col p-4 border-r border-gray-200">
-                                        <span className="text-xs font-poppins-medium text-gray-400">Latitude</span>
-                                        <span className={`font-poppins-semibold text-sm mt-1 ${coords ? "text-primary" : "text-gray-300"}`}>
-                                            {coords ? coords.lat.toFixed(6) : "0.000000"}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col p-4">
-                                        <span className="text-xs font-poppins-medium text-gray-400">Longitude</span>
-                                        <span className={`font-poppins-semibold text-sm mt-1 ${coords ? "text-primary" : "text-gray-300"}`}>
-                                            {coords ? coords.lng.toFixed(6) : "0.000000"}
-                                        </span>
-                                    </div>
+                                <div className="flex items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1">
+                                    <MapPinIcon size={11} className="text-gray-500" />
+                                    <span className="font-poppins-semibold text-[11px] text-gray-500">
+                                        {locations.length} titik lokasi
+                                    </span>
                                 </div>
                             </div>
-                            {!isDisabled && !geocoding && coords && (
-                                <p className="text-xs font-poppins-regular text-green-500 flex items-center gap-1">
-                                    <MapPinIcon size={11} />
-                                    Koordinat otomatis terdeteksi dari wilayah yang dipilih
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {locations.map((loc, index) => (
+                                    <ReadOnlyLocationCard
+                                        key={loc.id}
+                                        location={loc}
+                                        index={index}
+                                    />
+                                ))}
+                            </div>
+
+                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
+                                <MapPinIcon size={14} className="text-amber-500 shrink-0" />
+                                <p className="font-poppins-regular text-[12px] text-amber-600">
+                                    Data lokasi tidak dapat diubah atau dihapus melalui halaman ini.
                                 </p>
-                            )}
-                            {!isDisabled && !geocoding && !coords && (
-                                <p className="text-xs font-poppins-regular text-gray-400 flex items-center gap-1">
-                                    <MapPinIcon size={11} />
-                                    Pilih Kecamatan dan Desa/Kelurahan untuk memperbarui koordinat
-                                </p>
-                            )}
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-12 gap-3 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center">
+                                <MapPinIcon size={28} className="text-gray-300" />
+                            </div>
+                            <p className="font-poppins-medium text-gray-400 text-[14px]">Belum ada data lokasi</p>
+                        </div>
+                    )}
 
                     <div className="h-px bg-linear-to-r from-transparent via-gray-200 to-transparent mt-8" />
 
@@ -489,7 +460,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                                     </button>
                                 ))}
                             </div>
-
                             {!isDisabled && (
                                 <button
                                     onClick={() => setShowModalPhoto(true)}
@@ -521,7 +491,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             />
                                         </a>
-
                                         {!isDisabled && (
                                             <button
                                                 onClick={() => handleProjectIdentityPhotoDelete(item.id)}
@@ -530,13 +499,11 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                                                 <Trash2 size={13} />
                                             </button>
                                         )}
-
                                         <div className="bg-white px-3 py-2.5">
                                             <p className="text-[12px] font-poppins-medium text-gray-700 line-clamp-2">{item.title}</p>
                                         </div>
                                     </div>
                                 ))}
-
                                 {!isDisabled && (
                                     <button
                                         onClick={() => setShowModalPhoto(true)}
@@ -599,7 +566,6 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                                     Addendum kontrak, jaminan pelaksanaan, jaminan pemeliharaan, dsb.
                                 </p>
                             </div>
-
                             {!isDisabled && (
                                 <button
                                     onClick={() => setShowModalDocument(true)}
@@ -652,19 +618,17 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
                     />
 
                     <div className="flex flex-col gap-4">
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <div className="relative flex-1">
-                                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                <input
-                                    type="text"
-                                    value={pengaduanSearch}
-                                    onChange={(e) => setPengaduanSearch(e.target.value)}
-                                    placeholder="Cari laporan..."
-                                    className="w-full pl-9 pr-4 py-2.5 text-[13px] font-poppins-regular border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors duration-200"
-                                />
-                            </div>
+                        <div className="relative flex-1">
+                            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input
+                                type="text"
+                                value={pengaduanSearch}
+                                onChange={(e) => setPengaduanSearch(e.target.value)}
+                                placeholder="Cari laporan..."
+                                className="w-full pl-9 pr-4 py-2.5 text-[13px] font-poppins-regular border border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors duration-200"
+                            />
                         </div>
 
                         {proyekPengaduan.length > 0 ? (
@@ -689,7 +653,7 @@ export default function AdminDireksiIdentitasProyekUpdateView() {
 
                     {!isDisabled && (
                         <div className="mt-8">
-                            <SubmitButton text="Ubah Identitas Proyek" onClick={() => handleProjectIdentityPut(coords)} />
+                            <SubmitButton text="Ubah Identitas Proyek" onClick={() => handleProjectIdentityPut()} />
                         </div>
                     )}
                 </div>

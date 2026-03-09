@@ -12,6 +12,7 @@ import BackButton from "../../../ui/BackButton";
 import AdminDireksiTambahDokumentasiModal from "../modal/AdminDireksiTambahDokumentasiModal";
 import FormInput from "../../../ui/FormInput";
 import ShowTableForm from "../../../ui/ShowTableForm";
+import MapsShow from "../../../components/maps/MapsShow";
 
 type PhotoType = "start" | "progres" | "end";
 
@@ -150,7 +151,11 @@ export default function AdminDireksiDokumentasiUpdateView() {
 
           <div className="flex flex-col gap-4 mb-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-poppins-regular">
-              <ShowTableForm disabled={true} tenderCode={`TND-0${projectIdentityByIdData?.id}`} onClick={() => false} />
+              <ShowTableForm 
+                disabled={true} 
+                tenderCode={`TND-0${projectIdentityByIdData?.id}`} 
+                onClick={() => false} 
+              />
 
               <FormInput
                 title='Nama Proyek'
@@ -173,6 +178,10 @@ export default function AdminDireksiDokumentasiUpdateView() {
                 disabled={true}
               />
 
+              <div className="grid col-span-2">
+                <MapsShow data={projectIdentityByIdData.locations} />
+              </div>
+
               <FormInput
                 title='Kontraktor Pelaksana'
                 placeholder='Masukkan kontrator pelaksana (otomatis)'
@@ -184,13 +193,6 @@ export default function AdminDireksiDokumentasiUpdateView() {
                 title='Konsultas Pengawas'
                 placeholder='Masukkan konsultas pengawas (otomatis)'
                 value={projectIdentityByIdData?.konsultas_pengawas}
-                disabled={true}
-              />
-
-              <FormInput
-                title='Lokasi'
-                placeholder='Masukkan lokasi (otomatis)'
-                value={projectIdentityByIdData?.kecamatan}
                 disabled={true}
               />
 
@@ -212,8 +214,8 @@ export default function AdminDireksiDokumentasiUpdateView() {
                     key={tab}
                     onClick={() => setSelectedPhoto(tab)}
                     className={`flex items-center gap-2 font-poppins-semibold text-[13px] px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg transition-all duration-300 cursor-pointer ${isActive
-                        ? `bg-linear-to-r ${tabConfig[tab].color} text-white shadow-sm`
-                        : "text-gray-500 hover:text-gray-700 hover:bg-white/60"
+                      ? `bg-linear-to-r ${tabConfig[tab].color} text-white shadow-sm`
+                      : "text-gray-500 hover:text-gray-700 hover:bg-white/60"
                       }`}
                   >
                     {tabConfig[tab].icon}

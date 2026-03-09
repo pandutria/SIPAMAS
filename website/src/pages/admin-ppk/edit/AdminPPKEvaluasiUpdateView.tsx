@@ -6,17 +6,21 @@ import FormInput from "../../../ui/FormInput";
 import ShowTableForm from "../../../ui/ShowTableForm";
 import { useEffect, useState } from "react";
 import useEvaluasiHooks from "../../../hooks/EvaluasiHooks";
+import SubmitButton from "../../../ui/SubmitButton";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../../ui/LoadingSpinner";
 import { SortDescById } from "../../../utils/SortDescById";
+import MapsShow from "../../../components/maps/MapsShow";
 
 export default function AdminPPKEvaluasiUpdateView() {
     const { projectIdentityByIdData, setSelectedProjectIdentityId } = useProjectIdentity();
     const {
         evaluasiForm,
         handleChangeForm,
+        handleEvaluasiPost,
         evaluasiData,
         setEvaluasiForm,
+        handleEvaluasiDelete
     } = useEvaluasiHooks();
     const { id } = useParams();
     const [evaluasiDataFilter, setEvaluasiDataFilter] = useState<EvaluasiProps[]>([]);
@@ -139,6 +143,10 @@ export default function AdminPPKEvaluasiUpdateView() {
                                     disabled={true}
                                 />
 
+                                <div className="grid col-span-2">
+                                    <MapsShow data={projectIdentityByIdData!.locations} />
+                                </div>
+
                                 <FormInput
                                     title='Kontraktor Pelaksana'
                                     placeholder='Masukkan kontrator pelaksana (otomatis)'
@@ -150,13 +158,6 @@ export default function AdminPPKEvaluasiUpdateView() {
                                     title='Konsultas Pengawas'
                                     placeholder='Masukkan konsultas pengawas (otomatis)'
                                     value={projectIdentityByIdData?.konsultas_pengawas}
-                                    disabled={true}
-                                />
-
-                                <FormInput
-                                    title='Lokasi'
-                                    placeholder='Masukkan lokasi (otomatis)'
-                                    value={projectIdentityByIdData?.kecamatan}
                                     disabled={true}
                                 />
 
@@ -205,12 +206,19 @@ export default function AdminPPKEvaluasiUpdateView() {
                                             </div>
 
                                             <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSkorChange(skorValue - 1)}
+                                                    className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-poppins-bold text-gray-500 hover:border-primary hover:text-primary transition-all duration-200 shadow-sm hover:shadow-md text-lg"
+                                                >
+                                                    −
+                                                </button>
+
                                                 <input
                                                     type="number"
                                                     min={1}
                                                     max={100}
                                                     value={skorInput}
-                                                    disabled={true}
                                                     onChange={(e) => {
                                                         setSkorInput(e.target.value);
                                                         const val = Number(e.target.value);
@@ -223,6 +231,14 @@ export default function AdminPPKEvaluasiUpdateView() {
                                                     }}
                                                     className="w-16 h-9 text-center rounded-xl border border-gray-200 bg-white font-poppins-semibold text-sm focus:outline-none focus:border-primary transition-all duration-200 shadow-sm"
                                                 />
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSkorChange(skorValue + 1)}
+                                                    className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-poppins-bold text-gray-500 hover:border-primary hover:text-primary transition-all duration-200 shadow-sm hover:shadow-md text-lg"
+                                                >
+                                                    +
+                                                </button>
                                             </div>
                                         </div>
 
@@ -257,6 +273,12 @@ export default function AdminPPKEvaluasiUpdateView() {
                                     </div>
                                 </div>
                             </div>
+
+                            {evaluasiDataCurrent ? (
+                                <SubmitButton text="Batalkan Evaluasi" onClick={() => handleEvaluasiDelete(Number(evaluasiDataCurrent.id))} />
+                            ) : (
+                                <SubmitButton text="Simpan" onClick={() => handleEvaluasiPost(Number(realizationId))} />
+                            )}
                         </div>
                     </div>
 
