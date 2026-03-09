@@ -19,6 +19,7 @@ func GetAllPengaduan(c *gin.Context) {
 	if err := query.
 		Preload("CreatedBy").
 		Preload("IdentitasProyek").
+		Preload("IdentitasProyek.Locations").
 		Preload("IdentitasProyek.Photos").
 		Preload("IdentitasProyek.Documents").
 		Preload("Medias").
@@ -48,6 +49,7 @@ func GetPengaduanById(c *gin.Context) {
 		Preload("CreatedBy").
 		Preload("Medias").
 		Preload("IdentitasProyek").
+		Preload("IdentitasProyek.Locations").
 		Preload("IdentitasProyek.Photos").
 		Preload("IdentitasProyek.Documents").
 		Preload("Timelines").

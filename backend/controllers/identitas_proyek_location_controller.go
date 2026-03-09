@@ -87,7 +87,7 @@ func DeleteIdentitasProyekLocation(c *gin.Context) {
 
 	if err := query.First(&data, id).Error; err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{
-			"message": "Menghapus data gagal",
+			"message": "Menghapus data gagall",
 			"error":   err.Error(),
 		})
 		return
