@@ -86,7 +86,6 @@ export default function SearchData({ setSelectedRealization }: searchDataProps) 
             setIsSearching(false);
         }, 500);
     };
-    console.log(window.scrollY)
 
     const renderDropdown = (
         id: string,
