@@ -316,30 +316,36 @@ func DeleteIdentitas(c *gin.Context) {
 		return
 	}
 
-	if err := query.Delete(&location).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
+	if len(location) > 0 {
+		if err := query.Delete(&location).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
 	}
 
-	if err := query.Delete(&document).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
+	if len(document) > 0 {
+		if err := query.Delete(&document).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
 	}
 
-	if err := query.Delete(&photo).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
+	if len(photo) > 0 {
+		if err := query.Delete(&photo).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Menghapus data gagal",
+				"error":   err.Error(),
+			})
+			return
+		}
 	}
-
+	
 	if err := query.Delete(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
