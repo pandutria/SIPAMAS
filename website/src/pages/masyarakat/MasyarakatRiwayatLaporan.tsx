@@ -120,7 +120,7 @@ export default function MasyarakatRiwayatLaporan() {
   const filters: ("Semua" | StatusType)[] = ["Semua", "Menunggu", "Diterima", "Diproses", "Selesai"];
 
   useEffect(() => {
-    const filtered = pengaduanData?.filter((item) => item.created_by?.fullname === user?.fullname) ?? [];
+    const filtered = pengaduanData?.filter((item) => item.created_by?.id === user?.id) ?? [];
     setPengaduanDataFilter(filtered);
   }, [pengaduanData, user]);
 

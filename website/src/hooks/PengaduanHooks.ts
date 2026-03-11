@@ -37,7 +37,7 @@ export default function usePengaduanHooks() {
                 const mappingData = data?.map((item: PengaduanProps) => ({
                     ...item,
                     nama: item.created_by!.fullname,
-                    kontak: item?.created_by!.phone_number,
+                    kontak: item?.created_by!.phone_number ?? "-",
                 }))
 
                 setPengaduanData(SortDescById(mappingData || []))
@@ -163,13 +163,13 @@ export default function usePengaduanHooks() {
         }
     }
 
-    const handlePengaduanSetProjectIdentity = async () => {
+    const handlePengaduanSetProjectIdentity = async (id: number) => {
         try {
             SwalLoading();
             const formData = new FormData();
             formData.append("identitas_proyek_id", String(projectIdentityForm));
 
-            const response = await API.put(`/pengaduan/update/identitas/${projectIdentityForm}`, formData, {
+            const response = await API.put(`/pengaduan/update/identitas/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
