@@ -74,10 +74,10 @@ function ClickableMap({ pendingCoords, onMapClick }: ClickableMapProps) {
 
     const customMarkerIcon: google.maps.Icon | undefined = isLoaded
         ? {
-              url: maps,
-              scaledSize: new window.google.maps.Size(40, 40),
-              anchor: new window.google.maps.Point(20, 40),
-          }
+            url: maps,
+            scaledSize: new window.google.maps.Size(40, 40),
+            anchor: new window.google.maps.Point(20, 40),
+        }
         : undefined;
 
     const onAutocompleteLoad = (ac: google.maps.places.Autocomplete) => {
@@ -196,10 +196,10 @@ function MiniMap({ coords, label }: MiniMapProps) {
 
     const customMarkerIcon: google.maps.Icon | undefined = isLoaded
         ? {
-              url: maps,
-              scaledSize: new window.google.maps.Size(30, 30),
-              anchor: new window.google.maps.Point(15, 30),
-          }
+            url: maps,
+            scaledSize: new window.google.maps.Size(30, 30),
+            anchor: new window.google.maps.Point(15, 30),
+        }
         : undefined;
 
     if (!isLoaded) return <div className="w-full h-full bg-gray-100 animate-pulse" />;
@@ -416,6 +416,13 @@ export default function AdminDireksiIdentitasProyekAdd() {
             setLocations(prev => prev.filter((_, i) => i !== index));
             setRemovingIndex(null);
         }, 400);
+    };
+
+    const handleRemovePhoto = (type: PhotoType, index: number) => {
+        setPhotoData(prev => ({
+            ...prev,
+            [type]: prev[type].filter((_, i) => i !== index),
+        }));
     };
 
     const handleDeleteDocument = () => {
@@ -647,11 +654,10 @@ export default function AdminDireksiIdentitasProyekAdd() {
                                     <button
                                         key={tab}
                                         onClick={() => setSelectedPhoto(tab)}
-                                        className={`font-poppins-semibold transition-all duration-300 flex-1 sm:flex-none px-4 py-2 cursor-pointer rounded-lg text-[13px] sm:text-[14px] ${
-                                            selectedPhoto === tab
-                                                ? "text-white bg-linear-to-r from-primary to-secondary shadow-sm"
-                                                : "text-gray-500 hover:text-gray-700"
-                                        }`}
+                                        className={`font-poppins-semibold transition-all duration-300 flex-1 sm:flex-none px-4 py-2 cursor-pointer rounded-lg text-[13px] sm:text-[14px] ${selectedPhoto === tab
+                                            ? "text-white bg-linear-to-r from-primary to-secondary shadow-sm"
+                                            : "text-gray-500 hover:text-gray-700"
+                                            }`}
                                     >
                                         {tab === "start" ? "Foto Lokasi Awal" : "Foto Lokasi Akhir"}
                                     </button>
@@ -675,6 +681,12 @@ export default function AdminDireksiIdentitasProyekAdd() {
                                         data-aos-delay={index * 50}
                                         className="group rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
                                     >
+                                        <button
+                                            onClick={() => handleRemovePhoto(selectedPhoto, index)}
+                                            className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-200 hover:bg-red-600"
+                                        >
+                                            <X size={12} />
+                                        </button>
                                         <div className="overflow-hidden h-36 sm:h-40">
                                             <img src={item.photo_file} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                         </div>
