@@ -131,11 +131,65 @@ export default function useProjectIdentity() {
 
     const handleProjectIdentityPost = async (photosData: any, documentsData: ProjectIdentityDocumentProps[], locations: ProjectIdentityLocationProps[]) => {
         try {
-            if (photosData.start.length == 0 || locations.length == 0|| documentsData.length == 0) {
+            if (photosData.start.length == 0 || locations.length == 0 || documentsData.length == 0) {
                 SwalMessage({
                     type: "error",
                     title: "Gagal!",
                     text: "Data wajib diiisi!"
+                });
+
+                return;
+            }
+
+            const isFilled = (val: any) => {
+                if (val instanceof File) return true;
+                return val !== undefined && val !== null && String(val).trim() !== "";
+            };
+
+            const validateObjects = (data: any[], fields: string[]) => {
+                return data.every((item) =>
+                    fields.every((field) => isFilled(item[field]))
+                );
+            };
+
+            const locationRequiredFields = [
+                "alamat",
+                "provinsi",
+                "kabupaten",
+                "kecamatan",
+                "kelurahan",
+                "latitude",
+                "longitude",
+            ];
+
+            const photoRequiredFields = [
+                "title",
+                "type",
+                "photo_file",
+            ];
+
+            const documentRequiredFields = [
+                "name",
+                "kategori",
+                "photo_file",
+            ];
+
+            const isLocationValid = validateObjects(locations, locationRequiredFields);
+            const isPhotoValid = validateObjects(photosData.start, photoRequiredFields);
+            const isDocumentValid = validateObjects(documentsData, documentRequiredFields);
+
+            if (
+                locations.length === 0 ||
+                photosData.start.length === 0 ||
+                documentsData.length === 0 ||
+                !isLocationValid ||
+                !isPhotoValid ||
+                !isDocumentValid
+            ) {
+                SwalMessage({
+                    type: "error",
+                    title: "Gagal!",
+                    text: "Semua field wajib diisi!",
                 });
 
                 return;
