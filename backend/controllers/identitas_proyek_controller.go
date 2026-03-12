@@ -257,18 +257,15 @@ func DeleteIdentitas(c *gin.Context) {
 
 	var data models.IdentitasProyek
 	if err := query.First(&data, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Data tidak ditemukan",
 			"error":   err.Error(),
 		})
-
 		return
 	}
 
 	var rab []models.RabHeader
-	if err := query.
-		Where("identitas_proyek_id = ?", data.ID).
-		Find(&rab).Error; err != nil {
+	if err := query.Where("identitas_proyek_id = ?", data.ID).Find(&rab).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
 			"error":   err.Error(),
@@ -277,75 +274,16 @@ func DeleteIdentitas(c *gin.Context) {
 	}
 
 	if len(rab) > 0 {
-		c.JSON(http.StatusBadGateway, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Paket Pekerjaan Konstruksi sudah di-assign ke user PPK",
 		})
 		return
 	}
 
-	var location []models.IdentitasProyekLocation
-	if err := query.
-		Where("identitas_proyek_id = ?", data.ID).
-		Find(&location).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
-	}
+	query.Where("identitas_proyek_id = ?", data.ID).Delete(&models.IdentitasProyekLocation{})
+	query.Where("identitas_proyek_id = ?", data.ID).Delete(&models.IdentitasProyekDocument{})
+	query.Where("identitas_proyek_id = ?", data.ID).Delete(&models.IdentitasProyekPhoto{})
 
-	var photo []models.IdentitasProyekPhoto
-	if err := query.
-		Where("identitas_proyek_id = ?", data.ID).
-		Find(&photo).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
-	}
-
-	var document []models.IdentitasProyekDocument
-	if err := query.
-		Where("identitas_proyek_id = ?", data.ID).
-		Find(&document).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Menghapus data gagal",
-			"error":   err.Error(),
-		})
-		return
-	}
-
-	if len(location) > 0 {
-		if err := query.Delete(&location).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Menghapus data gagal",
-				"error":   err.Error(),
-			})
-			return
-		}
-	}
-
-	if len(document) > 0 {
-		if err := query.Delete(&document).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Menghapus data gagal",
-				"error":   err.Error(),
-			})
-			return
-		}
-	}
-
-	if len(photo) > 0 {
-		if err := query.Delete(&photo).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Menghapus data gagal",
-				"error":   err.Error(),
-			})
-			return
-		}
-	}
-	
 	if err := query.Delete(&data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Menghapus data gagal",
