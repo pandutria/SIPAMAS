@@ -84,7 +84,7 @@ class SearchActivity : AppCompatActivity() {
 
                 is State.Success -> {
                     binding.pbLoading.visibility = View.GONE
-                    allData = state.data.filter { x -> x.created_by?.ID == auth?.ID }
+                    allData = state.data.filter { x -> x.created_by?.id == auth?.id }
                     
                     if (allData.isEmpty()) {
                         binding.tvEmpty.visibility = View.VISIBLE

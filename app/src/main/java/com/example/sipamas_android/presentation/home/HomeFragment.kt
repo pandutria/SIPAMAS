@@ -12,6 +12,7 @@ import com.example.sipamas_android.data.local.AuthManager
 import com.example.sipamas_android.data.local.PrivacyManager
 import com.example.sipamas_android.data.local.TokenManager
 import com.example.sipamas_android.data.model.Pengaduan
+import com.example.sipamas_android.data.model.User
 import com.example.sipamas_android.data.remote.RetrofitInstance
 import com.example.sipamas_android.data.repository.AuthRepository
 import com.example.sipamas_android.data.repository.PengaduanRepository
@@ -30,7 +31,8 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: PengaduanAdapter
-    private var data: List<Pengaduan> = mutableListOf()
+    private var allData: List<Pengaduan> = listOf()
+    private var auth: User? = null
 
     private val viewModel: HomeViewModel by viewModels {
         HomeViewModelFactory(PengaduanRepository(), AuthRepository())
@@ -47,15 +49,14 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val auth = AuthManager(requireContext()).get()
-        val privacyManager = PrivacyManager(requireContext())
-        
-        binding.tvFullname.text = auth?.fullname ?: "Masyarakat"
+        setupUI()
+        observeViewModel()
+        refreshData()
+    }
 
-        binding.ivProfile.setOnClickListener {
-            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavbar)
-            bottomNav.selectedItemId = R.id.profileMenu
-        }
+    private fun setupUI() {
+        auth = AuthManager(requireContext()).get()
+        binding.tvFullname.text = auth?.fullname ?: "Masyarakat"
 
         adapter = PengaduanAdapter { data ->
             val bundle = Bundle().apply {
@@ -66,8 +67,12 @@ class HomeFragment : Fragment() {
 
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.getPengaduan(requireContext())
-            viewModel.getMe(requireContext())
+            refreshData()
+        }
+
+        binding.ivProfile.setOnClickListener {
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavbar)
+            bottomNav.selectedItemId = R.id.profileMenu
         }
 
         binding.etSearch.setOnClickListener {
@@ -81,111 +86,111 @@ class HomeFragment : Fragment() {
         }
 
         binding.layoutCamera.setOnClickListener {
-            if (privacyManager.isCameraEnabled()) {
+            if (PrivacyManager(requireContext()).isCameraEnabled()) {
                 val bundle = Bundle().apply {
                     putBoolean("useCamera", true)
                 }
                 IntenHelper.navigate(requireActivity(), PengaduanMediaActivity::class.java, bundle)
             } else {
-                Toasthelper.show(requireContext(), "Akses kamera dinonaktifkan. Silakan aktifkan di Pengaturan Privasi.")
+                Toasthelper.show(requireContext(), "Akses kamera dinonaktifkan di Pengaturan Privasi.")
             }
         }
 
         binding.btnBuatLaporan.setOnClickListener {
             IntenHelper.navigate(requireActivity(), PengaduanMediaActivity::class.java)
         }
+    }
 
+    private fun refreshData() {
         viewModel.getPengaduan(requireContext())
         viewModel.getMe(requireContext())
-        
-        observeViewModel()
     }
 
     private fun observeViewModel() {
-        val authManager = AuthManager(requireContext())
-        
         viewModel.meState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is State.Loading -> { }
                 is State.Success -> {
-                    val user = state.data
-                    binding.tvFullname.text = user.fullname ?: "Masyarakat"
-
-                    if (!user.profile_photo.isNullOrEmpty()) {
-                        val baseUrl = RetrofitInstance.baseUrl.replace("api/", "")
-                        val cleanPath = user.profile_photo.replace("\\", "/")
-                        val imageUrl = if (cleanPath.startsWith("/")) {
-                            baseUrl.removeSuffix("/") + cleanPath
-                        } else {
-                            baseUrl + cleanPath
-                        }
-
-                        Glide.with(this)
-                            .load(imageUrl)
-                            .placeholder(R.drawable.example_user)
-                            .error(R.drawable.example_user)
-                            .into(binding.ivProfile)
-                    } else {
-                        binding.ivProfile.setImageResource(R.drawable.example_user)
-                    }
-
-                    authManager.save(user)
+                    auth = state.data
+                    AuthManager(requireContext()).save(state.data)
+                    updateProfileUI(state.data)
+                    if (allData.isNotEmpty()) filterAndDisplay(allData)
                 }
-                is State.Error -> {
-                    // Fail silently or show minor toast for profile refresh
-                }
+                is State.Error -> handleAuthError()
+                else -> {}
             }
         }
 
         viewModel.getState.observe(viewLifecycleOwner) { state ->
-            val auth = authManager.get()
             when (state) {
-                is State.Loading -> {
-                    if (!binding.swipeRefresh.isRefreshing) {
-                        binding.tvTotalPengaduan.text = "0"
-                        binding.tvPengaduanProses.text = "0"
-                        binding.tvPengaduanSelesai.text = "0"
-                        binding.pbLoading.visibility = View.VISIBLE
-                        binding.rvPengaduan.visibility = View.GONE
-                        binding.tvEmpty.visibility = View.GONE
-                    }
-                }
-
+                is State.Loading -> showLoading(true)
                 is State.Success -> {
-                    binding.pbLoading.visibility = View.GONE
-                    binding.swipeRefresh.isRefreshing = false
-
-                    if (state.data.isEmpty()) {
-                        binding.tvEmpty.visibility = View.VISIBLE
-                        return@observe
-                    }
-
-                    data = state.data.filter { x -> x.created_by?.ID == auth?.ID }
-                    adapter.setData(data)
-
-                    binding.rvPengaduan.adapter = adapter
-                    binding.rvPengaduan.visibility = View.VISIBLE
-
-                    binding.tvTotalPengaduan.text = data.count().toString()
-                    binding.tvPengaduanProses.text =
-                        data.filter { x -> x.status == "Diproses" }.count().toString()
-                    binding.tvPengaduanSelesai.text =
-                        data.filter { x -> x.status == "Selesai" }.count().toString()
+                    showLoading(false)
+                    allData = state.data
+                    filterAndDisplay(allData)
                 }
-
-                is State.Error -> {
-                    binding.swipeRefresh.isRefreshing = false
-                    binding.pbLoading.visibility = View.GONE
-                    TokenManager(requireContext()).removeToken()
-                    requireActivity().finishAffinity()
-                }
-
-                else -> {
-                    binding.swipeRefresh.isRefreshing = false
-                    binding.pbLoading.visibility = View.GONE
-                }
+                is State.Error -> handleAuthError()
+                else -> showLoading(false)
             }
         }
+    }
+
+    private fun filterAndDisplay(list: List<Pengaduan>) {
+        val currentUserId = auth?.id ?: return
+        
+        val filtered = list.filter { 
+            it.created_by_id == currentUserId || it.created_by?.id == currentUserId
+        }
+
+        if (filtered.isEmpty()) {
+            binding.rvPengaduan.visibility = View.GONE
+            binding.tvEmpty.visibility = View.VISIBLE
+        } else {
+            binding.rvPengaduan.visibility = View.VISIBLE
+            binding.tvEmpty.visibility = View.GONE
+            adapter.setData(filtered)
+            binding.rvPengaduan.adapter = adapter
+        }
+
+        updateStats(filtered)
+    }
+
+    private fun updateStats(filteredList: List<Pengaduan>) {
+        binding.tvTotalPengaduan.text = filteredList.size.toString()
+        binding.tvPengaduanProses.text = filteredList.count { it.status?.lowercase() == "diproses" }.toString()
+        binding.tvPengaduanSelesai.text = filteredList.count { it.status?.lowercase() == "selesai" }.toString()
+    }
+
+    private fun updateProfileUI(user: User) {
+        binding.tvFullname.text = user.fullname ?: "Masyarakat"
+        if (!user.profile_photo.isNullOrEmpty()) {
+            val baseUrl = RetrofitInstance.baseUrl.replace("api/", "")
+            val cleanPath = user.profile_photo.replace("\\", "/")
+            val imageUrl = if (cleanPath.startsWith("/")) {
+                baseUrl.removeSuffix("/") + cleanPath
+            } else {
+                baseUrl + cleanPath
+            }
+
+            Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.example_user)
+                .error(R.drawable.example_user)
+                .into(binding.ivProfile)
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        if (!binding.swipeRefresh.isRefreshing) {
+            binding.pbLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+        if (!isLoading) binding.swipeRefresh.isRefreshing = false
+    }
+
+    private fun handleAuthError() {
+        TokenManager(requireContext()).removeToken()
+        AuthManager(requireContext()).remove()
+        requireActivity().finishAffinity()
+        Toasthelper.show(requireContext(), "Sesi berakhir, silakan login kembali")
     }
 
     override fun onDestroyView() {

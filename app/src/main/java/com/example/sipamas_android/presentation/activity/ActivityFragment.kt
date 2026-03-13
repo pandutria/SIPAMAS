@@ -76,8 +76,7 @@ class ActivityFragment : Fragment() {
                 }
                 is State.Success -> {
                     binding.pbLoading.visibility = View.GONE
-                    // Filter data hanya milik user yang sedang login
-                    allData = state.data.filter { it.created_by?.ID == auth?.ID }
+                    allData = state.data.filter { it.created_by?.id == auth?.id }
                     
                     if (allData.isEmpty()) {
                         binding.tvEmpty.visibility = View.VISIBLE

@@ -50,8 +50,8 @@ class LoginActivity : AppCompatActivity() {
             IntenHelper.navigate(this, RegisterActivity::class.java)
         }
 
-        binding.etEmail.setText("masyarakat@gmail.com")
-        binding.etPassword.setText("Masyarakat123$")
+//        binding.etEmail.setText("masyarakat@gmail.com")
+//        binding.etPassword.setText("Masyarakat123$")
 
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString()

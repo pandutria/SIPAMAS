@@ -8,6 +8,7 @@ import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -246,7 +247,11 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun uriToFile(uri: Uri): File {
-        val myFile = File.createTempFile("temp_media", null, cacheDir)
+        val fileName = getFileName(uri) ?: "temp_media"
+        val extension = fileName.substringAfterLast(".", "tmp")
+        val prefix = fileName.substringBeforeLast(".", "temp_media")
+        
+        val myFile = File.createTempFile(prefix, ".$extension", cacheDir)
         val inputStream = contentResolver.openInputStream(uri)
         val outputStream = FileOutputStream(myFile)
         val buffer = ByteArray(1024)
@@ -258,6 +263,27 @@ class PengaduanActivity : AppCompatActivity(), OnMapReadyCallback {
         outputStream.close()
         inputStream?.close()
         return myFile
+    }
+
+    @SuppressLint("Range")
+    private fun getFileName(uri: Uri): String? {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor = contentResolver.query(uri, null, null, null, null)
+            cursor.use {
+                if (it != null && it.moveToFirst()) {
+                    result = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result?.lastIndexOf('/')
+            if (cut != -1) {
+                result = result?.substring(cut!! + 1)
+            }
+        }
+        return result
     }
 
     private fun checkLocationPermission() {

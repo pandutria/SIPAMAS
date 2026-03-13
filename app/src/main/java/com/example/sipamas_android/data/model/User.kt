@@ -1,7 +1,7 @@
 package com.example.sipamas_android.data.model
 
 data class User(
-    val ID: Int? = null,
+    val id: Int? = null,
     val fullname: String? = null,
     val email: String? = null,
     val nik: String? = null,
